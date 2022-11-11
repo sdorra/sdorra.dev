@@ -23,4 +23,6 @@ export const generateStaticParams = async () => {
   }));
 };
 
+export const dynamicParams = false;
+
 export default PostPage;

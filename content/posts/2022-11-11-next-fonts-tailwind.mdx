@@ -1,0 +1,125 @@
+---
+title: Next.js 13 Fonts with Tailwind
+date: 2022-11-11
+summary: How to use Next.js font optimization with tailwind
+---
+
+Next.js 13 introduces a new way to use fonts.
+This new font system will automatically optimize your fonts and
+creates a fallback font which reduces the CLS (cumulative layout shift) to zero!
+
+The font system allows us to import fonts directly from google fonts e.g.:
+
+```tsx
+import { Raleway, Merriweather_Sans } from "@next/font/google";
+```
+
+In this example we use the Raleway and Merriweather Sans font.
+The font system will download the fonts and ship them with our app,
+this removes the extra network request to google, which is good for performance and privacy.
+
+After we have imported the fonts we can create an instance and use it in our jsx e.g.:
+
+```tsx
+const raleway = Raleway();
+
+<h1 className={raleway.className}>Hello Raleway</h1>
+```
+
+But this is not what we like to use in a tailwind project.
+In the next section i will show how to use the new font system with tailwind.
+
+## Complete example with TailwindCSS
+
+First we have to install the `@next/font` package.
+
+<CH.Code>
+
+```bash pnpm
+pnpm add @next/font
+```
+
+```bash yarn
+yarn add @next/font
+```
+
+```bash npm
+npm install @next/font
+```
+
+</CH.Code>
+
+
+In order to import fonts from google we have to specify the subsets of the fonts.
+We can do this on instance creation of every font or we can specify the subsets in the `next.config.js`:
+
+```js next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    appDir: true,
+    fontLoaders: [
+      { loader: "@next/font/google", options: { subsets: ["latin"] } },
+    ],
+  },
+};
+
+module.exports = nextConfig;
+```
+
+After that we import the fonts in our root layout and specify a css variable for each font by using the `variable` attribute.
+Than we can bind those variables to one of our html elements.
+
+```tsx app/layout.tsx
+import { FC, PropsWithChildren } from "react";
+import { Raleway, Merriweather_Sans } from "@next/font/google";
+
+const raleway = Raleway({
+  variable: "--display-font",
+});
+
+const merriweather = Merriweather_Sans({
+  variable: "--body-font",
+});
+
+const RootLayout: FC<PropsWithChildren> = ({ children }) => (
+  <html className={`${raleway.variable} ${merriweather.variable}`}>
+    <body>
+      {children}
+    </body>
+  </html>
+)
+```
+
+Now we can use these variables in our tailwind config to define our font families.
+
+```js tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.tsx",
+    "./pages/**/*.tsx",
+    "./components/**/*.tsx",
+  ],
+  theme: {
+    fontFamily: {
+      "display": "var(--display-font)",
+      "body": "var(--body-font)",
+    },
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+And now we are able to use our fonts with tailwind generated classes e.g.:
+
+```tsx
+<h1 className="font-display">Hello from raleway</h1>
+<p className="font-body">Hello from Merriweather Sans</p>
+```
+
+### More information
+
+* [Next.js font documentation](https://beta.nextjs.org/docs/optimizing/fonts)
+* [Tailwind](https://tailwindcss.com/docs/font-family)

@@ -17,7 +17,7 @@ const PostPage = ({ params }: Props) => {
   return <Post post={post} />;
 };
 
-export const generateStaticParams = () => {
+export const generateStaticParams = async () => {
   return allPosts.map((post) => ({
     slug: post._raw.flattenedPath,
   }));

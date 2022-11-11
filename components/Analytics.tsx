@@ -7,11 +7,11 @@ const Analytics = () => {
   useEffect(() => {
     Fathom.load("XBTBKWMG", {
       includedDomains: ["sdorra.dev"],
+      url: "https://ice-idea.sdorra.dev/script.js",
     });
 
-    const onRouteChange = (e: Event) => {
-      Fathom.trackPageview();
-    };
+    const onRouteChange = () => Fathom.trackPageview();
+
     window.addEventListener("routeChange", onRouteChange);
     return () => window.removeEventListener("routeChange", onRouteChange);
   }, []);

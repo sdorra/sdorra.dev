@@ -10,6 +10,7 @@ specifiers:
   autoprefixer: ^10.4.13
   clsx: ^1.2.1
   contentlayer: ^0.2.9
+  date-fns: ^2.29.3
   esbuild: '0.14'
   eslint: 8.27.0
   eslint-config-next: 13.0.3
@@ -34,6 +35,7 @@ dependencies:
   '@types/react-dom': 18.0.8
   clsx: 1.2.1
   contentlayer: 0.2.9_itfw7u6s7msjk3rlsbqnvaj734
+  date-fns: 2.29.3
   eslint: 8.27.0
   eslint-config-next: 13.0.3_rmayb2veg2btbq6mbmnyivgasy
   fathom-client: 3.5.0
@@ -1295,6 +1297,11 @@ packages:
   /data-uri-to-buffer/4.0.0:
     resolution: {integrity: sha512-Vr3mLBA8qWmcuschSLAOogKgQ/Jwxulv3RNE4FXnYWRGujzrRWQI4m12fQqRkwX06C0KanhLr4hK+GydchZsaA==}
     engines: {node: '>= 12'}
+    dev: false
+
+  /date-fns/2.29.3:
+    resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
+    engines: {node: '>=0.11'}
     dev: false
 
   /debug/2.6.9:

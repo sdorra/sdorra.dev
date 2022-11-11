@@ -1,0 +1,86 @@
+---
+title: Fathom with Next.js 13
+date: 2022-11-11
+summary: This article explains how to use fathom with Next.js 13
+---
+In this article we will explore how to use [fathom analytics](https://usefathom.com/) with the Next.js 13 app directory.
+
+The new app directory of Next.js 13 comes with a lot of exiting new features,
+but the new router (`next/navigation`) unfortunately does not support events.
+
+So we have to track route changes by our self.
+My first idea was to use the history api, but the history api does not send events for route changes!
+
+The last option we have now is to override the pushState method and send an custom event.
+
+```js
+var pushState = history.pushState;
+history.pushState = function (state) {
+  var result = pushState.apply(history, arguments);
+  window.dispatchEvent(new Event("routeChange", state));
+  return result;
+};
+```
+
+The snippet above overrides the `pushState` calls the original function and
+sends an `routeChange` event afterwards.
+
+## Next.js
+
+In Next.js we could use our method with the `Script` tag e.g.:
+
+```tsx app/layout.tsx
+import { FC, PropsWithChildren } from "react";
+import Script from "next/script";
+import Analytics from "./Analytics";
+
+const RootLayout: FC<PropsWithChildren> = ({ children }) => (
+  <html>
+    <body>
+      <main>{children}</main>
+      <Analytics />
+      <Script id="onRouteChange">{`
+        (function (history) {
+          var pushState = history.pushState;
+          history.pushState = function(state){
+            var result = pushState.apply(history, arguments);
+            window.dispatchEvent(new Event("routeChange", state));
+            return result;
+          };
+        })(window.history);
+      `}</Script>
+    </body>
+  </html>
+);
+
+export default RootLayout;
+```
+
+And now we are able to notify fathom about the route changes.
+We do this with a custom component (`Analytics`), which is used in our root layout (see snippet above).
+
+```tsx app/Analytics.tsx
+"use client";
+
+import { useEffect } from "react";
+import * as Fathom from "fathom-client";
+
+const Analytics = () => {
+  useEffect(() => {
+    Fathom.load("YOUR_FATHOM_TRACKING_CODE", {
+      includedDomains: ["yourdomain.com"],
+    });
+
+    const onRouteChange = () => Fathom.trackPageview();
+
+    window.addEventListener("routeChange", onRouteChange);
+    return () => window.removeEventListener("routeChange", onRouteChange);
+  }, []);
+
+  return null;
+};
+
+export default Analytics;
+```
+
+We have to use a custom component instead of hook in order to annotate the component with [use client](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components).

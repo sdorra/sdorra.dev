@@ -4,7 +4,7 @@ import Link from "next/link";
 const Home = () => (
   <main>
     <h1 className="text-6xl font-bold mb-4">sdorra.dev</h1>
-    <p>This is are some of mine notes polished for a blog</p>
+    <p>This are some of my notes polished for a blog</p>
     <h2 className="text-4xl mt-10 mb-4 font-semibold">Posts</h2>
     <ul className="space-y-4">
       {allPosts.map((post) => (

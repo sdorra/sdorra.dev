@@ -5,16 +5,22 @@ import { notFound } from "next/navigation";
 type Props = {
   params: {
     slug: string;
-  }
-}
+  };
+};
 
 const PostPage = ({ params }: Props) => {
-  const post = allPosts.find(p => p._raw.flattenedPath === params.slug);
+  const post = allPosts.find((p) => p._raw.flattenedPath === params.slug);
   if (!post) {
     notFound();
   }
 
-  return <Post post={post} />
-}
+  return <Post post={post} />;
+};
+
+export const generateStaticParams = () => {
+  return allPosts.map((post) => ({
+    slug: post._raw.flattenedPath,
+  }));
+};
 
 export default PostPage;

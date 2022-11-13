@@ -53,7 +53,7 @@ npm install @next/font
 In order to import fonts from google we have to specify the subsets of the fonts.
 We can do this on instance creation of every font or we can specify the subsets in the `next.config.js`:
 
-```js next.config.js
+```js next.config.js focus=5:7
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -70,7 +70,7 @@ module.exports = nextConfig;
 After that we import the fonts in our root layout and specify a css variable for each font by using the `variable` attribute.
 Than we can bind those variables to one of our html elements.
 
-```tsx app/layout.tsx
+```tsx app/layout.tsx focus=2:10,13
 import { FC, PropsWithChildren } from "react";
 import { Raleway, Merriweather_Sans } from "@next/font/google";
 
@@ -93,7 +93,7 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
 
 Now we can use these variables in our tailwind config to define our font families.
 
-```js tailwind.config.js
+```js tailwind.config.js focus=9:12
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [

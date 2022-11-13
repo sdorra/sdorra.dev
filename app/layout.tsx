@@ -2,6 +2,7 @@ import "@code-hike/mdx/dist/index.css";
 import { Cabin, Raleway } from "@next/font/google";
 import clsx from "clsx";
 import Analytics from "components/Analytics";
+import Navigation from "components/Navigation";
 import Link from "next/link";
 import Script from "next/script";
 import { FC, PropsWithChildren } from "react";
@@ -19,13 +20,7 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
     <head></head>
     <body className={clsx("flex h-full flex-col gap-5 p-10 font-body", raleway.variable, merriweather.variable)}>
       <header>
-        <nav>
-          <ul>
-            <li>
-              <Link href="/">Home</Link>
-            </li>
-          </ul>
-        </nav>
+        <Navigation />
       </header>
       <main className="flex-1">{children}</main>
       <footer className="pb-4 text-right">© Sebastian Sdorra</footer>

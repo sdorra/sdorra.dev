@@ -1,5 +1,6 @@
 import { Post as PostType } from "contentlayer/generated";
 import Markdown from "./Markdown";
+import PageTitle from "./PageTitle";
 
 type Props = {
   post: PostType;
@@ -7,7 +8,7 @@ type Props = {
 
 const Post = ({ post }: Props) => (
   <>
-    <h1 className="text-4xl font-bold mb-10">{post.title}</h1>
+    <PageTitle>{post.title}</PageTitle>
     <Markdown code={post.body.code} />
   </>
 );

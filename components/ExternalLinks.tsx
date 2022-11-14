@@ -1,25 +1,38 @@
+import clsx from "clsx";
 import { Rss, Github, Twitter } from "lucide-react";
+import { FC, PropsWithChildren } from "react";
 
 type Props = {
   className?: string;
 };
 
-export const FeedLink = ({ className }: Props) => (
-  <a title="RSS Feed" target="_blank" href="/rss.xml" rel="noreferrer" className={className}>
-    <Rss />
+type ExternalLinkProps = Props & {
+  title: string;
+  href: string;
+};
+
+const ExternalLink: FC<PropsWithChildren<ExternalLinkProps>> = ({ title, href, className, children}) => (
+  <a title={title} target="_blank" href={href} rel="noreferrer" className={clsx("hover:[&>*]:stroke-[3px]", className)}>
+    {children}
   </a>
+);
+
+export const FeedLink = ({ className }: Props) => (
+  <ExternalLink title="RSS Feed" href="/rss.xml" className={className}>
+    <Rss />
+  </ExternalLink>
 );
 
 export const GitHubLink = ({ className }: Props) => (
-  <a title="GitHub" target="_blank" href="https://github.com/sdorra/sdorra.dev" rel="noreferrer" className={className}>
+  <ExternalLink title="GitHub" href="https://github.com/sdorra/sdorra.dev" className={className}>
     <Github />
-  </a>
+  </ExternalLink>
 );
 
 export const TwitterLink = ({ className }: Props) => (
-  <a title="Twitter" target="_blank" href="https://twitter.com/ssdorra" rel="noreferrer" className={className}>
+  <ExternalLink title="Twitter"  href="https://twitter.com/ssdorra" className={className}>
     <Twitter />
-  </a>
+  </ExternalLink>
 );
 
 

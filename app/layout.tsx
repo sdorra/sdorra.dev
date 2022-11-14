@@ -18,7 +18,7 @@ const cabin = Cabin({
 const RootLayout: FC<PropsWithChildren> = ({ children }) => (
   <html lang="en" className="h-full text-zinc-700">
     <head></head>
-    <body className={clsx("flex h-full flex-col gap-5 p-10 font-body", raleway.variable, cabin.variable)}>
+    <body className={clsx("mx-auto flex h-full max-w-3xl flex-col gap-5 py-10 font-body", raleway.variable, cabin.variable)}>
       <header className="relative">
         <Navigation />
         <div className="absolute right-0 top-0 flex gap-2">

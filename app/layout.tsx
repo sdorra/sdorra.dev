@@ -3,7 +3,6 @@ import { Cabin, Raleway } from "@next/font/google";
 import clsx from "clsx";
 import Analytics from "components/Analytics";
 import Navigation from "components/Navigation";
-import Link from "next/link";
 import Script from "next/script";
 import { FC, PropsWithChildren } from "react";
 import "./globals.css";
@@ -11,14 +10,14 @@ import "./globals.css";
 const raleway = Raleway({
   variable: "--display-font",
 });
-const merriweather = Cabin({
+const cabin = Cabin({
   variable: "--body-font",
 });
 
 const RootLayout: FC<PropsWithChildren> = ({ children }) => (
   <html lang="en" className="h-full text-zinc-700">
     <head></head>
-    <body className={clsx("flex h-full flex-col gap-5 p-10 font-body", raleway.variable, merriweather.variable)}>
+    <body className={clsx("flex h-full flex-col gap-5 p-10 font-body", raleway.variable, cabin.variable)}>
       <header>
         <Navigation />
       </header>

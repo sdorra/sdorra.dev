@@ -9,7 +9,7 @@ type Props = {
 const Markdown = ({ code }: Props) => {
   const MDXComponent = useMDXComponent(code);
   return (
-    <section className="prose prose-zinc">
+    <section className="prose prose-zinc dark:prose-invert">
       <MDXComponent />
     </section>
   );

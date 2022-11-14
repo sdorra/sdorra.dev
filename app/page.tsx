@@ -12,10 +12,15 @@ const Home = () => (
         .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
         .map((post) => (
           <article key={post._id}>
-            <Link href={`/posts/${post._raw.flattenedPath}`} className="block rounded-md border p-4 hover:bg-zinc-100">
+            <Link
+              href={`/posts/${post._raw.flattenedPath}`}
+              className="block rounded-md border dark:border-zinc-700 p-4 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+            >
               <h3 className="text-2xl font-semibold">{post.title}</h3>
               <p className="text-lg">{post.summary}</p>
-              <time className="text-xs" dateTime={post.date}>{format(parseISO(post.date), 'yyyy-MM-dd')}</time>
+              <time className="text-xs" dateTime={post.date}>
+                {format(parseISO(post.date), "yyyy-MM-dd")}
+              </time>
             </Link>
           </article>
         ))}

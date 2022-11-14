@@ -2,6 +2,7 @@ import "@code-hike/mdx/dist/index.css";
 import { Cabin, Raleway } from "@next/font/google";
 import clsx from "clsx";
 import Analytics from "components/Analytics";
+import FeedLink from "components/FeedLink";
 import Navigation from "components/Navigation";
 import Script from "next/script";
 import { FC, PropsWithChildren } from "react";
@@ -18,8 +19,9 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
   <html lang="en" className="h-full text-zinc-700">
     <head></head>
     <body className={clsx("flex h-full flex-col gap-5 p-10 font-body", raleway.variable, cabin.variable)}>
-      <header>
+      <header className="relative">
         <Navigation />
+        <FeedLink className="absolute top-0 right-0"/>
       </header>
       <main className="flex-1">{children}</main>
       <footer className="pb-4 text-right">© Sebastian Sdorra</footer>

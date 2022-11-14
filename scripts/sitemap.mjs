@@ -1,23 +1,15 @@
 import { writeFile } from "fs/promises";
 import { globby } from "globby";
 import prettier from "prettier";
+import { allPosts } from "../.contentlayer/generated/index.mjs";
 
 const PAGE = "https://sdorra.dev";
 
-const createSlugs = async () => {
-  const paths = await globby("*.mdx", {
-    cwd: "./content/posts",
-  });
-  return paths.map((p) => p.replace(".mdx", ""));
-};
-
-const expandPath = (slugs) => {
-  return (p) => {
-    if (p === "/posts/[slug]") {
-      return slugs.map((s) => `/posts/${s}`);
-    }
-    return [p];
-  };
+const expandPath = (p) => {
+  if (p === "/posts/[slug]") {
+    return allPosts.map((p) => `/posts/${p._raw.flattenedPath}`);
+  }
+  return [p];
 };
 
 const createPath = (p) => {
@@ -30,11 +22,10 @@ const createPath = (p) => {
 };
 
 const createPaths = async () => {
-  const slugs = await createSlugs();
   const paths = await globby("./**/page.tsx", {
     cwd: "app",
   });
-  return paths.map(createPath).flatMap(expandPath(slugs));
+  return paths.map(createPath).flatMap(expandPath);
 };
 
 const createSitemap = async (routes) => {

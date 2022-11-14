@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "concurrently \"pnpm run build-site\" \"pnpm run sitemap\" \"pnpm run feed\"",
+    "build": "pnpm run build-site && pnpm run build-static-files",
+    "build-static-files": "concurrently \"pnpm run sitemap\" \"pnpm run feed\"",
     "build-site": "next build",
     "sitemap": "node scripts/sitemap.mjs",
     "feed": "node scripts/feed.mjs",

@@ -1,0 +1,59 @@
+---
+title: Next app directory and 100% height
+summary: Layouts of Next.js app directory are creating div wrappers, which could break designs
+date: 2022-11-14
+---
+
+The new app directory of Next.js 13 introduces the great concepts of [layouts](https://beta.nextjs.org/docs/routing/pages-and-layouts#layouts).
+But they come with a price ... a `div` wrapper.
+Each layout wraps its children in a `div`.
+This could break designs which are using a height of 100% percent.
+
+As [timneutkens](https://github.com/timneutkens) says (one of the Next.js maintainers), the problem is temporary but it has to be fixed in react:
+
+> First off: We totally understand your struggle because of the added elements.
+>
+> It's indeed added for now to handle keeping the right section of the page in view when navigating between pages.
+> Unlike in pages the new router has improved scroll and focus handling. It ensures only the changed part is scrolled into view and put focus on.
+>
+> Right now this is a trade-off as React doesn't allow finding the DOM node from a component and it has to interplay with server components which can't just get a ref passed as they render outside the browser.
+>
+> We're planning to create a RFC for React to solve the "selecting a underlying DOM node of a component" for this case.
+
+[Original post](https://github.com/vercel/next.js/discussions/41745#discussioncomment-3964086).
+
+## The workaround
+
+The good news Next.js 13.0.1 add a data attribute (`data-nextjs-scroll-focus-boundary`) to those `div` wrappers.
+With this attribute, we are now able to apply styles to the wrapper.
+For example, we can specify `display: contents` as suggested by [bmcmahen](https://github.com/bmcmahen) on the discussion at [vercel](https://github.com/vercel/next.js/discussions/41745#discussioncomment-3998683) e.g:
+
+```css
+[data-nextjs-scroll-focus-boundary] {
+  display: contents;
+}
+```
+
+Using `display: contents` prevent the wrapper from affecting the layout at all.
+
+[developer.mozilla.org](https://developer.mozilla.org/en-US/docs/Web/CSS/display) describes `display: content` as follows:
+
+> These elements don't produce a specific box by themselves.
+> They are replaced by their pseudo-box and their child boxes.
+> Please note that the CSS Display Level 3 spec defines how the contents value should affect "unusual elements" — elements that aren't rendered purely by CSS box concepts such as replaced elements.
+
+But they mention also accessibility issues:
+
+> Due to a bug in browsers, this will currently remove the element from the accessibility tree — screen readers will not look at what's inside.
+
+Here is blog post from Adrian Roselli, which describes the problem in more detail: [Display: Contents Is Not a CSS Reset](https://adrianroselli.com/2018/05/display-contents-is-not-a-css-reset.html)
+
+I'm not really sure, if the accessibility bugs still exists, accordingly to [caniuse.com](https://caniuse.com/css-display-contents) there are still issues with it.
+
+So if our only problem is the 100% height, perhaps we should just use:
+
+```css
+[data-nextjs-scroll-focus-boundary] {
+  height: 100%;
+}
+```

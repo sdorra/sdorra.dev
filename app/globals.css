@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   /* https://github.com/vercel/next.js/discussions/41745#discussioncomment-3964086 */
   [data-nextjs-scroll-focus-boundary] {

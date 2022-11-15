@@ -7,26 +7,29 @@ date: 2022-11-14
 The new app directory of Next.js 13 introduces the great concepts of [layouts](https://beta.nextjs.org/docs/routing/pages-and-layouts#layouts).
 But they come with a price ... a `div` wrapper.
 Each layout wraps its children in a `div`.
-This could break designs which are using a height of 100% percent.
+This could break designs which are using a height of 100%.
 
-As [timneutkens](https://github.com/timneutkens) says (one of the Next.js maintainers), the problem is temporary but it has to be fixed in react:
+As [timneutkens](https://github.com/timneutkens) (one of the Next.js maintainers) says,
+the problem is temporary but it has to be fixed in react:
 
 > First off: We totally understand your struggle because of the added elements.
 >
 > It's indeed added for now to handle keeping the right section of the page in view when navigating between pages.
-> Unlike in pages the new router has improved scroll and focus handling. It ensures only the changed part is scrolled into view and put focus on.
+> Unlike in pages the new router has improved scroll and focus handling.
+> It ensures only the changed part is scrolled into view and put focus on.
 >
-> Right now this is a trade-off as React doesn't allow finding the DOM node from a component and it has to interplay with server components which can't just get a ref passed as they render outside the browser.
+> Right now this is a trade-off as React doesn't allow finding the DOM node from a component and
+> it has to interplay with server components which can't just get a ref passed as they render outside the browser.
 >
 > We're planning to create a RFC for React to solve the "selecting a underlying DOM node of a component" for this case.
 
-[Original post](https://github.com/vercel/next.js/discussions/41745#discussioncomment-3964086).
+The original post can be found in the answers of this [github discussion](https://github.com/vercel/next.js/discussions/41745#discussioncomment-3964086).
 
 ## The workaround
 
 The good news Next.js 13.0.1 add a data attribute (`data-nextjs-scroll-focus-boundary`) to those `div` wrappers.
 With this attribute, we are now able to apply styles to the wrapper.
-For example, we can specify `display: contents` as suggested by [bmcmahen](https://github.com/bmcmahen) on the discussion at [vercel](https://github.com/vercel/next.js/discussions/41745#discussioncomment-3998683) e.g:
+For example, we can specify `display: contents` as suggested by [bmcmahen](https://github.com/bmcmahen) on the same [discussion](https://github.com/vercel/next.js/discussions/41745#discussioncomment-3964086):
 
 ```css
 [data-nextjs-scroll-focus-boundary] {
@@ -42,7 +45,7 @@ Using `display: contents` prevent the wrapper from affecting the layout at all.
 > They are replaced by their pseudo-box and their child boxes.
 > Please note that the CSS Display Level 3 spec defines how the contents value should affect "unusual elements" — elements that aren't rendered purely by CSS box concepts such as replaced elements.
 
-But they mention also accessibility issues:
+It sound perfect for our use case, but they mention also accessibility issues:
 
 > Due to a bug in browsers, this will currently remove the element from the accessibility tree — screen readers will not look at what's inside.
 

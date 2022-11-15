@@ -2,6 +2,7 @@ import { defineDocumentType, makeSource } from "contentlayer/source-files";
 
 import { remarkCodeHike } from "@code-hike/mdx";
 import { createRequire } from "module";
+import readingTime from "reading-time";
 
 const require = createRequire(import.meta.url);
 const theme = require("shiki/themes/nord.json");
@@ -31,6 +32,10 @@ export const Post = defineDocumentType(() => ({
     url: {
       type: "string",
       resolve: (post) => `/posts/${post._raw.flattenedPath}`,
+    },
+    readingTime: {
+      type: "string",
+      resolve: (post) => readingTime(post.body.raw).text,
     },
   },
 }));

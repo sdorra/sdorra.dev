@@ -1,3 +1,4 @@
+import DateTime from "components/DateTime";
 import { allPosts } from "contentlayer/generated";
 import { compareDesc, format, parseISO } from "date-fns";
 import Link from "next/link";
@@ -20,9 +21,7 @@ const Home = () => (
             >
               <h3 className="text-2xl font-semibold">{post.title}</h3>
               <p className="text-lg">{post.summary}</p>
-              <time className="self-end text-xs" dateTime={post.date}>
-                {format(parseISO(post.date), "yyyy-MM-dd")}
-              </time>
+              <DateTime className="self-end text-xs" value={post.date} />
             </Link>
           </article>
         ))}

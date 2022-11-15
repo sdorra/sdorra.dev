@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { IconButton } from "./icons";
 
 const DarkModeToggle = () => {
   const [mode, setMode] = useState("");
@@ -22,13 +23,13 @@ const DarkModeToggle = () => {
   };
 
   return (
-    <button
+    <IconButton
       onClick={onClick}
       title={`Enable ${mode} mode`}
-      className={clsx("transition-opacity hover:[&>*]:stroke-[3]", { "opacity-0": !mode, "opacity-100": !!mode })}
+      className={clsx("transition-opacity", { "opacity-0": !mode, "opacity-100": !!mode })}
     >
       {mode === "dark" ? <Sun /> : <Moon />}
-    </button>
+    </IconButton>
   );
 };
 

@@ -7,12 +7,23 @@ import { FC, PropsWithChildren } from "react";
 
 type Props = PropsWithChildren & {
   href: string;
+  className?: string;
 };
 
-const NavigationLink: FC<Props> = ({ href, children }) => {
+const NavigationLink: FC<Props> = ({ href, className, children }) => {
   const path = usePathname();
   return (
-    <Link className={clsx({ "font-semibold underline decoration-2": path === href })} href={href}>
+    <Link
+      className={clsx(
+        "underline decoration-2 hover:decoration-cyan-500",
+        {
+          "font-semibold": path === href,
+          "decoration-transparent": path !== href,
+        },
+        className
+      )}
+      href={href}
+    >
       {children}
     </Link>
   );

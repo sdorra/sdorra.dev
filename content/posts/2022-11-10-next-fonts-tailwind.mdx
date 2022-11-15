@@ -4,11 +4,11 @@ date: 2022-11-10
 summary: How to use Next.js font optimization with tailwind
 ---
 
-Next.js 13 introduces a new way to use fonts.
+Next.js 13 introduces a new way to use [fonts](https://beta.nextjs.org/docs/optimizing/fonts).
 This new font system will automatically optimize your fonts and
 creates a fallback font which reduces the CLS (cumulative layout shift) to zero!
 
-The font system allows us to import fonts directly from google fonts e.g.:
+The font system allows us to import fonts directly from google fonts:
 
 ```tsx
 import { Raleway, Merriweather_Sans } from "@next/font/google";
@@ -18,7 +18,7 @@ In this example we use the Raleway and Merriweather Sans font.
 The font system will download the fonts and ship them with our app,
 this removes the extra network request to google, which is good for performance and privacy.
 
-After we have imported the fonts we can create an instance and use it in our jsx e.g.:
+After we have imported the fonts we can create an instance and use it in our jsx:
 
 ```tsx
 const raleway = Raleway();
@@ -26,8 +26,8 @@ const raleway = Raleway();
 <h1 className={raleway.className}>Hello Raleway</h1>
 ```
 
-But this is not what we like to use in a tailwind project.
-In the next section i will show how to use the new font system with tailwind.
+But this is not what we like to do in a tailwind project.
+In the next section I will show how to use the new font system with tailwind.
 
 ## Complete example with TailwindCSS
 
@@ -91,7 +91,7 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
 )
 ```
 
-Now we can use these variables in our tailwind config to define our font families.
+Now we can use these variables in our tailwind config to define our [font families](https://tailwindcss.com/docs/font-family).
 
 ```js tailwind.config.js focus=9:12
 /** @type {import('tailwindcss').Config} */
@@ -112,14 +112,9 @@ module.exports = {
 }
 ```
 
-And now we are able to use our fonts with tailwind generated classes e.g.:
+And now we are able to use our fonts with tailwind generated classes:
 
 ```tsx
 <h1 className="font-display">Hello from raleway</h1>
 <p className="font-body">Hello from Merriweather Sans</p>
 ```
-
-### More information
-
-* [Next.js font documentation](https://beta.nextjs.org/docs/optimizing/fonts)
-* [Tailwind](https://tailwindcss.com/docs/font-family)

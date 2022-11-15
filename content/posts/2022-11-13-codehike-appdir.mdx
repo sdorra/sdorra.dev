@@ -6,15 +6,15 @@ date: 2022-11-13
 
 I'm using [MDX](https://mdxjs.com/),
 with [Contentlayer](https://www.contentlayer.dev/) and
-for the code listing i'm using the wonderful [Code Hike](https://codehike.org/) library.
+for the code listing I'm using the wonderful [Code Hike](https://codehike.org/) library.
 
 Next.js 13 had some problems with the usage of contentlayer and the app directory,
 but this issues are fixed with the version 13.0.3 of Next.js.
 
-But as i tried to integrate Code Hike,
+But as I tried to integrate Code Hike,
 the application fails with the following error `TypeError: ke.createContext is not a function`.
 
-We can fix the error, by making our Markdown component a [client component](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components) e.g.:
+We can fix the error by making our Markdown component a [client component](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components):
 
 ```tsx Markdown.tsx mark=1
 "use client";
@@ -38,5 +38,5 @@ export default Markdown;
 ```
 
 The essential part is the first line.
-The `use client` makes the component to a [client component](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components).
+The `use client` makes the component a [client component](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components).
 With this separate component we are able to use Code Hike.

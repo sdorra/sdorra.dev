@@ -34,7 +34,7 @@ const NavigationButton = ({ post, type }: NavigationButtonProps) => {
   const Icon = type === "next" ? ArrowRightCircle : ArrowLeftCircle;
   return (
     <Link
-      className={clsx("flex w-full items-center justify-start gap-2 group", {
+      className={clsx("group flex w-full items-center justify-start gap-2", {
         "text-left": type === "prev",
         "flex-row-reverse text-right": type === "next",
       })}
@@ -42,7 +42,9 @@ const NavigationButton = ({ post, type }: NavigationButtonProps) => {
       title={`Navigate to post "${post.title}"`}
     >
       <Icon className="w-6 shrink-0 group-hover:stroke-[3]" />
-      <span className="hidden md:block group-hover:underline group-hover:decoration-2 group-hover:decoration-cyan-500">{post.title}</span>
+      <span className="hidden group-hover:underline group-hover:decoration-cyan-500 group-hover:decoration-2 md:block">
+        {post.title}
+      </span>
     </Link>
   );
 };

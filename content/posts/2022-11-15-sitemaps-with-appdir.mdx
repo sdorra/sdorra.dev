@@ -155,10 +155,10 @@ The order is important, because contentlayer have to run first in order to gener
 ### robots.txt
 
 We could specify the url to our sitemap in the `robots.txt`, this makes it easier for search engines to find our sitemap.
-If we use the default path `/sitemap.xml` most of the search engines should find it with out the entry in the `robots.txt`.
+If we use the default path `/sitemap.xml` most of the search engines should find it without the entry in the `robots.txt`.
 How ever the entry could look like the following:
 
-```txt robots.txt focus=4
+``` public/robots.txt focus=4
 User-Agent: *
 Allow: /
 
@@ -170,7 +170,10 @@ Sitemap: https://sdorra.dev/sitemap.xml
 Since our sitemap is generated, we should not include it in our repository.
 So we should ignore it:
 
-```txt .gitignore
+``` .gitignore focus=4
+/node_modules
+/.next/
+.contentlayer
 public/sitemap.xml
 ```
 

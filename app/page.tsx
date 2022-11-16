@@ -1,7 +1,6 @@
-import DateTime from "components/DateTime";
+import PostCard from "components/PostCard";
 import { allPosts } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
-import Link from "next/link";
 
 const Home = () => (
   <>
@@ -14,19 +13,7 @@ const Home = () => (
       {allPosts
         .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
         .map((post) => (
-          <article key={post._id}>
-            <Link
-              href={`/posts/${post._raw.flattenedPath}`}
-              className="flex flex-col gap-2 rounded-md border-2 p-4 hover:border-cyan-500 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:border-cyan-400 dark:hover:bg-zinc-700"
-            >
-              <h3 className="text-2xl font-semibold">{post.title}</h3>
-              <p className="text-lg">{post.summary}</p>
-              <footer className="flex justify-between pt-2 text-xs">
-              <p>{post.readingTime}</p>
-                <DateTime value={post.date} />
-              </footer>
-            </Link>
-          </article>
+          <PostCard key={post._id} post={post} />
         ))}
     </section>
   </>

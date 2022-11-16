@@ -1,6 +1,6 @@
 import DateTime from "components/DateTime";
 import { allPosts } from "contentlayer/generated";
-import { compareDesc, format, parseISO } from "date-fns";
+import { compareDesc } from "date-fns";
 import Link from "next/link";
 
 const Home = () => (
@@ -21,7 +21,10 @@ const Home = () => (
             >
               <h3 className="text-2xl font-semibold">{post.title}</h3>
               <p className="text-lg">{post.summary}</p>
-              <DateTime className="self-end text-xs" value={post.date} />
+              <footer className="flex justify-between pt-2 text-xs">
+              <p>{post.readingTime}</p>
+                <DateTime value={post.date} />
+              </footer>
             </Link>
           </article>
         ))}

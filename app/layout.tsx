@@ -19,6 +19,9 @@ const cabin = Cabin({
 const RootLayout: FC<PropsWithChildren> = ({ children }) => (
   <html lang="en" className="h-full">
     <head>
+      <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="alternate" type="application/rss+xml" title="sdorra.dev rss feed" href="/rss.xml" />
       <script
         dangerouslySetInnerHTML={{
           __html: `

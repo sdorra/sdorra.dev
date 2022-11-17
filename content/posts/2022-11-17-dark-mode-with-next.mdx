@@ -1,0 +1,197 @@
+---
+title: Use dark mode with TailwindCSS and Next.js
+summary: How to use dark mode on Next.js 13, the app directory and TailwindCSS
+date: 2022-11-17
+---
+
+Enabling dark mode with tailwind couldn't be easier, just use the [dark variant](https://tailwindcss.com/docs/dark-mode) e.g.:
+
+```tsx
+<h1 className="text-zinc-700 dark:text-zinc-300">Hello dark mode</h1>
+```
+
+In the snippet above the `text-zinc-700` is used in light mode and
+`text-zinc-300` is used if dark mode is enabled on your operating system.
+This works because tailwind uses [prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) media query.
+But if we want to allow the user to switch between light and dark mode,
+thinks getting complicated.
+
+## Dark mode toggle
+
+First we have to enable the [manual dark mode](https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually) toggle in tailwind config:
+
+```js tailwind.config.mjs focus=7
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./app/**/*.tsx", "./pages/**/*.tsx", "./components/**/*.tsx"],
+  theme: {
+    extend: {},
+  },
+  darkMode: "class",
+  plugins: [],
+};
+```
+
+By setting `darkMode` to `class` tailwind applies the dark mode variant if a parent element has the class `dark`.
+Now we can implement a simple dark mode toggle:
+
+```tsx components/DarkModeToggle.tsx
+"use client";
+
+import { Moon, Sun } from "lucide-react";
+import { useState } from "react";
+
+const DarkModeToggle = () => {
+  const [mode, setMode] = useState("light");
+
+  const onClick = () => {
+    const toggle = document.documentElement.classList.toggle("dark");
+    const theme = toggle ? "dark" : "light";
+    setMode(theme);
+  };
+
+  return (
+    <button onClick={onClick} title={`Enable ${mode === "dark" ? "light" : "dark"} mode`}>
+      {mode === "dark" ? <Sun /> : <Moon />}
+    </button>
+  );
+};
+
+export default DarkModeToggle;
+```
+
+This example renders a moon icon (from the [lucide-react](https://lucide.dev/docs/lucide-react) package),
+after a click on the icon, the `dark` class is toggled on the html element and the icon switches to a sun.
+If the `dark` class is applied to the html element, we should see that the dark mode is applied to our page.
+
+But if we refresh the page, we are back on light mode.
+So we need a way to persist our selection.
+
+## Persist the selection
+
+According to the [tailwind docs](https://tailwindcss.com/docs/dark-mode#supporting-system-preference-and-manual-selection) a good way to store the selected mode is the [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
+So we could extend our toggle button and store the selection in the localStorage:
+
+```tsx components/DarkModeToggle.tsx focus=12
+"use client";
+
+import { Moon, Sun } from "lucide-react";
+import { useState } from "react";
+
+const DarkModeToggle = () => {
+  const [mode, setMode] = useState("light");
+
+  const onClick = () => {
+    const toggle = document.documentElement.classList.toggle("dark");
+    const theme = toggle ? "dark" : "light";
+    window.localStorage.setItem("theme", theme);
+    setMode(theme);
+  };
+
+  return (
+    <button onClick={onClick} title={`Enable ${mode === "dark" ? "light" : "dark"} mode`}>
+      {mode === "dark" ? <Sun /> : <Moon />}
+    </button>
+  );
+};
+
+export default DarkModeToggle;
+```
+
+Now we are able to apply the selected mode on page load.
+We should do this as early as possible during the rendering of our page to avoid flickering:
+
+```tsx app/layout.tsx focus=4:14
+const RootLayout: FC<PropsWithChildren> = ({ children }) => (
+  <html lang="en">
+    <head>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+          if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+          } else {
+            document.documentElement.classList.remove('dark')
+          }
+          `,
+        }}
+      />
+    </head>
+    <body>{children}</body>
+  </html>
+);
+
+export default RootLayout;
+```
+
+The snippet above adds the `dark` class,
+if the `theme` key in the localStorage is set to dark or
+if the key is not set and the `prefers-color-scheme` matches dark.
+Otherwise the class is removed from the html element.
+
+Finally, we should reflect the current mode in our toggle button.
+
+```tsx components/DarkModeToggle.tsx focus=8:15
+"use client";
+
+import { Moon, Sun } from "lucide-react";
+import { useEffect, useState } from "react";
+
+const DarkModeToggle = () => {
+  const [mode, setMode] = useState("light");
+  useEffect(() => {
+    if (document.documentElement.classList.contains("dark")) {
+      setMode("dark");
+    } else {
+      setMode("light");
+    }
+  }, []);
+
+  const onClick = () => {
+    const toggle = document.documentElement.classList.toggle("dark");
+    const theme = toggle ? "dark" : "light";
+    window.localStorage.setItem("theme", theme);
+    setMode(theme);
+  };
+
+  return (
+    <button onClick={onClick} title={`Enable ${mode === "dark" ? "light" : "dark"} mode`}>
+      {mode === "dark" ? <Sun /> : <Moon />}
+    </button>
+  );
+};
+
+export default DarkModeToggle;
+```
+We use an effect to check if the html element has the `dark` class,
+to reflect the initial state of the dark mode toggle.
+
+Now we have everything in place,
+we should be able to toggle between light and dark mode and
+our selection should be persisted.
+
+But if we look in the console log of our browser we see an error.
+
+### Hydration error
+
+```text
+react_devtools_backend.js:4026 Warning: Prop `className` did not match. Server: "dark" Client: ""
+    at html
+    at ReactDevOverlay (webpack-internal:///./node_modules/.pnpm/next@13.0.3_biqbaboplfbrettd7655fr4n2y/node_modules/next/dist/client/components/react-dev-overlay/internal/ReactDevOverlay.js:53:9)
+    at HotReload (webpack-internal:///./node_modules/.pnpm/next@13.0.3_biqbaboplfbrettd7655fr4n2y/node_modules/next/dist/client/components/react-dev-overlay/hot-reloader-client.js:19:11)
+    at Router (webpack-internal:///./node_modules/.pnpm/next@13.0.3_biqbaboplfbrettd7655fr4n2y/node_modules/next/dist/client/components/app-router.js:74:11)
+    at ErrorBoundaryHandler (webpack-internal:///./node_modules/.pnpm/next@13.0.3_biqbaboplfbrettd7655fr4n2y/node_modules/next/dist/client/components/error-boundary.js:28:9)
+    at ErrorBoundary (webpack-internal:///./node_modules/.pnpm/next@13.0.3_biqbaboplfbrettd7655fr4n2y/node_modules/next/dist/client/components/error-boundary.js:40:11)
+    at AppRouter
+    at ServerRoot (webpack-internal:///./node_modules/.pnpm/next@13.0.3_biqbaboplfbrettd7655fr4n2y/node_modules/next/dist/client/app-index.js:113:11)
+    at RSCComponent
+    at Root (webpack-internal:///./node_modules/.pnpm/next@13.0.3_biqbaboplfbrettd7655fr4n2y/node_modules/next/dist/client/app-index.js:130:11)
+```
+
+We see this error,
+because of the fact that server renders the html element without the `dark` class,
+even if dark mode is enabled.
+But we add the class, before react [hydrates](https://beta.reactjs.org/apis/react-dom/hydrate) the document.
+
+I don't know a way to avoid this error,
+but the good news is that the error only shows up in development mode.

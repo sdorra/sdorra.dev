@@ -17,7 +17,7 @@ const cabin = Cabin({
 });
 
 const RootLayout: FC<PropsWithChildren> = ({ children }) => (
-  <html lang="en" className="h-full">
+  <html lang="en" className="h-full" suppressHydrationWarning={true}>
     <head>
       <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />

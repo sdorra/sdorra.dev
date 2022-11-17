@@ -193,5 +193,13 @@ because of the fact that server renders the html element without the `dark` clas
 even if dark mode is enabled.
 But we add the class, before react [hydrates](https://beta.reactjs.org/apis/react-dom/hydrate) the document.
 
-I don't know a way to avoid this error,
-but the good news is that the error only shows up in development mode.
+~~I don't know a way to avoid this error,
+but the good news is that the error only shows up in development mode.~~
+
+The error can be suppressed by using the `suppressHydrationWarning` property on the html element:
+
+```tsx app/layout.tsx
+<html lang="en" suppressHydrationWarning={true}>
+```
+
+This will suppress the warning only for the html element, not for its children.

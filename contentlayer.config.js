@@ -1,6 +1,7 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 
 import { remarkCodeHike } from "@code-hike/mdx";
+import remarkGfm from "remark-gfm";
 import { createRequire } from "module";
 import readingTime from "reading-time";
 
@@ -44,6 +45,6 @@ export default makeSource({
   contentDirPath: "content/posts",
   documentTypes: [Post],
   mdx: {
-    remarkPlugins: [[remarkCodeHike, { theme }]],
+    remarkPlugins: [remarkGfm, [remarkCodeHike, { theme }]],
   },
 });

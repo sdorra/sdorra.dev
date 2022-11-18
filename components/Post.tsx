@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { allPosts, Post, Post as PostType } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import DateTime from "./DateTime";
 import Markdown from "./Markdown";
@@ -53,8 +54,19 @@ const Post = ({ post }: Props) => {
   const { next, prev } = createPrevAndNext(post);
   return (
     <>
-      <h1 className="text-4xl font-bold">{post.title}</h1>
-      <div className="mt-2 mb-6 flex justify-between text-xs">
+      <figure className="flex items-center gap-4">
+        <Image
+          src={post.image}
+          width={256}
+          height={160}
+          alt="Feature blog image"
+          className="h-40 w-64 flex-shrink-0 rounded-md border-2 border-zinc-200 object-cover dark:border-zinc-700"
+        />
+        <h1 className="-ml-52 sm:-ml-32 rounded-md border border-zinc-200 bg-white/80 p-2 text-4xl font-bold dark:border-zinc-700 dark:bg-zinc-800/80">
+          {post.title}
+        </h1>
+      </figure>
+      <div className="my-4 flex justify-between text-xs">
         <p>{post.readingTime}</p>
         <DateTime title="Posted at" value={post.date} />
       </div>

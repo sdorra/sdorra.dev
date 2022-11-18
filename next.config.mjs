@@ -10,11 +10,12 @@ const nextConfig = {
     };
     return config;
   },
+  images: {
+    domains: ["images.unsplash.com"],
+  },
   experimental: {
     appDir: true,
-    fontLoaders: [
-      { loader: "@next/font/google", options: { subsets: ["latin"] } },
-    ],
+    fontLoaders: [{ loader: "@next/font/google", options: { subsets: ["latin"] } }],
   },
 };
 

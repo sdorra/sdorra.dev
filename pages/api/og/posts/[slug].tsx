@@ -2,7 +2,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "@vercel/og";
 import { allPosts } from "contentlayer/generated";
-import { format, parseISO } from "date-fns";
 import { NextRequest } from "next/server";
 
 export const config = {
@@ -67,7 +66,7 @@ const Image = async (req: NextRequest) => {
             <div tw="flex justify-between items-end w-full text-zinc-400 text-xl">
               <span>{post.readingTime}</span>
               <div>sdorra.dev</div>
-              <span>{format(parseISO(post.date), "yyyy-MM-dd")}</span>
+              <span>{post.date.substring(0, post.date.indexOf("T"))}</span>
             </div>
           </div>
           <div

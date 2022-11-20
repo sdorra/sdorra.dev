@@ -8,6 +8,27 @@ export const config = {
   runtime: "experimental-edge",
 };
 
+const ralewayBold = fetch(new URL(`../../../../content/fonts/Raleway-Bold.ttf`, import.meta.url)).then((res) =>
+  res.arrayBuffer()
+);
+
+const cabinSemiBold = fetch(new URL(`../../../../content/fonts/Cabin-SemiBold.ttf`, import.meta.url)).then((res) =>
+  res.arrayBuffer()
+);
+
+const cabinMedium = fetch(new URL(`../../../../content/fonts/Cabin-Medium.ttf`, import.meta.url)).then((res) =>
+  res.arrayBuffer()
+);
+
+const createImageUrl = (src: string, width: number, height: number) => {
+  let result = src;
+  if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
+    result = `${src}?fit=crop&w=${width}&h=${height}`;
+  }
+  console.log("use image", result);
+  return result;
+}
+
 const Image = async (req: NextRequest) => {
   const slug = req.nextUrl.pathname.replace("/api/og/posts/", "");
   const post = allPosts.find((p) => slug === p._raw.flattenedPath);
@@ -27,15 +48,25 @@ const Image = async (req: NextRequest) => {
       <div
         tw="w-full h-full p-8 flex"
         style={{
-          backgroundImage: "linear-gradient(to right, #0891B2, #164E63)"
+          backgroundImage: "linear-gradient(to right, #0891B2, #164E63)",
+          fontFamily: '"Cabin"',
         }}
       >
         <div tw="rounded-xl border-2 border-zinc-700 w-full h-full p-4 flex bg-zinc-800 shadow-lg">
-
+          <img
+            width="375"
+            height="575"
+            src={createImageUrl(post.image, 375, 575)}
+            tw="rounded-xl border-2 border-zinc-700"
+            style={{ objectFit: "cover" }}
+          />
           <div tw="flex flex-col px-6 w-[740px] h-full justify-between">
             <div tw="flex flex-col">
               <span
                 tw="text-7xl font-bold text-zinc-50 mb-6"
+                style={{
+                  fontFamily: '"Raleway"',
+                }}
               >
                 {post.title}
               </span>
@@ -54,6 +85,12 @@ const Image = async (req: NextRequest) => {
             }}
           />
           <div tw="absolute left-[338px] bottom-[68px] flex items-center">
+            <img
+              tw="rounded-full border-2 border-zinc-700"
+              width="110"
+              height="110"
+              src="https://avatars.githubusercontent.com/u/493333"
+            />
             <p tw="ml-6 text-4xl font-semibold text-zinc-400">Sebastian Sdorra</p>
           </div>
         </div>
@@ -63,6 +100,26 @@ const Image = async (req: NextRequest) => {
       width: 1200,
       height: 675,
       debug: false,
+      fonts: [
+        {
+          name: "Raleway",
+          data: await ralewayBold,
+          style: "normal",
+          weight: 700,
+        },
+        {
+          name: "Cabin",
+          data: await cabinMedium,
+          style: "normal",
+          weight: 400,
+        },
+        {
+          name: "Cabin",
+          data: await cabinSemiBold,
+          style: "normal",
+          weight: 600,
+        },
+      ],
     }
   );
 };

@@ -20,6 +20,13 @@ const cabinMedium = fetch(new URL(`../../../../content/fonts/Cabin-Medium.ttf`, 
   res.arrayBuffer()
 );
 
+const createImageUrl = (src: string, width: number, height: number) => {
+  if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
+    return `${src}?fit=crop&w=${width}&h=${height}`;
+  }
+  return src;
+}
+
 const Image = async (req: NextRequest) => {
   const slug = req.nextUrl.pathname.replace("/api/og/posts/", "");
   const post = allPosts.find((p) => slug === p._raw.flattenedPath);
@@ -47,7 +54,7 @@ const Image = async (req: NextRequest) => {
           <img
             width="375"
             height="575"
-            src={post.image}
+            src={createImageUrl(post.image, 375, 575)}
             tw="rounded-xl border-2 border-zinc-700"
             style={{ objectFit: "cover" }}
           />

@@ -31,13 +31,7 @@ const Image = async (req: NextRequest) => {
         }}
       >
         <div tw="rounded-xl border-2 border-zinc-700 w-full h-full p-4 flex bg-zinc-800 shadow-lg">
-          <img
-            width="375"
-            height="575"
-            src={post.image}
-            tw="rounded-xl border-2 border-zinc-700"
-            style={{ objectFit: "cover" }}
-          />
+
           <div tw="flex flex-col px-6 w-[740px] h-full justify-between">
             <div tw="flex flex-col">
               <span

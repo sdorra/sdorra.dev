@@ -60,12 +60,6 @@ const Image = async (req: NextRequest) => {
             }}
           />
           <div tw="absolute left-[338px] bottom-[68px] flex items-center">
-            <img
-              tw="rounded-full border-2 border-zinc-700"
-              width="110"
-              height="110"
-              src="https://avatars.githubusercontent.com/u/493333"
-            />
             <p tw="ml-6 text-4xl font-semibold text-zinc-400">Sebastian Sdorra</p>
           </div>
         </div>

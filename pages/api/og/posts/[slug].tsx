@@ -8,18 +8,6 @@ export const config = {
   runtime: "experimental-edge",
 };
 
-const ralewayBold = fetch(new URL(`../../../../content/fonts/Raleway-Bold.ttf`, import.meta.url)).then((res) =>
-  res.arrayBuffer()
-);
-
-const cabinSemiBold = fetch(new URL(`../../../../content/fonts/Cabin-SemiBold.ttf`, import.meta.url)).then((res) =>
-  res.arrayBuffer()
-);
-
-const cabinMedium = fetch(new URL(`../../../../content/fonts/Cabin-Medium.ttf`, import.meta.url)).then((res) =>
-  res.arrayBuffer()
-);
-
 const Image = async (req: NextRequest) => {
   const slug = req.nextUrl.pathname.replace("/api/og/posts/", "");
   const post = allPosts.find((p) => slug === p._raw.flattenedPath);
@@ -39,8 +27,7 @@ const Image = async (req: NextRequest) => {
       <div
         tw="w-full h-full p-8 flex"
         style={{
-          backgroundImage: "linear-gradient(to right, #0891B2, #164E63)",
-          fontFamily: '"Cabin"',
+          backgroundImage: "linear-gradient(to right, #0891B2, #164E63)"
         }}
       >
         <div tw="rounded-xl border-2 border-zinc-700 w-full h-full p-4 flex bg-zinc-800 shadow-lg">
@@ -55,9 +42,6 @@ const Image = async (req: NextRequest) => {
             <div tw="flex flex-col">
               <span
                 tw="text-7xl font-bold text-zinc-50 mb-6"
-                style={{
-                  fontFamily: '"Raleway"',
-                }}
               >
                 {post.title}
               </span>
@@ -91,26 +75,6 @@ const Image = async (req: NextRequest) => {
       width: 1200,
       height: 675,
       debug: false,
-      fonts: [
-        {
-          name: "Raleway",
-          data: await ralewayBold,
-          style: "normal",
-          weight: 700,
-        },
-        {
-          name: "Cabin",
-          data: await cabinMedium,
-          style: "normal",
-          weight: 400,
-        },
-        {
-          name: "Cabin",
-          data: await cabinSemiBold,
-          style: "normal",
-          weight: 600,
-        },
-      ],
     }
   );
 };

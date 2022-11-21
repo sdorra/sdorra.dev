@@ -25,7 +25,7 @@ const createImageUrl = (src: string, width: number, height: number) => {
     return `${src}?fit=crop&w=${width}&h=${height}`;
   }
   return src;
-}
+};
 
 const Image = async (req: NextRequest) => {
   const slug = req.nextUrl.pathname.replace("/api/og/posts/", "");
@@ -72,7 +72,15 @@ const Image = async (req: NextRequest) => {
             </div>
             <div tw="flex justify-between items-end w-full text-zinc-400 text-xl">
               <span>{post.readingTime}</span>
-              <div>sdorra.dev</div>
+              <div
+                tw="flex text-4xl font-bold"
+                style={{
+                  fontFamily: '"Raleway"',
+                }}
+              >
+                <span tw="text-zinc-50">sdorra</span>
+                <span tw="text-cyan-400">.dev</span>
+              </div>
               <span>{post.date.substring(0, post.date.indexOf("T"))}</span>
             </div>
           </div>

@@ -4,7 +4,7 @@ summary: How to use dark mode on Next.js 13, the app directory and TailwindCSS
 date: 2022-11-17
 ---
 
-Enabling dark mode with tailwind couldn't be easier, just use the [dark variant](https://tailwindcss.com/docs/dark-mode) e.g.:
+Enabling dark mode with Tailwind couldn't be easier, just use the [dark variant](https://tailwindcss.com/docs/dark-mode) e.g.:
 
 ```tsx
 <h1 className="text-zinc-700 dark:text-zinc-300">Hello dark mode</h1>
@@ -12,13 +12,13 @@ Enabling dark mode with tailwind couldn't be easier, just use the [dark variant]
 
 In the snippet above the `text-zinc-700` is used in light mode and
 `text-zinc-300` is used if dark mode is enabled on your operating system.
-This works because tailwind uses [prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) media query.
+This works because Tailwind uses [prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) media query.
 But if we want to allow the user to switch between light and dark mode,
-thinks getting complicated.
+things are getting complicated.
 
 ## Dark mode toggle
 
-First we have to enable the [manual dark mode](https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually) toggle in tailwind config:
+First we have to enable the [manual dark mode](https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually) toggle in Tailwind's config:
 
 ```js tailwind.config.mjs focus=7
 /** @type {import('tailwindcss').Config} */
@@ -32,7 +32,7 @@ module.exports = {
 };
 ```
 
-By setting `darkMode` to `class` tailwind applies the dark mode variant if a parent element has the class `dark`.
+By setting `darkMode` to `class` Tailwind applies the dark mode variant if a parent element has the class `dark`.
 Now we can implement a simple dark mode toggle:
 
 ```tsx components/DarkModeToggle.tsx
@@ -60,16 +60,16 @@ const DarkModeToggle = () => {
 export default DarkModeToggle;
 ```
 
-This example renders a moon icon (from the [lucide-react](https://lucide.dev/docs/lucide-react) package),
-after a click on the icon, the `dark` class is toggled on the html element and the icon switches to a sun.
+This example renders a moon icon (from the [lucide-react](https://lucide.dev/docs/lucide-react) package).
+After a click on the icon, the `dark` class is toggled on the html element and the icon switches to a sun.
 If the `dark` class is applied to the html element, we should see that the dark mode is applied to our page.
 
 But if we refresh the page, we are back on light mode.
 So we need a way to persist our selection.
 
-## Persist the selection
+## Persisting the selection
 
-According to the [tailwind docs](https://tailwindcss.com/docs/dark-mode#supporting-system-preference-and-manual-selection) a good way to store the selected mode is the [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
+According to the [Tailwind docs](https://tailwindcss.com/docs/dark-mode#supporting-system-preference-and-manual-selection) a good way to store the selected mode is the [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 So we could extend our toggle button and store the selection in the localStorage:
 
 ```tsx components/DarkModeToggle.tsx focus=12
@@ -163,6 +163,7 @@ const DarkModeToggle = () => {
 
 export default DarkModeToggle;
 ```
+
 We use an effect to check if the html element has the `dark` class,
 to reflect the initial state of the dark mode toggle.
 
@@ -189,11 +190,11 @@ react_devtools_backend.js:4026 Warning: Prop `className` did not match. Server: 
 ```
 
 We see this error,
-because of the fact that server renders the html element without the `dark` class,
+because of the fact that the server renders the html element without the `dark` class,
 even if dark mode is enabled.
-But we add the class, before react [hydrates](https://beta.reactjs.org/apis/react-dom/hydrate) the document.
+But we add the class before react [hydrates](https://beta.reactjs.org/apis/react-dom/hydrate) the document.
 
-~~I don't know a way to avoid this error,
+~~I don't know how to avoid this error,
 but the good news is that the error only shows up in development mode.~~
 
 The error can be suppressed by using the `suppressHydrationWarning` property on the html element:

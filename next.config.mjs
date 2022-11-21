@@ -1,3 +1,4 @@
+import NextBundleAnalyzer from "@next/bundle-analyzer";
 import { withContentlayer } from "next-contentlayer";
 
 /** @type {import('next').NextConfig} */
@@ -19,4 +20,8 @@ const nextConfig = {
   },
 };
 
-export default withContentlayer(nextConfig);
+const withBundleAnalyzer = NextBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+export default withContentlayer(withBundleAnalyzer(nextConfig));

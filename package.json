@@ -35,6 +35,7 @@
     "typescript": "4.8.4"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^13.0.4",
     "@tailwindcss/typography": "^0.5.8",
     "autoprefixer": "^10.4.13",
     "concurrently": "^7.5.0",

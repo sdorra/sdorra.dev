@@ -6,6 +6,8 @@ type Props = {
   };
 };
 
+const fqdn = process.env.NEXT_PUBLIC_FQDN ? process.env.NEXT_PUBLIC_FQDN : "sdorra.dev";
+
 const Head = ({ params }: Props) => {
   const post = allPosts.find((p) => p._raw.flattenedPath === params.slug);
   if (!post) {
@@ -18,7 +20,7 @@ const Head = ({ params }: Props) => {
 
       <meta name="og:title" content={post.title} />
       <meta name="og:description" content={post.summary} />
-      <meta property="og:image" content={`/api/og/posts/${post._raw.flattenedPath}`} />
+      <meta property="og:image" content={`https://${fqdn}/api/og/posts/${post._raw.flattenedPath}`} />
       <meta property="og:type" content="article" />
     </>
   );

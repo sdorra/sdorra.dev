@@ -22,6 +22,11 @@ const Head = ({ params }: Props) => {
       <meta name="og:description" content={post.summary} />
       <meta property="og:image" content={`https://${fqdn}/api/og/posts/${post._raw.flattenedPath}`} />
       <meta property="og:type" content="article" />
+
+      <meta name="twitter:title" content={post.title} />
+      <meta name="twitter:description" content={post.summary} />
+      <meta property="twitter:image" content={`https://${fqdn}/api/og/posts/${post._raw.flattenedPath}`} />
+      <meta name="twitter:card" content="summary_large_image" />
     </>
   );
 };

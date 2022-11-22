@@ -1,21 +1,12 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "@vercel/og";
-import { type Post } from "contentlayer/generated";
+import allPosts from ".scripts/Post/withoutbody.json";
 import { NextRequest } from "next/server";
 
 export const config = {
   runtime: "experimental-edge",
 };
-
-// Load posts dynamically to reduce bundle size and avoid size limit of 1mb.
-// res.json() results in a parse error,
-// res.text() does also not work.
-// So we use res.blob() / text() and JSON.parse().
-const allPosts = fetch(new URL(`../../../../.contentlayer/generated/Post/_index.json`, import.meta.url))
-  .then((res) => res.blob())
-  .then((blob) => blob.text())
-  .then((text) => JSON.parse(text) as Post[]);
 
 const ralewayBold = fetch(new URL(`../../../../content/fonts/Raleway-Bold.ttf`, import.meta.url)).then((res) =>
   res.arrayBuffer()
@@ -38,7 +29,7 @@ const createImageUrl = (src: string, width: number, height: number) => {
 
 const Image = async (req: NextRequest) => {
   const slug = req.nextUrl.pathname.replace("/api/og/posts/", "");
-  const post = (await allPosts).find((p) => slug === p._raw.flattenedPath);
+  const post = allPosts.find((p) => slug === p._raw.flattenedPath);
   if (!post) {
     return new Response(
       JSON.stringify({

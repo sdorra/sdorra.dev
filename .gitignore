@@ -36,6 +36,7 @@ yarn-error.log*
 next-env.d.ts
 .contentlayer
 .vscode
+.scripts
 
 public/sitemap.xml
 public/rss.xml

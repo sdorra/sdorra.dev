@@ -1,0 +1,186 @@
+---
+title: Contentlayer, MDX and the vercel edge function size limit
+summary: The 1mb size limit of vercel edge functions is quickly reached with Contentlayer and MDX
+date: 2022-11-24
+image: https://images.unsplash.com/photo-1647666561879-b0a970912037
+---
+
+I've recently tried to implement social media cards with [@vercel/og](https://vercel.com/docs/concepts/functions/edge-functions/og-image-generation).
+The implementation uses an [edge function](https://vercel.com/docs/concepts/functions/edge-functions).
+During development everything went well, until I deployed it to vercel.
+On vercel the build ends with the following error:
+
+<Notification severity="error">
+<strong>Error:</strong> Provided Edge Function is too large
+</Notification>
+
+Too large?
+I've used only the `@vercel/og` and the `contentlayer/generated` package.
+And how much is actually too large?
+After a quick look at the [vercel documentation](https://vercel.com/docs/concepts/functions/edge-functions#limitations):
+
+> The maximum size for an Edge Function is 1 MB, including all the code that is bundled in the function.
+
+`1 MB` is not very much, but it should be enough for those two imports.
+
+## Analysis
+
+So I have installed [@next/bundle-analyzer](https://www.npmjs.com/package/@next/bundle-analyzer) to analyze the generated bundle and
+to find out who breaks the limit.
+
+```bash
+pnpm add -D @next/bundle-analyzer
+```
+
+After we have installed the analyzer, we can configure it in the next config:
+
+```js next.config.mjs focus=1,16:20
+import NextBundleAnalyzer from "@next/bundle-analyzer";
+import { withContentlayer } from "next-contentlayer";
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  webpack: (config) => {
+    // suppress warnings of webpack
+    // https://github.com/contentlayerdev/contentlayer/issues/313
+    config.infrastructureLogging = {
+      level: "error",
+    };
+    return config;
+  }
+};
+
+const withBundleAnalyzer = NextBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+export default withContentlayer(withBundleAnalyzer(nextConfig));
+```
+
+If we start our build with the environment variable `ANALYZE=true`, a browser with the output of bundle analyzer opens.
+I was pretty much surprised, because the analyzer shows me that the module `contentlayer/generated` takes `960k`!
+After a quick look at the generated file at `.contentlayer/generated/Post/_index.json`,
+it is clear that the body of the post needs all the memory.
+Especially the code blocks with [Code Hike](https://codehike.org/) need a lot of memory.
+
+## Solutions
+
+Now that we are know what causes the problem, we need a solution.
+
+### Load posts dynamically
+
+My first idea was to use `fetch` instead of `import` to get the posts:
+
+```tsx pages/api/og/posts/[slug].tsx
+import { type Post } from "contentlayer/generated";
+
+// res.json() results in a parse error,
+// res.text() does also not work.
+// So we use res.blob() / text() and JSON.parse().
+const allPosts = fetch(new URL(`../../../../.contentlayer/generated/Post/_index.json`, import.meta.url))
+  .then((res) => res.blob())
+  .then((blob) => blob.text())
+  .then((text) => JSON.parse(text) as Post[]);
+```
+
+As the comments show, there were a few stumbling blocks, but on the whole the implementation was straightforward.
+So i deployed my results to vercel, but unfortunately it shows the same error:
+
+<Notification severity="error">
+<strong>Error:</strong> Provided Edge Function is too large
+</Notification>
+
+This is strange, because our bundle should be much smaller now.
+So i've installed the [vercel cli](https://www.npmjs.com/package/vercel), to see the generated vercel deployment locally.
+
+```bash
+pnpm add --global vercel
+```
+
+After the installation, we can generate the output by calling `vercel build`.
+The generated output shows that the bundle size is now `320K`,
+but there is a `assets` directory which contains the `_index.json` of contentlayer.
+
+It looks like the assets directory is counted in the limit.
+So we need an other solution.
+
+### Parameters as part of the url
+
+My second plan was to add the required parameters for the edge function to the url.
+So we have a url like the following:
+
+```text
+/api/og/posts?summary=Next%20app%20directory%20and%20100%25%20height&description=...
+```
+
+The maximum url length is `14KiB` this should be enough for our requirements.
+But with such a url it is easy to manipulate the parameters and
+to generate a social media card with our layout but with different content.
+To avoid such a manipulation we had to sign or encrypt the parameters.
+There is a example on vercel for [encrypting parameters](https://vercel.com/docs/concepts/functions/edge-functions/og-image-examples#encrypting-parameters).
+This should work, but it is quite an effort and the urls are still looking awful.
+Can we do better?
+
+### Generate json without body
+
+A third idea came to my mind.
+We can generate a json, which contains all fields of the posts, but without the body.
+
+```js scripts/posts-withoutbody.mjs
+import { allPosts } from "../.contentlayer/generated/index.mjs";
+import { mkdir, writeFile } from "fs/promises";
+
+const createJson = () => {
+  return allPosts.map((post) => {
+    const { body, ...content } = post;
+    return content;
+  });
+};
+
+(async () => {
+  console.log(`create posts json without body for ${allPosts.length} paths`);
+  const json = createJson();
+  await mkdir("./.scripts/Post", {
+    recursive: true
+  })
+  await writeFile("./.scripts/Post/withoutbody.json", JSON.stringify(json, null, 2), {
+    encoding: "utf-8",
+  });
+})();
+```
+
+The script above load the posts from the contentlayer directory,
+removes the body and writes the new file to `./.scripts/Post/withoutbody.json`.
+The newly generated file is only `3.9K` large.
+
+Now we have to integrate the script into the build of our project.
+
+```json package.json focus=3
+"scripts": {
+  "dev": "next dev",
+  "build": "contentlayer build && node scripts/posts-withoutbody.mjs && next build",
+  "start": "next start",
+  "lint": "next lint"
+}
+```
+
+First we need to call the contentlayer build,
+that we are able to import it in our script.
+Than we can run our script and finally we can run the next build.
+
+After the build integration we can import the generated json:
+
+```tsx pages/api/og/[slug].tsx
+import allPosts from ".scripts/Post/withoutbody.json";
+```
+
+To ensure that we are not add the generated file to out repository,
+we should add the `.scripts` directory to the `.gitignore`.
+
+```gitignore focus=3
+/node_modules
+.contentlayer
+.scripts
+```
+
+With this solution, the build also runs through at Vercel.

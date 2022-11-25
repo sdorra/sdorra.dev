@@ -10,7 +10,7 @@ The implementation uses an [edge function](https://vercel.com/docs/concepts/func
 During development everything went well, until I deployed it to vercel.
 On vercel the build ends with the following error:
 
-<Notification severity="error">
+<Notification type="error">
   <strong>Error:</strong> Provided Edge Function is too large
 </Notification>
 
@@ -86,7 +86,7 @@ const allPosts = fetch(new URL(`../../../../.contentlayer/generated/Post/_index.
 As the comments show, there were a few stumbling blocks, but on the whole the implementation was straightforward.
 So i deployed my results to vercel, but unfortunately it shows the same error:
 
-<Notification severity="error">
+<Notification type="error">
   <strong>Error:</strong> Provided Edge Function is too large
 </Notification>
 
@@ -210,3 +210,12 @@ we should add the `.scripts` directory to the `.gitignore`.
 ```
 
 With this solution, the build also runs through at Vercel.
+
+<Notification type="success">
+  <pre>Build Completed in /vercel/output [44s]
+  Deployed outputs in 8s
+  Build completed. Populating build cache...
+  Uploading build cache [84.14 MB]...
+  Build cache uploaded: 1.756s
+  Done with "."</pre>
+</Notification>

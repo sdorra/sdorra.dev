@@ -39,12 +39,12 @@ type FileSizeProps = {
 
 const FileSize = ({ size }: FileSizeProps) => <span className="mr-2">({humanFileSize(size)})</span>;
 
-type LeafNodeProps = {
+type NodeProps = {
   node: TreeNode;
   depth: number;
 };
 
-const LeafNode = ({ node, depth }: LeafNodeProps) => {
+const LeafNode = ({ node, depth }: NodeProps) => {
   const Icon = isDirectory(node) ? FolderOpen : File;
   return (
     <li className="flex gap-1">
@@ -62,26 +62,32 @@ const LeafNode = ({ node, depth }: LeafNodeProps) => {
   );
 };
 
-const renderNode = (node: TreeNode, depth: number) => {
-  return (
-    <>
-      <LeafNode node={node} depth={depth} />
-      {isDirectory(node)
-        ? (node.children || []).map((c) => <ul key={depth + "_" + c.name}>{renderNode(c, depth + 1)}</ul>)
-        : null}
-    </>
-  );
-};
+const NonLeafNode = ({ node, depth }: NodeProps) => (
+  <>
+    <LeafNode node={node} depth={depth} />
+    {isDirectory(node)
+      ? (node.children || []).map((c) => (
+          <ul key={depth + "_" + c.name}>
+            <NonLeafNode node={c} depth={depth + 1} />
+          </ul>
+        ))
+      : null}
+  </>
+);
 
 const FileTree = ({ nodes, className }: Props) => (
-  <ul
+  <div
     className={clsx(
-      "not-prose flex flex-col gap-2 rounded-md border-2 border-zinc-300 p-5 shadow-md dark:border-zinc-700",
+      "not-prose flex flex-col gap-2 overflow-x-scroll rounded-md border-2 border-zinc-300 p-5 shadow-md dark:border-zinc-700",
       className
     )}
   >
-    {nodes.map((n) => renderNode(n, 0))}
-  </ul>
+    <ul className={"flex min-w-[460px] flex-col gap-2"}>
+      {nodes.map((n) => (
+        <NonLeafNode key={n.name} node={n} depth={0} />
+      ))}
+    </ul>
+  </div>
 );
 
 export default FileTree;

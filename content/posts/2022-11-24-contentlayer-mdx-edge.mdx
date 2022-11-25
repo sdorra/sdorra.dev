@@ -11,7 +11,7 @@ During development everything went well, until I deployed it to vercel.
 On vercel the build ends with the following error:
 
 <Notification severity="error">
-<strong>Error:</strong> Provided Edge Function is too large
+  <strong>Error:</strong> Provided Edge Function is too large
 </Notification>
 
 Too large?
@@ -47,7 +47,7 @@ const nextConfig = {
       level: "error",
     };
     return config;
-  }
+  },
 };
 
 const withBundleAnalyzer = NextBundleAnalyzer({
@@ -87,7 +87,7 @@ As the comments show, there were a few stumbling blocks, but on the whole the im
 So i deployed my results to vercel, but unfortunately it shows the same error:
 
 <Notification severity="error">
-<strong>Error:</strong> Provided Edge Function is too large
+  <strong>Error:</strong> Provided Edge Function is too large
 </Notification>
 
 This is strange, because our bundle should be much smaller now.
@@ -98,8 +98,34 @@ pnpm add --global vercel
 ```
 
 After the installation, we can generate the output by calling `vercel build`.
-The generated output shows that the bundle size is now `320K`,
+The generated output shows that the bundle size is now `390K`,
 but there is a `assets` directory which contains the `_index.json` of contentlayer.
+
+<FileTree
+  nodes={[
+    {
+      type: "directory",
+      name: ".vercel/output/functions/api/og/posts/[slug].func/",
+      children: [
+        {
+          type: "directory",
+          name: "assets",
+          children: [{ type: "file", name: "_index.df90b64bb8d3d072.json", size: 985334 }],
+        },
+        {
+          type: "file",
+          name: "index.js",
+          size: 399590,
+        },
+        {
+          type: "file",
+          name: "index.js.map",
+          size: 564330,
+        },
+      ],
+    },
+  ]}
+/>
 
 It looks like the assets directory is counted in the limit.
 So we need an other solution.
@@ -141,8 +167,8 @@ const createJson = () => {
   console.log(`create posts json without body for ${allPosts.length} paths`);
   const json = createJson();
   await mkdir("./.scripts/Post", {
-    recursive: true
-  })
+    recursive: true,
+  });
   await writeFile("./.scripts/Post/withoutbody.json", JSON.stringify(json, null, 2), {
     encoding: "utf-8",
   });
@@ -171,7 +197,7 @@ Than we can run our script and finally we can run the next build.
 After the build integration we can import the generated json:
 
 ```tsx pages/api/og/[slug].tsx
-import allPosts from ".scripts/Post/withoutbody.json";
+
 ```
 
 To ensure that we are not add the generated file to out repository,

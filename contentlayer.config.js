@@ -1,9 +1,10 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 
 import { remarkCodeHike } from "@code-hike/mdx";
-import remarkGfm from "remark-gfm";
 import { createRequire } from "module";
 import readingTime from "reading-time";
+import remarkGfm from "remark-gfm";
+import rehypeImgSize from "rehype-img-size"
 
 const require = createRequire(import.meta.url);
 const theme = require("shiki/themes/nord.json");
@@ -31,8 +32,8 @@ export const Post = defineDocumentType(() => ({
     image: {
       type: "string",
       description: "Featured image for the post",
-      required: true
-    }
+      required: true,
+    },
   },
   computedFields: {
     url: {
@@ -50,6 +51,7 @@ export default makeSource({
   contentDirPath: "content/posts",
   documentTypes: [Post],
   mdx: {
+    rehypePlugins: [[rehypeImgSize, { dir: "public" }]],
     remarkPlugins: [remarkGfm, [remarkCodeHike, { theme }]],
   },
 });

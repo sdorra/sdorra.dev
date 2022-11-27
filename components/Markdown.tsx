@@ -4,6 +4,7 @@ import clsx from "clsx";
 import Notification from "components/Notification";
 import { useMDXComponent } from "next-contentlayer/hooks";
 import FileTree from "./FileTree";
+import MarkdownImage from "./MarkdownImage";
 
 type Props = {
   code: string;
@@ -21,7 +22,7 @@ const Markdown = ({ code }: Props) => {
         "hover:prose-a:decoration-cyan-500 hover:prose-a:decoration-2"
       )}
     >
-      <MDXComponent components={{ Notification, FileTree }} />
+      <MDXComponent components={{ Notification, FileTree, img: MarkdownImage }} />
     </section>
   );
 };

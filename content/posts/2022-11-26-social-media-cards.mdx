@@ -1,0 +1,474 @@
+---
+title: Social Media Cards
+summary: Creating social media cards with @vercel/og and workaround its limitations
+date: 2022-11-26
+image: https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7
+---
+
+Recently I added social media cards to this blog.
+Social media cards are images which are displayed,
+when you or someone else post a link to your content on a social media platform.
+Posts with a nice looking image are more often clicked, as those without an image.
+Lets see how we can implement them.
+
+## Possible implementations
+
+I've implemented social media cards many times before and
+I've used many different technics to implement them,
+but all of them had their downsides.
+
+### Manually creation
+
+The simplest way is to create the social media cards manually.
+Just open [figma](https://figma.com/) or a similar tool and create a card for each post.
+This approach works, but it is very error prone and time consuming.
+We had to remember to create a new card, every time we create a new post.
+
+### Node Canvas
+
+Another approach is it to create a background image and
+insert the texts and the metadata with a canvas library like [node-canvas](https://github.com/Automattic/node-canvas).
+This approach is very well described in [this Learn With Jason episode](https://www.learnwithjason.dev/generate-dynamic-images-with-node-canvas).
+But with a canvas library we have to specify on which coordinates we want to render our texts and
+it does not wrap automatically if it becomes to long.
+
+### External service
+
+We could also use an external service like [cloudinary](https://cloudinary.com/).
+The [post of Jason](https://www.learnwithjason.dev/blog/auto-generate-social-image/) describes this approach very detailed.
+[Cloudinary](https://cloudinary.com/) is able to break texts on a certain width,
+but the api is not very intuitive and the largest part of the card is an image which must be build with an external tool.
+
+### SVG and opentype.js
+
+With an SVG we can define our image as code, which is pretty neat.
+But SVG is not able to wrap texts.
+We can use [opentype.js](https://opentype.js.org/) to calculate the width of our texts and to wrap it manually.
+Finally we have to convert the SVG to a PNG, because the most of social media platforms do not support SVG.
+This approach could work, but requires a lot of code and it is very complicated.
+
+### Headless browser
+
+If all these solutions have problems with wrapping of texts or requires us to build the image with an external tool,
+why we could just use HTML+CSS to define our image.
+This is possible!
+We can create our card with HTML+SVG+CSS, open a browser and create a screenshot of the result.
+I've use this approach in the [past](https://github.com/scm-manager/website/blob/master/src/lib/socialSharingCards.js) and it works well.
+The problem is that process is very slow.
+[This example](https://github.com/scm-manager/website/blob/master/src/lib/socialSharingCards.js) creates the cards during the build.
+Creating the cards during the build requires external caching, because is slows down the build extremely.
+Generating cards with this approach in a serverless function is often not possible,
+because it requires a browser within the function which breaks breaks the size limit of those functions.
+
+### @vercel/og
+
+`@vercel/og` promises a new way of generating social media cards, which does not have the downsides of the other approaches.
+The library uses [Satori](https://github.com/vercel/satori) under the hood.
+[Satori](https://github.com/vercel/satori) describes itself as follows:
+
+> Enlightened library to convert HTML and CSS to SVG.
+
+We can use HTML+SVG+CSS to create an Image without the requirement to start a browser for an screenshot.
+This sounds like the solution I've been looking for.
+So let us try it out.
+
+## Hello World
+
+First we have to install the package from the npm registry:
+
+```bash
+pnpm add @vercel/og
+```
+
+After the installation we have to create an edge function, which renders our social media card.
+
+```tsx pages/api/og.tsx
+import { ImageResponse } from "@vercel/og";
+
+export const config = {
+  runtime: "experimental-edge",
+};
+
+export default function () {
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          fontSize: 128,
+          background: "white",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          textAlign: "center",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        Hello world!
+      </div>
+    ),
+    {
+      width: 1200,
+      height: 600,
+    }
+  );
+}
+```
+
+This was easy, so lets try to create something more complicated.
+
+## The goal
+
+I've headed over to [figma](https://www.figma.com/) and started to create an example social media card.
+I've ended with the following:
+
+![Figma template](/posts/2022-11-26-social-media-cards/template.png)
+
+Ok, now lets see if we can implement it with `@vercel/og`.
+
+## The implementation
+
+The first hurdle that I had to overcome, was the usage of custom fonts.
+The figma template uses [Raleway](https://fonts.google.com/specimen/Raleway) and [Cabin](https://fonts.google.com/specimen/Cabin).
+This are the same fonts which are used on the website.
+
+### Fonts
+
+Unfortunately we can't use the [@next/font](https://nextjs.org/docs/api-reference/next/font) package with Satori.
+So we have to copy the font files to our project.
+
+<Notification>
+  It looks like Satori has problems with dynamic fonts. Therefore only static fonts should be used and we have to load
+  each used weight separately.
+</Notification>
+
+In an edge function we can't access the filesystem, but we can use `fetch` to load the fonts:
+
+```tsx pages/api/og/[slug].tsx
+const ralewayBold = fetch(new URL(`../../../../content/fonts/Raleway-Bold.ttf`, import.meta.url)).then((res) =>
+  res.arrayBuffer()
+);
+
+const cabinSemiBold = fetch(new URL(`../../../../content/fonts/Cabin-SemiBold.ttf`, import.meta.url)).then((res) =>
+  res.arrayBuffer()
+);
+
+const cabinMedium = fetch(new URL(`../../../../content/fonts/Cabin-Medium.ttf`, import.meta.url)).then((res) =>
+  res.arrayBuffer()
+);
+```
+
+Than we have to define them on the `ImageResponse` config:
+
+```tsx pages/api/og/[slug].tsx
+return new ImageResponse(<div>...</div>, {
+  width: 1200,
+  height: 675,
+  fonts: [
+    {
+      name: "Raleway",
+      data: await ralewayBold,
+      style: "normal",
+      weight: 700,
+    },
+    {
+      name: "Cabin",
+      data: await cabinMedium,
+      style: "normal",
+      weight: 400,
+    },
+    {
+      name: "Cabin",
+      data: await cabinSemiBold,
+      style: "normal",
+      weight: 600,
+    },
+  ],
+});
+```
+
+After we have load the fonts we can use them in our jsx:
+
+```tsx
+<div style={{ fontFamily: '"Cabin"' }}>Hello from Cabin</div>
+```
+
+<Notification>
+**Note** the extra double quotes around the font name,
+those are required and the font is not used without them.
+</Notification>
+
+### Tailwind
+
+`@vercel/og` offers experimental Tailwind support and
+I love Tailwind so I decided to use it.
+
+In order to use Tailwind utilities, we can use the `tw` attribute on any element e.g.:
+
+```tsx
+<div tw="rounded-xl border-2 border-zinc-700 shadow-lg"></div>
+```
+
+The first problem I've noticed is that my Tailwind config was not used.
+It looks like `@vercel/og` uses the default config and
+ignores the configuration of the project.
+
+The second problem I've noticed is that not all utilities seams to work.
+I'm not sure whats the reason for that, but some utilities work and other not.
+For example the gradient utilities are not working, although the CSS properties are supported by Satori.
+Maybe utilities that use CSS variables are not supported?
+However the following utilities I want use are not working as expected:
+
+- bg-gradient-\*, from-\*, via-\* and to-\*
+- object-cover
+- rotate-\*
+
+Another problem took me some time.
+In a normal Tailwind project,
+the Tailwind preflight is loaded,
+which removes the default browser margins and paddings from each element.
+This does not happen for `@vercel/og`,
+which took me some time to figure out where are spacings come from.
+I've fixed it by just using `div` and `span` tags.
+Semantics of elements could be ignored here,
+because in the end we create an image and all the elements are gone.
+
+By the way, the `debug` option on the `ImageResponse` is pretty handy.
+If it is used, every element becomes a colored border,
+which helps to identify which element takes how much space.
+
+Ok, enough about problems and workarounds here is the code:
+
+```tsx pages/api/og/[slug].tsx
+import { ImageResponse } from "@vercel/og";
+import { allPosts } from "contentlayer/generated";
+import { NextRequest } from "next/server";
+
+export const config = {
+  runtime: "experimental-edge",
+};
+
+const ralewayBold = fetch(new URL(`../../../../content/fonts/Raleway-Bold.ttf`, import.meta.url)).then((res) =>
+  res.arrayBuffer()
+);
+
+const cabinSemiBold = fetch(new URL(`../../../../content/fonts/Cabin-SemiBold.ttf`, import.meta.url)).then((res) =>
+  res.arrayBuffer()
+);
+
+const cabinMedium = fetch(new URL(`../../../../content/fonts/Cabin-Medium.ttf`, import.meta.url)).then((res) =>
+  res.arrayBuffer()
+);
+
+const Image = async (req: NextRequest) => {
+  const slug = req.nextUrl.pathname.replace("/api/og/posts/", "");
+  const post = allPosts.find((p) => slug === p._raw.flattenedPath);
+  if (!post) {
+    return new Response(
+      JSON.stringify({
+        message: "Could not find post with slug: " + slug,
+      }),
+      {
+        status: 404,
+      }
+    );
+  }
+
+  return new ImageResponse(
+    (
+      <div
+        tw="w-full h-full p-8 flex"
+        style={{
+          backgroundImage: "linear-gradient(to right, #0891B2, #164E63)",
+          fontFamily: '"Cabin"',
+        }}
+      >
+        <div tw="rounded-xl border-2 border-zinc-700 w-full h-full p-4 flex bg-zinc-800 shadow-lg">
+          <img
+            width="375"
+            height="575"
+            src={post.image}
+            tw="rounded-xl border-2 border-zinc-700"
+            style={{ objectFit: "cover" }}
+          />
+          <div tw="flex flex-col px-6 w-[740px] h-full justify-between">
+            <div tw="flex flex-col">
+              <span
+                tw="text-7xl font-bold text-zinc-50 mb-6"
+                style={{
+                  fontFamily: '"Raleway"',
+                }}
+              >
+                {post.title}
+              </span>
+              <span tw="text-5xl text-zinc-300">{post.summary}</span>
+            </div>
+            <div tw="flex justify-between items-end w-full text-zinc-400 text-xl">
+              <span>{post.readingTime}</span>
+              <div
+                tw="flex text-4xl font-bold"
+                style={{
+                  fontFamily: '"Raleway"',
+                }}
+              >
+                <span tw="text-zinc-50">sdorra</span>
+                <span tw="text-cyan-400">.dev</span>
+              </div>
+              <span>{post.date.substring(0, post.date.indexOf("T"))}</span>
+            </div>
+          </div>
+          <div
+            tw="w-32 h-32 border-t-2 border-t-zinc-700 border-l-2 border-l-zinc-700 bg-zinc-800 rounded-full absolute left-[324px] bottom-[59px]"
+            style={{
+              transform: "rotate(-45deg)",
+            }}
+          />
+          <div tw="absolute left-[338px] bottom-[68px] flex items-center">
+            <img
+              tw="rounded-full border-2 border-zinc-700"
+              width="110"
+              height="110"
+              src="https://avatars.githubusercontent.com/u/493333"
+            />
+            <p tw="ml-6 text-4xl font-semibold text-zinc-400">Sebastian Sdorra</p>
+          </div>
+        </div>
+      </div>
+    ),
+    {
+      width: 1200,
+      height: 675,
+      debug: false,
+      fonts: [
+        {
+          name: "Raleway",
+          data: await ralewayBold,
+          style: "normal",
+          weight: 700,
+        },
+        {
+          name: "Cabin",
+          data: await cabinMedium,
+          style: "normal",
+          weight: 400,
+        },
+        {
+          name: "Cabin",
+          data: await cabinSemiBold,
+          style: "normal",
+          weight: 600,
+        },
+      ],
+    }
+  );
+};
+
+export default Image;
+```
+
+With about 120 lines of code I was able to create the following image:
+
+![Result](/posts/2022-11-26-social-media-cards/result.png)
+
+Now it is time to deploy it to vercel.
+
+### Edge function size limit
+
+The first deployment to vercel ends with the following error:
+
+<Notification type="error">
+  <strong>Error:</strong> Provided Edge Function is too large
+</Notification>
+
+It took me some time to figure out what is going on.
+I've create a [separate post](http://localhost:3000/posts/2022-11-24-contentlayer-mdx-edge) about this problem and my workaround.
+
+### Unsplash image size
+
+After I bypassed the size limitation of the edge function,
+the deployment went through but the og endpoint ends with an error 500.
+The error in the vercel log does not help at all.
+So I started to look at the code and start commenting out some parts of the code and
+it took not very long to find out that the post image is the problem.
+It looks like another size limitation.
+The image is loaded from [Unsplash](https://unsplash.com/) and is about `7mb` large.
+Luckily [Unsplash](https://unsplash.com/) has an api to resize the image,
+so we could fetch the image in exactly the size we need.
+
+```tsx pages/api/og/[slug].tsx
+const createImageUrl = (src: string, width: number, height: number) => {
+  if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
+    return `${src}?fit=crop&w=${width}&h=${height}`;
+  }
+  return src;
+};
+
+<img
+  width="375"
+  height="575"
+  src={createImageUrl(post.image, 375, 575)}
+  tw="rounded-xl border-2 border-zinc-700"
+  style={{ objectFit: "cover" }}
+/>;
+```
+
+After this fix we are able to generate social media cards on our production site.
+
+## Meta tags
+
+Now it is time to link our social media cards in the header of our post page.
+So that the social media networks are able to find the image.
+For this we are creating a `head.tsx` file with the following content:
+
+```tsx app/posts/[slug]/head.tsx
+import { allPosts } from "contentlayer/generated";
+
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+
+const fqdn = process.env.NEXT_PUBLIC_FQDN ? process.env.NEXT_PUBLIC_FQDN : "sdorra.dev";
+
+const Head = ({ params }: Props) => {
+  const post = allPosts.find((p) => p._raw.flattenedPath === params.slug);
+  if (!post) {
+    return null;
+  }
+  return (
+    <>
+      <title>{post.title}</title>
+      <meta name="description" content={post.summary} />
+
+      <meta name="og:title" content={post.title} />
+      <meta name="og:description" content={post.summary} />
+      <meta property="og:image" content={`https://${fqdn}/api/og/posts/${post._raw.flattenedPath}`} />
+      <meta property="og:type" content="article" />
+
+      <meta name="twitter:title" content={post.title} />
+      <meta name="twitter:description" content={post.summary} />
+      <meta property="twitter:image" content={`https://${fqdn}/api/og/posts/${post._raw.flattenedPath}`} />
+      <meta name="twitter:card" content="summary_large_image" />
+    </>
+  );
+};
+
+export default Head;
+```
+
+We use [og tags](https://ogp.me/) which are accepted by the most of the social media sites.
+Expect Twitter, I've had strange results if I used only `og` with Twitter.
+So I've added the Twitter tags beside the `og` tags.
+
+<Notification>
+  Ensure that the image url is an complete url with scheme and hostname.
+  The most social media sites do not render images with an relative url.
+</Notification>
+
+Now we can test the results with [socialsharepreview](https://socialsharepreview.com/).
+
+## Conclusion
+
+Even if there are a few stumbling blocks with `@vercel/og`,
+it is the best solution for social media cards if worked with so far.

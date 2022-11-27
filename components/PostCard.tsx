@@ -23,6 +23,7 @@ const PostCard = ({ post }: Props) => (
           alt="Featured Image"
           width={128}
           height={128}
+          priority={true}
           className={clsx(
             "relative -mt-10 mb-2 h-32 w-32 flex-shrink-0 rounded-md bg-white object-cover  dark:bg-zinc-800 sm:mb-0",
             "border-2 border-zinc-300 group-hover:border-cyan-500 dark:border-zinc-700 dark:group-hover:border-cyan-400"

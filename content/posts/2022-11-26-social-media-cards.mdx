@@ -14,7 +14,7 @@ Lets see how we can implement them.
 ## Possible implementations
 
 I've implemented social media cards many times before and
-I've used many different technics to implement them,
+I've used many different techniques to implement them,
 but all of them had their downsides.
 
 ### Manually creation
@@ -49,16 +49,16 @@ This approach could work, but requires a lot of code and it is very complicated.
 
 ### Headless browser
 
-If all these solutions have problems with wrapping of texts or requires us to build the image with an external tool,
-why we could just use HTML+CSS to define our image.
+If all these solutions have problems with wrapping texts or require us to build the image with an external tool,
+why could we just use HTML+CSS to define our image?
 This is possible!
 We can create our card with HTML+SVG+CSS, open a browser and create a screenshot of the result.
-I've use this approach in the [past](https://github.com/scm-manager/website/blob/master/src/lib/socialSharingCards.js) and it works well.
-The problem is that process is very slow.
+I've used this approach in the [past](https://github.com/scm-manager/website/blob/master/src/lib/socialSharingCards.js) and it worked well.
+The problem is that the process is very slow.
 [This example](https://github.com/scm-manager/website/blob/master/src/lib/socialSharingCards.js) creates the cards during the build.
-Creating the cards during the build requires external caching, because is slows down the build extremely.
-Generating cards with this approach in a serverless function is often not possible,
-because it requires a browser within the function which breaks breaks the size limit of those functions.
+Creating the cards during the build requires external caching, because it slows down the build extremely.
+Also generating cards with this approach in a serverless function is often not possible,
+because it requires a browser within the function which breaks the size limit of those functions.
 
 ### @vercel/og
 
@@ -68,17 +68,29 @@ The library uses [Satori](https://github.com/vercel/satori) under the hood.
 
 > Enlightened library to convert HTML and CSS to SVG.
 
-We can use HTML+SVG+CSS to create an Image without the requirement to start a browser for an screenshot.
-This sounds like the solution I've been looking for.
-So let us try it out.
+We can use HTML+SVG+CSS to create an image without the requirement to start a browser for a screenshot.
+This sounds exactly like the solution I've been looking for.
+So let's try it out.
 
 ## Hello World
 
 First we have to install the package from the npm registry:
 
-```bash
+<CH.Code>
+
+```bash pnpm
 pnpm add @vercel/og
 ```
+
+```bash yarn
+yarn add @vercel/og
+```
+
+```bash npm
+npm install @vercel/og
+```
+
+</CH.Code>
 
 After the installation we have to create an edge function, which renders our social media card.
 
@@ -124,13 +136,13 @@ I've ended with the following:
 
 ![Figma template](/posts/2022-11-26-social-media-cards/template.png)
 
-Ok, now lets see if we can implement it with `@vercel/og`.
+Ok, now lets see if we can implement this with `@vercel/og`.
 
 ## The implementation
 
-The first hurdle that I had to overcome, was the usage of custom fonts.
+The first hurdle that I had to overcome was the usage of custom fonts.
 The figma template uses [Raleway](https://fonts.google.com/specimen/Raleway) and [Cabin](https://fonts.google.com/specimen/Cabin).
-This are the same fonts which are used on the website.
+These are the same fonts which are used on the website.
 
 ### Fonts
 
@@ -139,7 +151,7 @@ So we have to copy the font files to our project.
 
 <Notification>
   It looks like Satori has problems with dynamic fonts. Therefore only static fonts should be used and we have to load
-  each used weight separately.
+  each weight used separately.
 </Notification>
 
 In an edge function we can't access the filesystem, but we can use `fetch` to load the fonts:
@@ -158,7 +170,7 @@ const cabinMedium = fetch(new URL(`../../../../content/fonts/Cabin-Medium.ttf`, 
 );
 ```
 
-Than we have to define them on the `ImageResponse` config:
+Than we have to configure our fonts in the `ImageResponse`:
 
 ```tsx pages/api/og/[slug].tsx
 return new ImageResponse(<div>...</div>, {
@@ -187,15 +199,15 @@ return new ImageResponse(<div>...</div>, {
 });
 ```
 
-After we have load the fonts we can use them in our jsx:
+Now we are able to use the fonts in our jsx:
 
 ```tsx
 <div style={{ fontFamily: '"Cabin"' }}>Hello from Cabin</div>
 ```
 
 <Notification>
-**Note** the extra double quotes around the font name,
-those are required and the font is not used without them.
+Pay attention to the additional double quotes around the font name.
+If we don't wrap the font in double quotes, `@vercel/og` will not use the font.
 </Notification>
 
 ### Tailwind
@@ -203,7 +215,7 @@ those are required and the font is not used without them.
 `@vercel/og` offers experimental Tailwind support and
 I love Tailwind so I decided to use it.
 
-In order to use Tailwind utilities, we can use the `tw` attribute on any element e.g.:
+In order to use Tailwind utilities, we can use the `tw` attribute on any element:
 
 ```tsx
 <div tw="rounded-xl border-2 border-zinc-700 shadow-lg"></div>
@@ -213,11 +225,11 @@ The first problem I've noticed is that my Tailwind config was not used.
 It looks like `@vercel/og` uses the default config and
 ignores the configuration of the project.
 
-The second problem I've noticed is that not all utilities seams to work.
-I'm not sure whats the reason for that, but some utilities work and other not.
-For example the gradient utilities are not working, although the CSS properties are supported by Satori.
+The second problem I've noticed is that not all utilities seem to work.
+I'm not sure what the reason for that is, but some utilities work and others not.
+For example the gradient utilities are not working, although those CSS properties are supported by Satori.
 Maybe utilities that use CSS variables are not supported?
-However the following utilities I want use are not working as expected:
+However, the following utilities I want to use are not working as expected:
 
 - bg-gradient-\*, from-\*, via-\* and to-\*
 - object-cover
@@ -227,17 +239,17 @@ Another problem took me some time.
 In a normal Tailwind project,
 the Tailwind preflight is loaded,
 which removes the default browser margins and paddings from each element.
-This does not happen for `@vercel/og`,
-which took me some time to figure out where are spacings come from.
+This does not happen for `@vercel/og` and
+it took me some time to figure out where the spacings were coming from.
 I've fixed it by just using `div` and `span` tags.
 Semantics of elements could be ignored here,
-because in the end we create an image and all the elements are gone.
+because in the end we will create an image and all the elements will be gone anyways.
 
 By the way, the `debug` option on the `ImageResponse` is pretty handy.
-If it is used, every element becomes a colored border,
-which helps to identify which element takes how much space.
+If it is used, every element gets a colored border,
+which helps to determine which element takes how much space.
 
-Ok, enough about problems and workarounds here is the code:
+Ok, enough about problems and workarounds, here is the code:
 
 ```tsx pages/api/og/[slug].tsx
 import { ImageResponse } from "@vercel/og";
@@ -381,19 +393,19 @@ The first deployment to vercel ends with the following error:
 </Notification>
 
 It took me some time to figure out what is going on.
-I've create a [separate post](http://localhost:3000/posts/2022-11-24-contentlayer-mdx-edge) about this problem and my workaround.
+I've created a [separate post](http://localhost:3000/posts/2022-11-24-contentlayer-mdx-edge) about this problem together with my workaround.
 
 ### Unsplash image size
 
-After I bypassed the size limitation of the edge function,
-the deployment went through but the og endpoint ends with an error 500.
-The error in the vercel log does not help at all.
-So I started to look at the code and start commenting out some parts of the code and
-it took not very long to find out that the post image is the problem.
-It looks like another size limitation.
-The image is loaded from [Unsplash](https://unsplash.com/) and is about `7mb` large.
+After I worked my way around the size limitation of the edge function,
+the deployment was successful but the og endpoint responded with an error 500.
+The error in the vercel log did not help at all.
+So I started to look at the code and began to comment out parts of the code. Fortunately
+it didn't take very long to find out that the image of the post was the problem.
+It looked like there is another size limitation.
+The image was loaded from [Unsplash](https://unsplash.com/) and about `7mb` in size.
 Luckily [Unsplash](https://unsplash.com/) has an api to resize the image,
-so we could fetch the image in exactly the size we need.
+so we can fetch the image in exactly the size we need.
 
 ```tsx pages/api/og/[slug].tsx
 const createImageUrl = (src: string, width: number, height: number) => {
@@ -416,9 +428,9 @@ After this fix we are able to generate social media cards on our production site
 
 ## Meta tags
 
-Now it is time to link our social media cards in the header of our post page.
-So that the social media networks are able to find the image.
-For this we are creating a `head.tsx` file with the following content:
+Now it is time to link our social media cards in the header of our post page,
+so that the social media networks are able to find the image.
+Therefore we are creating a `head.tsx` file with the following content:
 
 ```tsx app/posts/[slug]/head.tsx
 import { allPosts } from "contentlayer/generated";
@@ -457,13 +469,13 @@ const Head = ({ params }: Props) => {
 export default Head;
 ```
 
-We use [og tags](https://ogp.me/) which are accepted by the most of the social media sites.
-Expect Twitter, I've had strange results if I used only `og` with Twitter.
-So I've added the Twitter tags beside the `og` tags.
+We use [og tags](https://ogp.me/) which are accepted by most of the social media sites.
+Except Twitter where I've had strange results if I only used `og` tags.
+So I've added the Twitter tags besides the `og` tags.
 
 <Notification>
-  Ensure that the image url is an complete url with scheme and hostname.
-  The most social media sites do not render images with an relative url.
+  Ensure that the image url is a complete url with scheme and hostname.
+  The most social media sites do not render images with a relative url.
 </Notification>
 
 Now we can test the results with [socialsharepreview](https://socialsharepreview.com/).

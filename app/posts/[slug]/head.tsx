@@ -18,15 +18,19 @@ const Head = ({ params }: Props) => {
       <title>{post.title}</title>
       <meta name="description" content={post.summary} />
 
+      <meta property="og:url" content={`https://${fqdn}/posts/${post._raw.flattenedPath}`} />
+      <meta property="og:type" content="article" />
       <meta name="og:title" content={post.title} />
       <meta name="og:description" content={post.summary} />
       <meta property="og:image" content={`https://${fqdn}/api/og/posts/${post._raw.flattenedPath}`} />
-      <meta property="og:type" content="article" />
 
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:domain" content={fqdn} />
+      <meta property="twitter:url" content={`https://${fqdn}/posts/${post._raw.flattenedPath}`} />
       <meta name="twitter:title" content={post.title} />
       <meta name="twitter:description" content={post.summary} />
       <meta property="twitter:image" content={`https://${fqdn}/api/og/posts/${post._raw.flattenedPath}`} />
-      <meta name="twitter:card" content="summary_large_image" />
+
     </>
   );
 };

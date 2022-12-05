@@ -175,7 +175,7 @@ Than we have to configure our fonts in the `ImageResponse`:
 ```tsx pages/api/og/[slug].tsx
 return new ImageResponse(<div>...</div>, {
   width: 1200,
-  height: 675,
+  height: 630,
   fonts: [
     {
       name: "Raleway",
@@ -289,7 +289,7 @@ const Image = async (req: NextRequest) => {
   return new ImageResponse(
     (
       <div
-        tw="w-full h-full p-8 flex"
+        tw="w-full h-full p-4 flex"
         style={{
           backgroundImage: "linear-gradient(to right, #0891B2, #164E63)",
           fontFamily: '"Cabin"',
@@ -298,7 +298,7 @@ const Image = async (req: NextRequest) => {
         <div tw="rounded-xl border-2 border-zinc-700 w-full h-full p-4 flex bg-zinc-800 shadow-lg">
           <img
             width="375"
-            height="575"
+            height="562"
             src={post.image}
             tw="rounded-xl border-2 border-zinc-700"
             style={{ objectFit: "cover" }}
@@ -349,7 +349,7 @@ const Image = async (req: NextRequest) => {
     ),
     {
       width: 1200,
-      height: 675,
+      height: 630,
       debug: false,
       fonts: [
         {
@@ -417,8 +417,8 @@ const createImageUrl = (src: string, width: number, height: number) => {
 
 <img
   width="375"
-  height="575"
-  src={createImageUrl(post.image, 375, 575)}
+  height="562"
+  src={createImageUrl(post.image, 375, 562)}
   tw="rounded-xl border-2 border-zinc-700"
   style={{ objectFit: "cover" }}
 />;
@@ -453,15 +453,18 @@ const Head = ({ params }: Props) => {
       <title>{post.title}</title>
       <meta name="description" content={post.summary} />
 
+      <meta property="og:url" content={`https://${fqdn}/posts/${post._raw.flattenedPath}`} />
+      <meta property="og:type" content="article" />
       <meta name="og:title" content={post.title} />
       <meta name="og:description" content={post.summary} />
       <meta property="og:image" content={`https://${fqdn}/api/og/posts/${post._raw.flattenedPath}`} />
-      <meta property="og:type" content="article" />
 
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:domain" content={fqdn} />
+      <meta property="twitter:url" content={`https://${fqdn}/posts/${post._raw.flattenedPath}`} />
       <meta name="twitter:title" content={post.title} />
       <meta name="twitter:description" content={post.summary} />
       <meta property="twitter:image" content={`https://${fqdn}/api/og/posts/${post._raw.flattenedPath}`} />
-      <meta name="twitter:card" content="summary_large_image" />
     </>
   );
 };

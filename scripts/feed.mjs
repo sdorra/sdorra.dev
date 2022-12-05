@@ -1,5 +1,5 @@
 import { evaluateSync } from "@mdx-js/mdx";
-import { compareDesc, parseISO } from "date-fns";
+import { compareDesc, parseISO, setHours } from "date-fns";
 import { Feed } from "feed";
 import { writeFile } from "fs/promises";
 import React from "react";
@@ -68,7 +68,7 @@ const createFeed = () => {
             link: "https://sdorra.dev",
           },
         ],
-        date: parseISO(post.date),
+        date: setHours(parseISO(post.date), 13),
         content: convertContent(post.body.raw),
         category: post.tags.map((name) => ({ name })),
         image: `https://sdorra.dev/api/og/posts/${post._raw.flattenedPath}`

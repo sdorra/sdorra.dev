@@ -71,7 +71,7 @@ const createFeed = () => {
         date: parseISO(post.date),
         content: convertContent(post.body.raw),
         category: post.tags.map((name) => ({ name })),
-        //image: ""
+        image: `https://sdorra.dev/api/og/posts/${post._raw.flattenedPath}`
       });
     });
 

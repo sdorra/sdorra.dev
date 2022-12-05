@@ -44,7 +44,7 @@ const Image = async (req: NextRequest) => {
   return new ImageResponse(
     (
       <div
-        tw="w-full h-full p-8 flex"
+        tw="w-full h-full p-4 flex"
         style={{
           backgroundImage: "linear-gradient(to right, #0891B2, #164E63)",
           fontFamily: '"Cabin"',
@@ -53,8 +53,8 @@ const Image = async (req: NextRequest) => {
         <div tw="rounded-xl border-2 border-zinc-700 w-full h-full p-4 flex bg-zinc-800 shadow-lg">
           <img
             width="375"
-            height="575"
-            src={createImageUrl(post.image, 375, 575)}
+            height="562"
+            src={createImageUrl(post.image, 375, 562)}
             tw="rounded-xl border-2 border-zinc-700"
             style={{ objectFit: "cover" }}
           />
@@ -104,7 +104,7 @@ const Image = async (req: NextRequest) => {
     ),
     {
       width: 1200,
-      height: 675,
+      height: 630,
       debug: false,
       fonts: [
         {

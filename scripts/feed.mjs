@@ -32,6 +32,13 @@ const convertContent = (body) => {
   );
 };
 
+const createImageUrl = (src, width, height) => {
+  if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
+    return `${src}?fit=crop&amp;w=${width}&amp;h=${height}`;
+  }
+  return src;
+};
+
 const createFeed = () => {
   const feed = new Feed({
     title: "sdorra.dev",
@@ -71,7 +78,9 @@ const createFeed = () => {
         date: setHours(parseISO(post.date), 13),
         content: convertContent(post.body.raw),
         category: post.tags.map((name) => ({ name })),
-        image: `https://sdorra.dev/api/og/posts/${post._raw.flattenedPath}`
+        // 1000x420 is best for dev.to
+        // https://dev.to/p/editor_guide
+        image: { url: createImageUrl(post.image, 1000, 420) },
       });
     });
 

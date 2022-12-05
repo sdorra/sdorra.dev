@@ -34,6 +34,12 @@ export const Post = defineDocumentType(() => ({
       description: "Featured image for the post",
       required: true,
     },
+    tags: {
+      type: 'list',
+      of: { type: 'string' },
+      description: "List of post tags",
+      required: true,
+    },
   },
   computedFields: {
     url: {

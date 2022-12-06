@@ -3,9 +3,9 @@ import { Feed } from "feed";
 import { writeFile } from "fs/promises";
 import { allPosts } from "../.contentlayer/generated/index.mjs";
 
-const createImageUrl = (src, width, height) => {
+const createImageUrl = (src, width) => {
   if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
-    return `${src}?fit=crop&amp;w=${width}&amp;h=${height}`;
+    return `${src}?fit=crop&amp;w=${width}`;
   }
   return src;
 };
@@ -48,9 +48,7 @@ const createFeed = () => {
         ],
         date: setHours(parseISO(post.date), 13),
         category: post.tags.map((name) => ({ name })),
-        // 1000x420 is best for dev.to
-        // https://dev.to/p/editor_guide
-        image: { url: createImageUrl(post.image, 1000, 420) },
+        image: createImageUrl(post.image, 720),
       });
     });
 

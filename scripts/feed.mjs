@@ -1,36 +1,7 @@
-import { evaluateSync } from "@mdx-js/mdx";
 import { compareDesc, parseISO, setHours } from "date-fns";
 import { Feed } from "feed";
 import { writeFile } from "fs/promises";
-import React from "react";
-import { renderToString } from "react-dom/server";
-import * as runtime from "react/jsx-runtime";
-import remarkGfm from "remark-gfm";
 import { allPosts } from "../.contentlayer/generated/index.mjs";
-
-const convertContent = (body) => {
-  const mdx = evaluateSync(body, {
-    ...runtime,
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [],
-  }).default;
-
-  const CH = ({ children }) => React.createElement("div", null, children);
-  CH.Code = ({ children }) => React.createElement("div", null, children);
-  CH.Code.displayName = "CH.Code";
-
-  const components = {
-    CH,
-    Notification: ({ children }) => React.createElement("div", null, children),
-    FileTree: () => null,
-  };
-
-  return renderToString(
-    React.createElement(mdx, {
-      components,
-    })
-  );
-};
 
 const createImageUrl = (src, width, height) => {
   if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
@@ -76,7 +47,6 @@ const createFeed = () => {
           },
         ],
         date: setHours(parseISO(post.date), 13),
-        content: convertContent(post.body.raw),
         category: post.tags.map((name) => ({ name })),
         // 1000x420 is best for dev.to
         // https://dev.to/p/editor_guide

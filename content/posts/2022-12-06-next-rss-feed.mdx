@@ -1,0 +1,208 @@
+---
+title: RSS Feed with Next.js
+summary: A good blog needs an RSS feed, even if hardly anyone seems to use an RSS reader anymore
+date: 2022-12-06
+image: https://images.unsplash.com/photo-1498644035638-2c3357894b10
+tags:
+- nextjs
+- rss
+- feed
+- contentlayer
+---
+
+A good blog needs an RSS feed, even if hardly anyone seems to use an RSS reader anymore.
+This article will explain how to create a RSS feed for a static blog.
+In this example we will use [contentlayer](https://www.contentlayer.dev/),
+but it should work with other data sources too.
+
+## Feed generator
+
+First we need a script to create the feed from our posts.
+The script will load the generated posts from the contentlayer directory.
+
+```js scripts/rss.mjs
+import { allPosts } from "../.contentlayer/generated/index.mjs";
+```
+
+I had to specify the whole path including extension, otherwise node threw errors at me.
+
+After that we use the [feed](https://www.npmjs.com/package/feed) library to create the feed and
+to convert our posts into RSS items.
+First we have to install the library and install [date-fns](https://date-fns.org/) as well.
+We need [date-fns](https://date-fns.org/) later to simplify working with dates.
+
+<CH.Code>
+
+```bash pnpm
+pnpm add -D feed date-fns
+```
+
+```bash yarn
+yarn add -D feed date-fns
+```
+
+```bash npm
+npm install --save-dev feed date-fns
+```
+
+</CH.Code>
+
+Than we can create the feed and specify some information about our blog e.g.:
+
+* title
+* description
+* url
+* language
+
+This could look as follows.
+
+```js scripts/rss.mjs
+import { Feed } from "feed";
+
+const feed = new Feed({
+  title: "Example blog",
+  description: "Description for the awesome example blog",
+  id: "https://blog.example.com",
+  link: "https://blog.example.com",
+  language: "en",
+  favicon: "https://blog.example.com/favicon.ico",
+  copyright: "All rights reserved 2022, Your Name",
+  author: {
+    name: "Your Name",
+    email: "your.name@exmaple.com",
+    link: "https://blog.example.com",
+  },
+});
+```
+
+Now we can convert our blog posts to feed items.
+We start by sorting the posts by their date.
+Then we convert each post to a RSS item and add it to the feed.
+
+```js scripts/rss.mjs
+import { compareDesc, parseISO } from "date-fns";
+
+allPosts
+  .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
+  .forEach((post) => {
+    const url = `https://example.com/posts/${post._raw.flattenedPath}`;
+    feed.addItem({
+      id: url,
+      link: url,
+      title: post.title,
+      description: post.summary,
+      date: parseISO(post.date),
+      category: post.tags.map((name) => ({ name })),
+      image: post.coverImage,
+      author: [{
+        name: "Your Name",
+        email: "your.name@exmaple.com",
+        link: "https://blog.example.com",
+      }],
+    });
+  });
+```
+
+The feed does not contain the content of our posts, if we wanted to we could attach the content of our posts as HTML.
+Now we should have everything in place and we can write the feed to the public directory.
+
+```js scripts/rss.mjs
+import { writeFileSync } from "fs";
+
+writeFileSync("./public/rss.xml", feed.rss2(), { encoding: "utf-8" })
+```
+
+The complete script should like the following.
+
+```js scripts/rss.mjs
+import { compareDesc, parseISO } from "date-fns";
+import { Feed } from "feed";
+import { writeFileSync } from "fs";
+import { allPosts } from "../.contentlayer/generated/index.mjs";
+
+const feed = new Feed({
+  title: "Example blog",
+  description: "Description for the awesome example blog",
+  id: "https://blog.example.com",
+  link: "https://blog.example.com",
+  language: "en",
+  favicon: "https://blog.example.com/favicon.ico",
+  copyright: "All rights reserved 2022, Your Name",
+  author: {
+    name: "Your Name",
+    email: "your.name@exmaple.com",
+    link: "https://blog.example.com",
+  },
+});
+
+allPosts
+  .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
+  .forEach((post) => {
+    const url = `https://example.com/posts/${post._raw.flattenedPath}`;
+    feed.addItem({
+      id: url,
+      link: url,
+      title: post.title,
+      description: post.summary,
+      date: parseISO(post.date),
+      category: post.tags.map((name) => ({ name })),
+      image: post.coverImage,
+      author: [{
+        name: "Your Name",
+        email: "your.name@exmaple.com",
+        link: "https://blog.example.com",
+      }],
+    });
+  });
+
+writeFileSync("./public/rss.xml", feed.rss2(), { encoding: "utf-8" });
+```
+
+## Discoverable
+
+In order for RSS readers to find our feed, we can help them out with a `link` tag in the `head` of our page.
+For Next.js 13 and the app directory, the root layout is the right place for the `link` tag, since that is how it is included on every page.
+
+```tsx app/layout.tsx focus=6
+import { FC, PropsWithChildren } from "react";
+
+const RootLayout: FC<PropsWithChildren> = ({ children }) => (
+  <html lang="en">
+    <head>
+      <link rel="alternate" type="application/rss+xml" title="example.com rss feed" href="/rss.xml" />
+    </head>
+    <body>{children}</body>
+  </html>
+);
+
+export default RootLayout;
+```
+
+## Build
+
+Now it is time to add our feed generator to the build:
+
+```json package.json
+{
+  "scripts": {
+    "build": "next build && node scripts/rss.mjs"
+  }
+}
+```
+
+Whenever our page is build using the `build` script, our RSS feed is build afterwards.
+The order is important, because [contentlayer](https://www.contentlayer.dev/) have to run first in order to generate the posts.
+
+## Git
+
+Since our RSS feed is generated, we should not include it in our repository.
+So we should ignore it:
+
+```text .gitignore focus=4
+/node_modules
+/.next/
+.contentlayer
+public/rss.xml
+```
+
+If we would not do that, we would see changes to the `rss.xml` every time we work on our posts.

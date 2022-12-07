@@ -3,8 +3,9 @@ import { defineDocumentType, makeSource } from "contentlayer/source-files";
 import { remarkCodeHike } from "@code-hike/mdx";
 import { createRequire } from "module";
 import readingTime from "reading-time";
+import rehypeImgSize from "rehype-img-size";
+import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
-import rehypeImgSize from "rehype-img-size"
 
 const require = createRequire(import.meta.url);
 const theme = require("shiki/themes/nord.json");
@@ -35,8 +36,8 @@ export const Post = defineDocumentType(() => ({
       required: true,
     },
     tags: {
-      type: 'list',
-      of: { type: 'string' },
+      type: "list",
+      of: { type: "string" },
       description: "List of post tags",
       required: true,
     },
@@ -57,7 +58,7 @@ export default makeSource({
   contentDirPath: "content/posts",
   documentTypes: [Post],
   mdx: {
-    rehypePlugins: [[rehypeImgSize, { dir: "public" }]],
+    rehypePlugins: [rehypeSlug, [rehypeImgSize, { dir: "public" }]],
     remarkPlugins: [remarkGfm, [remarkCodeHike, { theme }]],
   },
 });

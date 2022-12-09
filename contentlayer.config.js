@@ -59,6 +59,6 @@ export default makeSource({
   documentTypes: [Post],
   mdx: {
     rehypePlugins: [rehypeSlug, [rehypeImgSize, { dir: "public" }]],
-    remarkPlugins: [remarkGfm, [remarkCodeHike, { theme }]],
+    remarkPlugins: [remarkGfm, [remarkCodeHike, { theme, showCopyButton: true }]],
   },
 });

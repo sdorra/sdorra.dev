@@ -40,3 +40,4 @@ next-env.d.ts
 
 public/sitemap.xml
 public/rss.xml
+public/posts

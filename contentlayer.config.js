@@ -2,10 +2,11 @@ import { defineDocumentType, makeSource } from "contentlayer/source-files";
 
 import { remarkCodeHike } from "@code-hike/mdx";
 import { createRequire } from "module";
+import path from "path";
 import readingTime from "reading-time";
-import rehypeImgSize from "rehype-img-size";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+import mdxImages from "./lib/mdx-images";
 
 const require = createRequire(import.meta.url);
 const theme = require("shiki/themes/nord.json");
@@ -58,7 +59,10 @@ export default makeSource({
   contentDirPath: "content/posts",
   documentTypes: [Post],
   mdx: {
-    rehypePlugins: [rehypeSlug, [rehypeImgSize, { dir: "public" }]],
+    rehypePlugins: [
+      rehypeSlug,
+      [mdxImages, { publicDir: path.join(process.cwd(), "public", "posts"), resourcePath: "/posts" }],
+    ],
     remarkPlugins: [remarkGfm, [remarkCodeHike, { theme, showCopyButton: true }]],
   },
 });

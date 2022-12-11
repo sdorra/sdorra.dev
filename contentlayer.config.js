@@ -6,6 +6,7 @@ import path from "path";
 import readingTime from "reading-time";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+import resolveImageBlurDataURL from "./lib/imageBlurDataURL";
 import mdxImages from "./lib/mdx-images";
 
 const require = createRequire(import.meta.url);
@@ -52,6 +53,10 @@ export const Post = defineDocumentType(() => ({
       type: "string",
       resolve: (post) => readingTime(post.body.raw).text,
     },
+    imageBlurDataURL: {
+      type: "string",
+      resolve: resolveImageBlurDataURL
+    }
   },
 }));
 

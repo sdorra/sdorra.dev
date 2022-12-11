@@ -5,6 +5,7 @@ import path from "node:path";
 import sharp from "sharp";
 import { Plugin, VFileWithOutput } from "unified";
 import { visit } from "unist-util-visit";
+import createPlaceholder from "./placeholder";
 
 type FileData = {
   rawDocumentData: {
@@ -20,9 +21,9 @@ const fileChecksum = async (file: string) => {
   try {
     return checksum(await fs.readFile(file));
   } catch (_) {
-    return ""
+    return "";
   }
-}
+};
 
 const checksum = (content: Buffer) => {
   return crypto.createHash("sha256").update(content).digest("hex");
@@ -44,7 +45,7 @@ const findPath = (file: VFileWithOutput<unknown>, image: Element) => {
 };
 
 const copy = async (source: string, sha256sum: string, target: string) => {
-  if (sha256sum !== await fileChecksum(target)) {
+  if (sha256sum !== (await fileChecksum(target))) {
     const targetDir = path.dirname(target);
 
     await fs.mkdir(targetDir, { recursive: true });
@@ -52,26 +53,11 @@ const copy = async (source: string, sha256sum: string, target: string) => {
   }
 };
 
-const placeholderImage = async (image: sharp.Sharp, width: number, height: number) => {
-  const imgAspectRatio = width / height;
-
-  const placeholderImgWidth = 8;
-  const placeholderImgHeight = Math.round(placeholderImgWidth / imgAspectRatio);
-
-  return image
-    .resize(placeholderImgWidth, placeholderImgHeight)
-    .png({
-      quality: 75
-    })
-    .toBuffer()
-    .then((buffer) => `data:image/png;base64,${buffer.toString("base64")}`);
-};
-
 const metadata = async (resourcePath: string, source: string, pathname: string) => {
   const content = await fs.readFile(source);
   const image = await sharp(content);
 
-  const { width, height, format } = await image.metadata();
+  const { width, height } = await image.metadata();
 
   if (!width || !height) {
     return null;
@@ -81,7 +67,7 @@ const metadata = async (resourcePath: string, source: string, pathname: string) 
 
   const sha256 = checksum(content);
 
-  const blurDataURL = await placeholderImage(image, width, height);
+  const blurDataURL = await createPlaceholder(image);
   return {
     sha256,
     props: {

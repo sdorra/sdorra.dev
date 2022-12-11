@@ -20,6 +20,8 @@ const PostCard = ({ post }: Props) => (
       <figure className="flex items-stretch justify-center gap-4 sm:justify-start">
         <Image
           src={post.image}
+          blurDataURL={post.imageBlurDataURL}
+          placeholder={post.imageBlurDataURL ? "blur" : "empty"}
           alt="Featured Image"
           width={128}
           height={128}

@@ -57,6 +57,8 @@ const Post = ({ post }: Props) => {
       <figure className="flex items-center gap-4">
         <Image
           src={post.image}
+          blurDataURL={post.imageBlurDataURL}
+          placeholder={post.imageBlurDataURL ? "blur" : "empty"}
           width={256}
           height={160}
           alt="Feature blog image"

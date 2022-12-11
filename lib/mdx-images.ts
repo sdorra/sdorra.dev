@@ -1,3 +1,4 @@
+import { RawDocumentData } from "contentlayer/source-files";
 import fs from "fs/promises";
 import { Element, Root } from "hast";
 import crypto from "node:crypto";
@@ -8,13 +9,7 @@ import { visit } from "unist-util-visit";
 import createPlaceholder from "./placeholder";
 
 type FileData = {
-  rawDocumentData: {
-    sourceFilePath: string;
-    sourceFileName: string;
-    sourceFileDir: string;
-    contentType: string;
-    flattenedPath: string;
-  };
+  rawDocumentData: RawDocumentData;
 };
 
 const fileChecksum = async (file: string) => {

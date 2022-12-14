@@ -12,7 +12,7 @@ type DirectoryNode = {
 type FileNode = {
   name: string;
   type: "file";
-  size: number;
+  size?: number;
 };
 
 type Props = {
@@ -34,10 +34,15 @@ const humanFileSize = (size: number) => {
 };
 
 type FileSizeProps = {
-  size: number;
+  size?: number;
 };
 
-const FileSize = ({ size }: FileSizeProps) => <span className="mr-2">({humanFileSize(size)})</span>;
+const FileSize = ({ size }: FileSizeProps) => {
+  if (size === undefined ||size === null) {
+    return null;
+  }
+  return <span className="mr-2">({humanFileSize(size)})</span>
+};
 
 type NodeProps = {
   node: TreeNode;

@@ -7,6 +7,7 @@ import Link from "next/link";
 import DateTime from "./DateTime";
 import Markdown from "./Markdown";
 import ScrollToTop from "./ScrollToTop";
+import ShareButton from "./ShareButton";
 
 type Props = {
   post: PostType;
@@ -54,7 +55,7 @@ const Post = ({ post }: Props) => {
   const { next, prev } = createPrevAndNext(post);
   return (
     <>
-      <figure className="flex items-center gap-4">
+      <figure className="relative flex items-center gap-4">
         <Image
           src={post.image}
           blurDataURL={post.imageBlurDataURL}
@@ -64,7 +65,7 @@ const Post = ({ post }: Props) => {
           alt="Feature blog image"
           className="h-40 w-64 flex-shrink-0 rounded-md border-2 border-zinc-200 object-cover dark:border-zinc-700"
         />
-        <h1 className="-ml-52 sm:-ml-32 rounded-md border border-zinc-200 bg-white/80 p-2 text-4xl font-bold dark:border-zinc-700 dark:bg-zinc-800/80">
+        <h1 className="-ml-52 rounded-md border border-zinc-200 bg-white/80 p-2 text-4xl font-bold dark:border-zinc-700 dark:bg-zinc-800/80 sm:-ml-32">
           {post.title}
         </h1>
       </figure>
@@ -73,6 +74,10 @@ const Post = ({ post }: Props) => {
         <DateTime title="Posted at" value={post.date} />
       </div>
       <Markdown code={post.body.code} />
+      <div className="mt-4 flex justify-between text-sm text-zinc-500 dark:text-zinc-400">
+        <p>Posted in: {post.tags.join(", ")}</p>
+        <ShareButton title={post.title} text={post.summary} url={post.url} />
+      </div>
       <nav className="my-5 grid grid-cols-3 place-items-center border-t border-t-zinc-300 pt-4 dark:border-t-zinc-700">
         <NavigationButton type="prev" post={prev} />
         <ScrollToTop />

@@ -18,7 +18,7 @@ const createClassName = (className?: string) =>
   );
 
 export const IconExternalLink = ({ title, href, className, children }: IconExternalLinkProps) => (
-  <a title={title} target="_blank" href={href} rel="noreferrer" className={createClassName(className)}>
+  <a title={title} target="_blank" href={href} rel="noopener noreferrer" className={createClassName(className)}>
     {children}
   </a>
 );

@@ -57,7 +57,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
     const data = {
       title,
       text,
-      url,
+      url: url + "?utm_campaign=social-sharing&utm_source=btn&utm_medium=native",
     };
     if (isWebShareSupported(data)) {
       await window.navigator.share(data);
@@ -66,7 +66,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
     }
   };
 
-  const completeUrl = `https://${fqdn}${url}`;
+  const completeUrl = `https://${fqdn}${url}?utm_campaign=social-sharing&utm_source=btn&utm_medium=`;
 
   return (
     <>
@@ -109,27 +109,27 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                   <ul className="mt-6 flex justify-around gap-2 text-zinc-500 dark:text-zinc-400">
                     <ShareIcon
                       title="Add to Pocket"
-                      url={`https://getpocket.com/save?url=${encodeURIComponent(completeUrl)}`}
+                      url={`https://getpocket.com/save?url=${encodeURIComponent(completeUrl + "pocket")}`}
                     >
                       <Pocket />
                     </ShareIcon>
                     <ShareIcon
                       title="Share on Twitter"
                       url={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
-                        completeUrl
+                        completeUrl + "twitter"
                       )}&text=${encodeURIComponent(title)}`}
                     >
                       <Twitter />
                     </ShareIcon>
                     <ShareIcon
                       title="Share on Facebook"
-                      url={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(completeUrl)}`}
+                      url={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(completeUrl + "facebook")}`}
                     >
                       <Facebook />
                     </ShareIcon>
                     <ShareIcon
                       title="Share on LinkedIn"
-                      url={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(completeUrl)}`}
+                      url={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(completeUrl + "linkedin")}`}
                     >
                       <Linkedin />
                     </ShareIcon>
@@ -137,11 +137,11 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                       title="Send by e-mail"
                       url={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(
                         text + "\n\n"
-                      )}${encodeURIComponent(completeUrl)}`}
+                      )}${encodeURIComponent(completeUrl + "email")}`}
                     >
                       <Mail />
                     </ShareIcon>
-                    <CopyButton url={completeUrl} />
+                    <CopyButton url={completeUrl + "copy"} />
                   </ul>
                   <button className="group absolute top-4 right-4" aria-label="Close" onClick={() => setIsOpen(false)}>
                     <XCircle className="text-zinc-400 group-hover:stroke-[3px] group-hover:text-zinc-700 dark:group-hover:text-zinc-200" />

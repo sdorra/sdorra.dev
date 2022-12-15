@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@code-hike/mdx': ^0.7.4
+  '@headlessui/react': ^1.7.6
   '@next/bundle-analyzer': 13.0.6
   '@next/font': 13.0.6
   '@tailwindcss/typography': ^0.5.8
@@ -44,6 +45,7 @@ specifiers:
 
 dependencies:
   '@code-hike/mdx': 0.7.4_react@18.2.0
+  '@headlessui/react': 1.7.6_biqbaboplfbrettd7655fr4n2y
   '@next/font': 13.0.6
   '@types/node': 18.11.9
   '@types/react': 18.0.25
@@ -360,6 +362,18 @@ packages:
       long: 4.0.0
       protobufjs: 7.1.2
       yargs: 16.2.0
+    dev: false
+
+  /@headlessui/react/1.7.6_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-yM/IOGCRaS/DaQRchElrTiH0jOfYWbBX5wkZTAbPDu4OMYdQ1ateM/UgApOcv+7DNpeRaMjUz4bZ4xxNgTGNLA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: ^16 || ^17 || ^18
+      react-dom: ^16 || ^17 || ^18
+    dependencies:
+      client-only: 0.0.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /@humanwhocodes/config-array/0.11.7:

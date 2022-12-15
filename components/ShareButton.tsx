@@ -53,11 +53,14 @@ const CopyButton = ({ url }: { url: string }) => {
 
 const ShareButton = ({ title, text, url, className }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const completeUrl = `https://${fqdn}${url}?utm_campaign=social-sharing&utm_source=btn&utm_medium=`;
+
   const onClick = async () => {
-    const data = {
+    const data: ShareData = {
       title,
       text,
-      url: url + "?utm_campaign=social-sharing&utm_source=btn&utm_medium=native",
+      url: completeUrl + "native",
     };
     if (isWebShareSupported(data)) {
       await window.navigator.share(data);
@@ -65,8 +68,6 @@ const ShareButton = ({ title, text, url, className }: Props) => {
       setIsOpen(true);
     }
   };
-
-  const completeUrl = `https://${fqdn}${url}?utm_campaign=social-sharing&utm_source=btn&utm_medium=`;
 
   return (
     <>

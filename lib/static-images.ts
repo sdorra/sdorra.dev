@@ -102,7 +102,7 @@ type Options = {
   resourcePath: string;
 };
 
-const mdxImages: Plugin<[Options], Root> = (options) => (tree, file, done) => {
+const staticImages: Plugin<[Options], Root> = (options) => (tree, file, done) => {
   const tasks: Promise<void>[] = [];
 
   visit(tree, "element", (node) => {
@@ -114,4 +114,4 @@ const mdxImages: Plugin<[Options], Root> = (options) => (tree, file, done) => {
   Promise.all(tasks).then(() => done());
 };
 
-export default mdxImages;
+export default staticImages;

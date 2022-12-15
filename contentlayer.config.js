@@ -7,7 +7,7 @@ import readingTime from "reading-time";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import resolveImageBlurDataURL from "./lib/imageBlurDataURL";
-import mdxImages from "./lib/mdx-images";
+import staticImages from "./lib/static-images";
 
 const require = createRequire(import.meta.url);
 const theme = require("shiki/themes/nord.json");
@@ -66,7 +66,7 @@ export default makeSource({
   mdx: {
     rehypePlugins: [
       rehypeSlug,
-      [mdxImages, { publicDir: path.join(process.cwd(), "public", "posts"), resourcePath: "/posts" }],
+      [staticImages, { publicDir: path.join(process.cwd(), "public", "posts"), resourcePath: "/posts" }],
     ],
     remarkPlugins: [remarkGfm, [remarkCodeHike, { theme, showCopyButton: true }]],
   },

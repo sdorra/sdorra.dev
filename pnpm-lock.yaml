@@ -11,7 +11,7 @@ specifiers:
   '@types/react': 18.0.26
   '@types/react-dom': 18.0.10
   '@types/sharp': ^0.31.0
-  '@vercel/og': ^0.0.20
+  '@vercel/og': ^0.0.21
   autoprefixer: ^10.4.13
   clsx: ^1.2.1
   concurrently: ^7.5.0
@@ -50,7 +50,7 @@ dependencies:
   '@types/node': 18.11.17
   '@types/react': 18.0.26
   '@types/react-dom': 18.0.10
-  '@vercel/og': 0.0.20
+  '@vercel/og': 0.0.21
   clsx: 1.2.1
   contentlayer: 0.2.9_itfw7u6s7msjk3rlsbqnvaj734
   date-fns: 2.29.3
@@ -1008,12 +1008,12 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: false
 
-  /@vercel/og/0.0.20:
-    resolution: {integrity: sha512-089P+TfqWz0xBxjOvOhkZIDDtfrLcye94H4IZ+SqxoGPWpNGXaBvRJER/z5SoJxJRcCAL8tPiK5zdjRskM6tLw==}
+  /@vercel/og/0.0.21:
+    resolution: {integrity: sha512-WgMahG5c8UM7xtn/mT+ljUpDMSDnSlu8AXL52JtTwxb1odrd0GWqZg2N1X38wulPj+sCccNpDdFmmAuw0GLc+Q==}
     engines: {node: '>=16'}
     dependencies:
       '@resvg/resvg-wasm': 2.0.0-alpha.4
-      satori: 0.0.43
+      satori: 0.0.44
       yoga-wasm-web: 0.1.2
     dev: false
 
@@ -4401,8 +4401,8 @@ packages:
       is-regex: 1.1.4
     dev: false
 
-  /satori/0.0.43:
-    resolution: {integrity: sha512-SzYwr+LsELWRJU9KMviEOE9TdShry+R5AdS54YQvgAVKFDN4yniAIzwQk1/z2TtIx0ceUT9zTeosWAoWvJBEtQ==}
+  /satori/0.0.44:
+    resolution: {integrity: sha512-WKUxXC2qeyno6J3ucwwLozPL6j1HXOZiN5wIUf7iqAhlx1RUC/6ePIKHi7iPc3Cy6DYuZcJriZXxXkSdo2FQHg==}
     engines: {node: '>=16'}
     dependencies:
       '@shuding/opentype.js': 1.4.0-beta.0

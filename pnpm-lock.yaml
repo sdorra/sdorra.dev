@@ -23,7 +23,7 @@ specifiers:
   fathom-client: ^3.5.0
   feed: ^4.2.2
   globby: ^13.1.2
-  lucide-react: ^0.100.0
+  lucide-react: ^0.104.1
   markdown-wasm: ^1.2.0
   next: 13.1.1
   next-contentlayer: ^0.2.9
@@ -57,7 +57,7 @@ dependencies:
   eslint: 8.27.0
   eslint-config-next: 13.1.1_fqmqyeinda7panflsqpj5zauc4
   fathom-client: 3.5.0
-  lucide-react: 0.100.0_sh5qlbywuemxd2y3xkrw2y2kr4
+  lucide-react: 0.104.1_sh5qlbywuemxd2y3xkrw2y2kr4
   next: 13.1.1_biqbaboplfbrettd7655fr4n2y
   next-contentlayer: 0.2.9_yzgkxbhffubonbr2jchd4tmgkq
   react: 18.2.0
@@ -3018,8 +3018,8 @@ packages:
     dependencies:
       yallist: 4.0.0
 
-  /lucide-react/0.100.0_sh5qlbywuemxd2y3xkrw2y2kr4:
-    resolution: {integrity: sha512-5t0vx1NDLPyZ9v2gvBW5tn6/Lskzc0/2bt7+1MVegQoPvZ+V7HGg5i7OoKm1J7SfdfCBgDDctsTgGTt1KtPF/g==}
+  /lucide-react/0.104.1_sh5qlbywuemxd2y3xkrw2y2kr4:
+    resolution: {integrity: sha512-BKvhulnLKmBj+6pqUN5ViYk4a5fabMgc4B0a4ZLUnbRqkDDWH3h7Iet6U4WbesJzjWauQrXUlEvQCe5XpFuRnw==}
     peerDependencies:
       prop-types: ^15.7.2
       react: ^16.5.1 || ^17.0.0 || ^18.0.0

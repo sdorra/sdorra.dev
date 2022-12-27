@@ -4,9 +4,15 @@ summary: Layouts of Next.js app directory are creating div wrappers, which could
 date: 2022-11-14
 image: https://images.unsplash.com/photo-1498889444388-e67ea62c464b
 tags:
-- nextjs
-- css
+  - nextjs
+  - css
 ---
+
+<Notification type="info">
+  This article describes the behavior of Next.js between version 13.0.0 and version 13.0.7.
+
+  Version 13.0.7 removes the extra div which is described here, see [#43717](https://github.com/vercel/next.js/pull/43717) for details.
+</Notification>
 
 The new app directory of Next.js 13 introduces the great concepts of [layouts](https://beta.nextjs.org/docs/routing/pages-and-layouts#layouts).
 But they come with a price ... a `div` wrapper.

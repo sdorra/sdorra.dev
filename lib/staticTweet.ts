@@ -116,6 +116,10 @@ const staticTweet: Plugin<[Options], Root> = (options) => (tree, file, done) => 
       return;
     }
 
+    if (!urlString.startsWith("https://twitter.com")) {
+      return;
+    }
+
     const id = getIdFromUrl(urlString);
     if (!id) {
       return;

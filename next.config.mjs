@@ -12,7 +12,7 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ["images.unsplash.com"],
+    domains: ["images.unsplash.com", "pbs.twimg.com"],
   },
   experimental: {
     appDir: true,

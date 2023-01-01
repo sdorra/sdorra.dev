@@ -7,6 +7,7 @@ import { useMDXComponent } from "next-contentlayer/hooks";
 import { ReactNode } from "react";
 import FileTree from "./FileTree";
 import MarkdownImage from "./MarkdownImage";
+import StaticTweet from "./StaticTweet";
 
 type Props = {
   code: string;
@@ -47,6 +48,7 @@ const Markdown = ({ code }: Props) => {
         components={{
           Notification,
           FileTree,
+          StaticTweet,
           img: MarkdownImage,
           h1: heading("h1"),
           h2: heading("h2"),

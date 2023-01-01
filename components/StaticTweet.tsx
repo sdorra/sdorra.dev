@@ -24,7 +24,7 @@ const StaticTweet = ({ tweet }: Props) => (
       />
       <div className="flex flex-col gap-2">
         <p className="text-lg font-bold">{tweet.author.name}</p>
-        <blockquote>{tweet.text}</blockquote>
+        <blockquote dangerouslySetInnerHTML={{__html: tweet.text}} />
         <DateTime value={tweet.createdAt} className="text-xs text-zinc-500 dark:text-zinc-400" />
       </div>
       <Twitter className="absolute top-2 right-2 stroke-2 text-zinc-400 group-hover:stroke-[3px] group-hover:text-cyan-600 dark:text-zinc-500 dark:group-hover:text-cyan-400" />

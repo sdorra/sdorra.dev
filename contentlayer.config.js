@@ -8,7 +8,7 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import resolveImageBlurDataURL from "./lib/imageBlurDataURL";
 import staticImages from "./lib/static-images";
-import staticTweet from "./lib/staticTweet";
+import mdxEmbedder from "./lib/mdxEmbedder";
 
 const require = createRequire(import.meta.url);
 const theme = require("shiki/themes/nord.json");
@@ -69,6 +69,6 @@ export default makeSource({
       rehypeSlug,
       [staticImages, { publicDir: path.join(process.cwd(), "public", "posts"), resourcePath: "/posts" }],
     ],
-    remarkPlugins: [remarkGfm, staticTweet, [remarkCodeHike, { theme, showCopyButton: true }]],
+    remarkPlugins: [remarkGfm, mdxEmbedder, [remarkCodeHike, { theme, showCopyButton: true }]],
   },
 });

@@ -1,4 +1,4 @@
-import { Tweet } from "lib/fetchTweets";
+import { Tweet } from "lib/mdxEmbedder/twitter";
 import { Twitter } from "lucide-react";
 import Image from "next/image";
 import DateTime from "./DateTime";

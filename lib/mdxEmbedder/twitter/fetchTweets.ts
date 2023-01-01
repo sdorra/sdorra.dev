@@ -22,8 +22,6 @@ interface UsersItem {
   username: string;
 }
 
-export type Tweet = Awaited<ReturnType<typeof fetchTweet>>;
-
 const fetchTweet = async (id: string) => {
   const options = "?expansions=author_id&tweet.fields=created_at&user.fields=profile_image_url";
 

@@ -11,7 +11,7 @@ tags:
 <Notification type="info">
   This article describes the behavior of Next.js between version 13.0.0 and version 13.0.7.
 
-  Version 13.0.7 removes the extra div which is described here, see [#43717](https://github.com/vercel/next.js/pull/43717) for details.
+  Version 13.0.7 removes the extra div, see section [the fix](#the-fix) for details.
 </Notification>
 
 The new app directory of Next.js 13 introduces the great concepts of [layouts](https://beta.nextjs.org/docs/routing/pages-and-layouts#layouts).
@@ -19,7 +19,7 @@ But they come with a price ... a `div` wrapper.
 Each layout wraps its children in a `div`.
 This could break designs which are using a height of 100%.
 
-As [timneutkens](https://github.com/timneutkens) (one of the Next.js maintainers) says,
+As [Tim Neutkens](https://github.com/timneutkens) (one of the Next.js maintainers) says,
 the problem is temporary but it has to be fixed in react:
 
 > First off: We totally understand your struggle because of the added elements.
@@ -70,3 +70,12 @@ So if our only problem is the 100% height, perhaps we should just use:
   height: 100%;
 }
 ```
+
+## The Fix
+
+A few weeks after this article was published [Tim Neutkens](https://github.com/timneutkens), tweets the following:
+
+https://twitter.com/timneutkens/status/1601349358255214592
+
+A few days later Next.js 13.0.7 was released, which contains the following fix [PR #43717](https://github.com/vercel/next.js/pull/43717).
+So if you run Next.js 13.0.7 or newer you do not need the workaround anymore.

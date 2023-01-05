@@ -1,0 +1,319 @@
+---
+title: Implementing a share button
+summary: In this article we will implement a button to share our articles on mobile devices and in the browser
+date: 2023-01-05
+image: https://images.unsplash.com/photo-1501281668745-f7f57925c3b4
+tags:
+  - react
+  - tailwindcss
+  - headlessui
+---
+
+In this article we will create a button, which makes it easy for our readers to share our articles.
+We all know the share button on our phones,
+which allows us to send a piece of information from an app to one of our contacts via messenger, email, etc.
+Wouldn't it be awesome if we could include a button like this on our blog as well.
+It turns out we can.
+The [Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API) allows us to open the well known share menu on our phones.
+The example below shows a simple example in react.
+
+```tsx
+type Props = {
+  title: string;
+  text: string;
+  url: string;
+};
+
+const ShareButton = ({ title, text, url }: Props) => {
+  const onClick = async () => {
+    await window.navigator.share({
+      title,
+      text,
+      url,
+    });
+  };
+  return <button onClick={onClick}>Share</button>;
+};
+```
+
+Quite simple, isn't it.
+
+## Support
+
+It could be so simple if desktop operating systems and browsers also had a share menu.
+But sadly this is not yet the case.
+So we have to implement a fallback for those which do not have a share menu.
+We can check if the browser supports sharing our kind of information with the following function.
+
+```tsx
+const isWebShareSupported = (data: ShareData) => {
+  return window.navigator.canShare && window.navigator.share && window.navigator.canShare(data);
+};
+```
+
+The function will check if the browser has an implementation of the `canShare` and `share` function.
+It will also check with `canShare` if api is able to share our information.
+If this function returns `false`, we should display a fallback instead.
+
+## Fallback
+
+For the fallback we could open a modal, with some options to share the article e.g.:
+
+- [Pocket](https://getpocket.com/)
+- [Twitter](https://twitter.com)
+- [Facebook](https://www.facebook.com/)
+- [LinkedIn](https://www.linkedin.com/)
+
+All of these services are popular for sharing information and they all offer a url to simplify this process.
+In addition to the services we could add an share with email link and a copy to clipboard function.
+
+For the modal we will use [headlessui](https://headlessui.com/react/dialog),
+because it makes it easy for us to implement the modal and we can style it how we want.
+Furthermore [headlessui](https://headlessui.com) will handle the accessibility attributes and functions for us,
+which are quite complicated for modals.
+
+First we have to install [headlessui](https://headlessui.com).
+
+<CH.Code>
+
+```bash pnpm
+pnpm add @headlessui/react
+```
+
+```bash yarn
+yarn add @headlessui/react
+```
+
+```bash npm
+npm install @headlessui/react
+```
+
+</CH.Code>
+
+Ok, now we are able to open the modal if the [Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API) is not supported.
+
+```tsx
+import { Dialog } from "@headlessui/react";
+import { useState } from "react";
+
+type Props = {
+  title: string;
+  text: string;
+  url: string;
+};
+
+const ShareButton = ({ title, text, url }: Props) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onClick = async () => {
+    const data = {
+      title,
+      text,
+      url,
+    };
+    if (isWebShareSupported(data)) {
+      await window.navigator.share();
+    } else {
+      setIsOpen(true);
+    }
+  };
+
+  return (
+    <>
+      <button onClick={onClick}>Share</button>
+      <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
+        <Dialog.Panel>
+          <Dialog.Title>Share article</Dialog.Title>
+          {/* TODO add share links */}
+        </Dialog.Panel>
+      </Dialog>
+    </>
+  );
+};
+```
+
+With this modification,
+we check on every click on the button if we are able to use the [Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API).
+If the api is supported we open the native share menu,
+if not we set an internal state to open the modal.
+We are now ready to add some links.
+
+### Pocket
+
+[Pocket](https://getpocket.com/) is a social bookmarking service for storing, sharing, and discovering web bookmarks.
+[Pocket](https://getpocket.com/) has a special link for sharing buttons.
+Our implementation could look like the following.
+
+```tsx
+import { Pocket } from "lucide-react";
+
+type Props = {
+  url: string;
+};
+
+const PocketLink = ({ url }: Props) => (
+  <a href={`https://getpocket.com/save?url=${encodeURIComponent(url)}`} target="_blank" rel="noreferrer">
+    <Pocket /> Pocket
+  </a>
+);
+```
+
+We use the [lucide-react](https://lucide.dev/docs/lucide-react) to render a nice icon for the [Pocket](https://getpocket.com/) link.
+
+### Twitter
+
+[Twitter](https://twitter.com/) is a social networking service from which probably everyone has heard.
+[Twitter](https://twitter.com/) has also a special link,
+which is able to pre fill the tweet editor.
+
+```tsx
+import { Twitter } from "lucide-react";
+
+type Props = {
+  title: string;
+  url: string;
+};
+
+const TwitterLink = ({ url, title }: Props) => (
+  <a
+    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`}
+    target="_blank"
+    rel="noreferrer"
+  >
+    <Twitter /> Twitter
+  </a>
+);
+```
+
+### Facebook
+
+[Facebook](https://www.facebook.com/) is another quite popular social media network,
+with a link which pre-fills the post editor.
+
+```tsx
+import { Facebook } from "lucide-react";
+
+type Props = {
+  url: string;
+};
+
+const FacebookLink = ({ url }: Props) => (
+  <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`} target="_blank" rel="noreferrer">
+    <Facebook /> Facebook
+  </a>
+);
+```
+
+### LinkedIn
+
+[LinkedIn](https://www.linkedin.com/) is another social media network with a business focus.
+They also have a share link.
+
+```tsx
+import { Linkedin } from "lucide-react";
+
+type Props = {
+  url: string;
+};
+
+const LinkedInLink = ({ url }: Props) => (
+  <a
+    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}
+    target="_blank"
+    rel="noreferrer"
+  >
+    <Linkedin /> LinkedIn
+  </a>
+);
+```
+
+### Email
+
+Another simple option to share an article is to send the url per email.
+Here is how we can provide a button, which opens the email client with a prepared email.
+
+```tsx
+import { Mail } from "lucide-react";
+
+type Props = {
+  title: string;
+  text: string;
+  url: string;
+};
+
+const MailToLink = ({ url, title, text }: Props) => (
+  <a
+    href={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text + "\n\n")}${encodeURIComponent(
+      url
+    )}`}
+    target="_blank"
+    rel="noreferrer"
+  >
+    <Mail /> Send as email
+  </a>
+);
+```
+
+### Copy to clipboard
+
+The last option we want to offer is a button which copies the article url to the clipboard of the client.
+
+```tsx
+import { Check, Copy } from "lucide-react";
+
+type Props = {
+  url: string;
+};
+
+const CopyToClipboardButton = ({ url }: Props) => {
+  const [copied, setCopied] = useState(false);
+
+  const copy = () => {
+    window.navigator.clipboard.writeText(url);
+    setCopied(true);
+  };
+
+  return <button onClick={copy}>{copied ? <Check /> : <Copy />} Copy to clipboard</button>;
+};
+```
+
+The button shows a copy icon, after it is clicked we use the clipboard api to copy the url.
+After the url is copied, the button shows a check mark instead of the copy icon.
+
+### Share menu
+
+Now we are able to complete the fallback share menu.
+
+```tsx
+<Dialog open={isOpen} onClose={() => setIsOpen(false)}>
+  <Dialog.Panel>
+    <Dialog.Title>Share article</Dialog.Title>
+    <ul>
+      <li>
+        <PocketLink />
+      </li>
+      <li>
+        <TwitterLink />
+      </li>
+      <li>
+        <FacebookLink />
+      </li>
+      <li>
+        <LinkedInLink />
+      </li>
+      <li>
+        <MailToLink />
+      </li>
+      <li>
+        <CopyToClipboardButton />
+      </li>
+    </ul>
+  </Dialog.Panel>
+</Dialog>
+```
+
+## Complete example
+
+For a complete example,
+which is styled with [Tailwind CSS](https://tailwindcss.com/),
+have a look at the source code of my blog ([ShareButton sdorra.dev](https://github.com/sdorra/sdorra.dev/blob/main/components/ShareButton.tsx)).

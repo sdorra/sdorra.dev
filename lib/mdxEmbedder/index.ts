@@ -1,12 +1,11 @@
 import { Link, Root, Text } from "mdast";
 import { Plugin } from "unified";
 import { visit } from "unist-util-visit";
+import GitHubProvider from "./github";
 import { Provider } from "./provider";
 import TwitterProvider from "./twitter";
 
-const providers: Provider[] = [
-  TwitterProvider
-];
+const providers: Provider[] = [TwitterProvider, GitHubProvider];
 
 const getUrlString = (url: string): string | null => {
   const urlString = url.startsWith("http") ? url : `https://${url}`;
@@ -51,7 +50,7 @@ const mdxEmbedder: Plugin<[Options], Root> = (options) => (tree, file, done) => 
 
     for (const provider of providers) {
       if (urlString.startsWith(provider.baseUrl)) {
-        const result = provider.transform(paragraphNode, urlString)
+        const result = provider.transform(paragraphNode, urlString);
         if (result) {
           tasks.push(result);
           break;

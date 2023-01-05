@@ -6,6 +6,7 @@ import { Hash } from "lucide-react";
 import { useMDXComponent } from "next-contentlayer/hooks";
 import { ReactNode } from "react";
 import FileTree from "./FileTree";
+import GitHubPullRequest from "./GitHubPullRequest";
 import MarkdownImage from "./MarkdownImage";
 import StaticTweet from "./StaticTweet";
 
@@ -49,6 +50,7 @@ const Markdown = ({ code }: Props) => {
           Notification,
           FileTree,
           StaticTweet,
+          GitHubPullRequest,
           img: MarkdownImage,
           h1: heading("h1"),
           h2: heading("h2"),

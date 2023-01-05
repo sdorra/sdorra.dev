@@ -16,7 +16,7 @@ const StaticTweet = ({ tweet }: Props) => (
       className="group relative mb-2 flex gap-5 rounded-md border-2 p-5 shadow-md hover:border-cyan-600 dark:border-zinc-700 dark:hover:border-cyan-400"
     >
       <Image
-        className="h-16 w-16 flex-shrink-0 rounded-full shadow-md ring-2 ring-zinc-300 dark:ring-zinc-700"
+        className="h-8 w-8 md:h-16 md:w-16 flex-shrink-0 rounded-full shadow-md ring-2 ring-zinc-300 dark:ring-zinc-700"
         src={tweet.author.profileImageUrl}
         width={64}
         height={64}

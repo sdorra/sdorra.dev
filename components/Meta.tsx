@@ -20,16 +20,16 @@ const Meta = ({ title, description, ogType = "website", url = "/", ogImage }: Pr
 
       <meta property="og:url" content={completeUrl} />
       <meta property="og:type" content={ogType} />
-      <meta name="og:title" content={title} />
-      <meta name="og:description" content={description} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
       {ogImage ? <meta property="og:image" content={`${scheme}://${fqdn}${ogImage}`} /> : null}
 
       <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
       <meta name="twitter:domain" content={fqdn} />
-      <meta property="twitter:url" content={completeUrl} />
+      <meta name="twitter:url" content={completeUrl} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      {ogImage ? <meta property="twitter:image" content={`${scheme}://${fqdn}${ogImage}`} /> : null}
+      {ogImage ? <meta name="twitter:image" content={`${scheme}://${fqdn}${ogImage}`} /> : null}
     </>
   );
 };

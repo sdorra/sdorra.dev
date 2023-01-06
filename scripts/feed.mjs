@@ -27,12 +27,8 @@ const createFeed = () => {
     id: "https://sdorra.dev",
     link: "https://sdorra.dev",
     language: "en",
-    // image: "",
     favicon: "https://sdorra.dev/favicon.ico",
     copyright: "All rights reserved 2022, Sebastian Sdorra",
-    feedLinks: {
-      atom: "https://sdorra.dev/atom.xml",
-    },
     author: {
       name: "Sebastian Sdorra",
       email: "s.sdorra@gmail.com",

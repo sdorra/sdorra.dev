@@ -14,7 +14,7 @@ const Meta = ({ title, description, ogType = "website", url = "/", ogImage }: Pr
   return (
     <>
       <title>{title}</title>
-      <link rel="canonical" href={completeUrl} />
+      <link rel="canonical" href={`https://sdorra.dev${url}`} />
 
       <meta name="description" content={description} />
 

@@ -3,16 +3,22 @@ import { Feed } from "feed";
 import { writeFile } from "fs/promises";
 import { allPosts } from "../.contentlayer/generated/index.mjs";
 
-const createImageUrl = (src, width, height) => {
+const createImageUrl = (src, width, height, escape = false) => {
   if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
-    return `${src}?fit=crop&amp;w=${width}&amp;=${height}`;
+    const amp = escape ? "&amp;" : "&";
+    return `${src}?fit=crop${amp}w=${width}${amp}h=${height}`;
   }
   return src;
 };
 
 const createPostUrl = (url) => {
-  return url + "?utm_campaign=feed&utm_source=rss2"
-}
+  return url + "?utm_campaign=feed&utm_source=rss2";
+};
+
+const createContent = (post, url) => `
+<img src="${createImageUrl(post.image, 1000, 420)}" width="1000" height="420" vspace="3" hspace="8" align="center">
+<p>${post.summary}</p>
+<p>Read the full article on <a href="${url}">sdorra.dev</a></p>`;
 
 const createFeed = () => {
   const feed = new Feed({
@@ -37,12 +43,14 @@ const createFeed = () => {
   allPosts
     .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
     .forEach((post) => {
-      const url = `https://sdorra.dev/posts/${post._raw.flattenedPath}`;
+      const id = `https://sdorra.dev/posts/${post._raw.flattenedPath}`;
+      const url = createPostUrl(id);
       feed.addItem({
         title: post.title,
-        id: url,
-        link: createPostUrl(url),
+        id: id,
+        link: url,
         description: post.summary,
+        content: createContent(post, url),
         author: [
           {
             name: "Sebastian Sdorra",
@@ -52,7 +60,7 @@ const createFeed = () => {
         ],
         date: setHours(parseISO(post.date), 13),
         category: post.tags.map((name) => ({ name })),
-        image: createImageUrl(post.image, 720, 480),
+        image: createImageUrl(post.image, 256, 256, true),
       });
     });
 

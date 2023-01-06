@@ -10,6 +10,10 @@ const createImageUrl = (src, width, height) => {
   return src;
 };
 
+const createPostUrl = (url) => {
+  return url + "?utm_campaign=feed&utm_source=rss2"
+}
+
 const createFeed = () => {
   const feed = new Feed({
     title: "sdorra.dev",
@@ -37,7 +41,7 @@ const createFeed = () => {
       feed.addItem({
         title: post.title,
         id: url,
-        link: url,
+        link: createPostUrl(url),
         description: post.summary,
         author: [
           {

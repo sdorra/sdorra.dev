@@ -52,7 +52,7 @@ const isWebShareSupported = (data: ShareData) => {
 ```
 
 The function will check if the browser has an implementation of the `canShare` and `share` function.
-It will also check with `canShare` if api is able to share our information.
+It will also check with `canShare` if the api is able to share our information.
 If this function returns `false`, we should display a fallback instead.
 
 ## Fallback
@@ -65,7 +65,7 @@ For the fallback we could open a modal, with some options to share the article e
 - [LinkedIn](https://www.linkedin.com/)
 
 All of these services are popular for sharing information and they all offer a url to simplify this process.
-In addition to the services we could add an share with email link and a copy to clipboard function.
+In addition to the services we could add a share with email link and a copy to clipboard function.
 
 For the modal we will use [headlessui](https://headlessui.com/react/dialog),
 because it makes it easy for us to implement the modal and we can style it how we want.
@@ -162,9 +162,9 @@ We use the [lucide-react](https://lucide.dev/docs/lucide-react) to render a nice
 
 ### Twitter
 
-[Twitter](https://twitter.com/) is a social networking service from which probably everyone has heard.
+[Twitter](https://twitter.com/) is a social networking service that probably everyone has heard of.
 [Twitter](https://twitter.com/) has also a special link,
-which is able to pre fill the tweet editor.
+which is able to pre-fill the tweet editor.
 
 ```tsx
 import { Twitter } from "lucide-react";
@@ -277,7 +277,7 @@ const CopyToClipboardButton = ({ url }: Props) => {
 };
 ```
 
-The button shows a copy icon, after it is clicked we use the clipboard api to copy the url.
+The button shows a copy icon and after it is clicked we use the clipboard api to copy the url.
 After the url is copied, the button shows a check mark instead of the copy icon.
 
 ### Share menu

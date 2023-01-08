@@ -24,7 +24,7 @@ The script will load the generated posts from the contentlayer directory.
 import { allPosts } from "../.contentlayer/generated/index.mjs";
 ```
 
-I had to specify the whole path including extension, otherwise node threw errors at me.
+I had to specify the whole path including the extension, otherwise node threw errors at me.
 
 After that we use the [feed](https://www.npmjs.com/package/feed) library to create the feed and
 to convert our posts into RSS items.
@@ -103,8 +103,8 @@ allPosts
   });
 ```
 
-The feed does not contain the content of our posts, if we wanted to we could attach the content of our posts as HTML.
-Now we should have everything in place and we can write the feed to the public directory.
+The feed does not contain the content of our posts. If we want to include the content we can attach it as HTML.
+Now we should have everything in place and we can write the feed to the public directory:
 
 ```js scripts/rss.mjs
 import { writeFileSync } from "fs";
@@ -158,10 +158,10 @@ allPosts
 writeFileSync("./public/rss.xml", feed.rss2(), { encoding: "utf-8" });
 ```
 
-## Discoverable
+## Discoverability
 
-In order for RSS readers to find our feed, we can help them out with a `link` tag in the `head` of our page.
-For Next.js 13 and the app directory, the root layout is the right place for the `link` tag, since that is how it is included on every page.
+In order for RSS readers to find our feed, we can help them with a `link` tag in the `head` of our page.
+For Next.js 13 and the app directory, the root layout is the right place for the `link` tag, since that is how it's included in every page.
 
 ```tsx app/layout.tsx focus=6
 import { FC, PropsWithChildren } from "react";
@@ -180,7 +180,7 @@ export default RootLayout;
 
 ## Build
 
-Now it is time to add our feed generator to the build:
+Now it's time to add our feed generator to the build:
 
 ```json package.json
 {
@@ -190,13 +190,12 @@ Now it is time to add our feed generator to the build:
 }
 ```
 
-Whenever our page is build using the `build` script, our RSS feed is build afterwards.
+Whenever our page is build using the `build` script, our RSS feed gets build afterwards.
 The order is important, because [contentlayer](https://www.contentlayer.dev/) have to run first in order to generate the posts.
 
 ## Git
 
-Since our RSS feed is generated, we should not include it in our repository.
-So we should ignore it:
+Because our RSS feed is generated, we should exclude it from our repository:
 
 ```text .gitignore focus=4
 /node_modules

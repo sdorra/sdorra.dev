@@ -17,12 +17,12 @@ CLS ([Cumulative Layout Shift](https://blog.hubspot.com/marketing/cumulative-lay
 
 ## next/image
 
-In [Next.js](https://nextjs.org/) we can use the [next/image component](https://nextjs.org/docs/api-reference/next/image) to avoid this bad user experience.
-`next/image` automatically optimized our images in three ways to reduce the slow loading times:
+In [Next.js](https://nextjs.org/) we can use the [next/image](https://nextjs.org/docs/api-reference/next/image) component to avoid this bad user experience.
+`next/image` automatically optimizes our images in three ways to reduce the slow loading times:
 
 - Converts the image to the smallest supported format
 - Resizes the image based on the used device viewport
-- Use image compression
+- Uses image compression
 
 It also creates a placeholder to avoid the CLS.
 The following example shows the usage of `next/image` with a static image:
@@ -42,19 +42,19 @@ This looks great, but how can we use it in our markdown files?
 My first reaction was to use [MDX](https://mdxjs.com/) and use `next/image` just as in the example.
 But that means that we can't use normal markdown images and
 it turns out that this won't work with [contentlayer](https://www.contentlayer.dev/).
-This wont work, because [Next.js](https://nextjs.org/) does some magic on the import of the static image.
-The object which gets returned by the import,
+It won't work, because [Next.js](https://nextjs.org/) does some magic on the import of the static image.
+The object which gets returned by the import
 contains not only a path to the image,
-it contains also the width and height,
+it contains also the width and height
 plus a very small version of the image for the blurred placeholder.
 This magic does not work if the [MDX](https://mdxjs.com/) file is loaded with [contentlayer](https://www.contentlayer.dev/),
 because [contentlayer](https://www.contentlayer.dev/) uses its own bundler,
-which does not know about the import magic for images.
+which knows nothing about the import magic for images.
 
 ### The trick with the public folder
 
 The next idea was to use normal markdown images and to place the images in the `public` folder.
-This eliminates the need for static import and treats our image like a remote image.
+This eliminates the need for static imports and treats our image like a remote image.
 But in order to make this work, we have to tell `next/image` the dimensions of the image.
 If we would use a static import for the image,
 the import magic would provide the dimensions for us.
@@ -90,14 +90,14 @@ export default makeSource({
 });
 ```
 
-The plugin will now find each image in markdown content and pass its dimensions to the image component.
-If we have the following markdown content:
+The plugin will now find each image in the markdown content and pass its dimensions to the image component.
+If we have the following markdown content...
 
 ```markdown
 ![Picture of a mountain](/pictures/mountain.jpg)
 ```
 
-[rehype-img-size](https://github.com/ksoichiro/rehype-img-size) will look up
+... [rehype-img-size](https://github.com/ksoichiro/rehype-img-size) will look up
 `pictures/mountain.jpg` in the `public` directory (as configured in the contentlayer config) and
 calculate its size.
 Now we can replace the image component with `next/image`:
@@ -126,7 +126,7 @@ const Markdown = ({ code }: Props) => {
 export default Markdown;
 ```
 
-And that's it, we are using now `next/image` to render our markdown images.
+And that's it, we are now using `next/image` to render our markdown images.
 This approach works, but it is not ideal, because the images can't be located next to the content.
 They have to be placed in the `public` directory.
 
@@ -185,7 +185,7 @@ It would be better if we could locate the images right next to the content:
 We also don't have the small image for the blurred placeholder,
 we can only use the `empty` placeholder.
 
-If these two things are not so important to you, this is the right approach for you.
+If these two things are not so important to you, this is the right approach.
 
 ### Custom rehype plugin
 
@@ -197,10 +197,10 @@ Our plugin should do the following things:
 * Calculate the width and height
 * Create small image for blurred placeholder
 
-Before we write write the plugin,
+Before we write this plugin,
 we should understand how the markdown processing works in [contentlayer](https://www.contentlayer.dev/).
 
-[contentlayer](https://www.contentlayer.dev/) uses [remark](https://github.com/remarkjs/remark) to parse the markdown in an [mdast](https://github.com/syntax-tree/mdast).
+[contentlayer](https://www.contentlayer.dev/) uses [remark](https://github.com/remarkjs/remark) to parse the markdown into a [mdast](https://github.com/syntax-tree/mdast).
 We can now use `remark plugins` to modify the `mdast`.
 Then `rehype` comes into play and converts the `mdast` into a [hast](https://github.com/syntax-tree/hast).
 `rehype plugins` can now modify the `hast`.
@@ -215,10 +215,10 @@ Finally the `hast` is converted into [react](https://reactjs.org/) components.
 
 For our plugin we have to modify the `hast`,
 because images in the `mdast` don't have width or height and they don't support custom properties.
-The `hast` on the other hand, supports all properties of the HTML `img` component and
+The `hast` on the other hand supports all properties of the HTML `img` component and
 we can pass custom properties.
 
-#### implementation
+#### Implementation
 
 We start our plugin by defining the options:
 
@@ -227,15 +227,15 @@ We start our plugin by defining the options:
 Then we can define our plugin.
 The plugin is a function which gets the options and returns another function which receives the following parameters:
 
-* tree: The whole `hast`
-* file: The parsed file which path and content
-* done: function which should be called if our plugin is finished
+* tree: the whole `hast`
+* file: the parsed file with path and content
+* done: a function which should be called when our plugin has finished
 
-Our plugin searches the `hast` tree and for each element with the `tagName` `img`,
+Our plugin searches the `hast` tree and for each element with the `tagName` `img`
 we call the `processImage` function.
 `rehype` plugins can't be async, but image processing is async.
 That's the reason why we store each resulting `Promise` of the `processImage` function in an array and
-call the done function if all `Promises` are resolved and the work is done.
+call the `done` function if all `Promises` are resolved and the work is done.
 
 ```ts lib/static-images.ts
 type Options = {
@@ -262,8 +262,8 @@ export default staticImages;
 ```
 
 Ok, now we can have a detailed look at the implementation of the `processImage` function.
-First we have to find the real path of the image.
-Fortunately, contentlayer stores information about the location of our Markdown file in the `data` field of `file`.
+At first we have to find the real path of the image.
+Fortunately, contentlayer stores information about the location of our markdown file in the `data` field of the `file`.
 
 ```ts lib/static-images.ts
 // find the content directory
@@ -278,11 +278,11 @@ const directory = data.rawDocumentData.sourceFileDir;
 const filePath = image.properties?.src as string || "";
 
 // create the path by joining root, directory and filePath
-// path is import from node:path
+// path is imported from node:path
 const imagePath = path.join(root, directory, filePath)
 ```
 
-Now that we have the path, we can use [sharp](https://sharp.pixelplumbing.com/) to read the width and height of the image.
+Now that we have the path we can use [sharp](https://sharp.pixelplumbing.com/) to read the width and height of the image.
 
 ```ts lib/static-images.ts
 // sharp is an import from sharp (@types/sharp)
@@ -316,7 +316,7 @@ await fs.mkdir(path.dirname(targetDir), { recursive: true });
 await fs.copyFile(imagePath, target);
 ```
 
-Now we have all the information in place, we can update the properties of the `img` tag.
+With all the information in place we can update the properties of the `img` tag.
 
 ```ts lib/static-images.ts
 node.properties = {
@@ -357,12 +357,12 @@ We have written a `rehype` plugin, which does the following steps fully automati
 * Copy the image from its location to the public folder
 * Update the `src` attribute to the new location
 * Calculate the width and height
-* Create small image for blurred placeholder
+* Create a small image for the blurred placeholder
 
-With this plugin we can use the normal markdown image syntax and gain all the benefits of `next/image`.
+With this plugin we can use the normal markdown image syntax and gain all the benefits of `next/image`:
 
 - Smallest supported format
 - Resized version based on the used device viewport
 - image compression
 
-For a more complete example have a look at the [source of this blog](https://github.com/sdorra/sdorra.dev/blob/main/lib/static-images.ts).
+For a more complete example have a look at the [article's source code](https://github.com/sdorra/sdorra.dev/blob/main/lib/static-images.ts).

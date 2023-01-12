@@ -1,17 +1,15 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 
 import { remarkCodeHike } from "@code-hike/mdx";
-import { createRequire } from "module";
 import path from "path";
 import readingTime from "reading-time";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import resolveImageBlurDataURL from "./lib/imageBlurDataURL";
-import staticImages from "./lib/static-images";
 import mdxEmbedder from "./lib/mdxEmbedder";
+import staticImages from "./lib/static-images";
 
-const require = createRequire(import.meta.url);
-const theme = require("shiki/themes/nord.json");
+import theme from "./lib/ch-theme.json" assert { type: "json" };
 
 export const Post = defineDocumentType(() => ({
   name: "Post",

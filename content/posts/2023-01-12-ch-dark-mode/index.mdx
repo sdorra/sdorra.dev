@@ -1,0 +1,228 @@
+---
+title: Dark mode with Shiki and Code Hike
+summary: How to implement beautiful syntax highlighting including dark mode with Shiki and Code Hike using css variables
+date: 2023-01-12
+image: https://images.unsplash.com/photo-1502725205173-5e6e47cdf175
+tags:
+  - shiki
+  - codehike
+  - tailwindcss
+  - react
+---
+
+I'm using [Code Hike](https://codehike.org/) for the code snippets in my blog and i love this library.
+It has many nice features, like [tabs](https://codehike.org/demo/filenames) or [focus](https://codehike.org/demo/code).
+But it is laking support for switching themes at runtime, which i want to have for my dark mode implementation.
+
+https://github.com/code-hike/codehike/issues/271
+
+That is really a pity.
+But why actually?
+Code Hike uses [Shiki](https://shiki.matsu.io/) and [Shiki](https://shiki.matsu.io/) supports [changing themes via CSS variables](https://github.com/shikijs/shiki/blob/main/docs/themes.md#1-use-the-css-variables-theme).
+We should try that out?
+
+## Shiki
+
+In order to switch [Shiki](https://shiki.matsu.io/) colors at runtime,
+we have to load a special theme which uses [CSS variables](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) instead of hard coded colors.
+This should look like this:
+
+```javascript
+{
+  options: {
+    remarkPlugins: [
+      [remarkCodeHike, { theme: "css-variables" }]
+    ],
+  },
+}
+```
+
+After that we can define our colors for the theme with css variables:
+
+```css
+:root {
+  --shiki-color-text: #24292f;
+  --shiki-color-background: #ffffff;
+  --shiki-token-constant: #0550ae;
+  --shiki-token-string: #24292f;
+  --shiki-token-comment: #6e7781;
+  --shiki-token-keyword: #cf222e;
+  --shiki-token-parameter: #24292f;
+  --shiki-token-function: #8250df;
+  --shiki-token-string-expression: #0a3069;
+  --shiki-token-punctuation: #24292f;
+  --shiki-token-link: #000012;
+}
+```
+
+And we can override them for the dark mode:
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shiki-color-text: #c9d1d9;
+    --shiki-color-background: #0d1117;
+    --shiki-token-constant: #79c0ff;
+    --shiki-token-string: #a5d6ff;
+    --shiki-token-comment: #8b949e;
+    --shiki-token-keyword: #ff7b72;
+    --shiki-token-parameter: #c9d1d9;
+    --shiki-token-function: #d2a8ff;
+    --shiki-token-string-expression: #a5d6ff;
+    --shiki-token-punctuation: #c9d1d9;
+    --shiki-token-link: #000012;
+  }
+}
+```
+
+### Tailwind CSS
+
+If you use [Tailwind CSS](https://tailwindcss.com/) and use the dark mode with the class strategy instead of media query,
+you can override the variables like this:
+
+```css
+html.dark {
+  --shiki-color-text: #c9d1d9;
+  --shiki-color-background: #0d1117;
+  --shiki-token-constant: #79c0ff;
+  --shiki-token-string: #a5d6ff;
+  --shiki-token-comment: #8b949e;
+  --shiki-token-keyword: #ff7b72;
+  --shiki-token-parameter: #c9d1d9;
+  --shiki-token-function: #d2a8ff;
+  --shiki-token-string-expression: #a5d6ff;
+  --shiki-token-punctuation: #c9d1d9;
+  --shiki-token-link: #000012;
+}
+```
+
+**Bonus**: You can use colors from [Tailwind CSS](https://tailwindcss.com/docs/customizing-colors) by using the [theme function](https://tailwindcss.com/docs/functions-and-directives#theme):
+
+```postcss
+:root {
+  --shiki-color-text: theme("colors.zinc.700");
+  --shiki-color-background: theme("colors.white");
+  --shiki-token-constant: theme('colors.emerald.700');
+  --shiki-token-string: theme('colors.emerald.700');
+  --shiki-token-comment: theme('colors.zinc.500');
+  --shiki-token-keyword: theme('colors.cyan.700');
+  --shiki-token-parameter: theme('colors.pink.700');
+  --shiki-token-function: theme('colors.violet.700');
+  --shiki-token-string-expression: theme('colors.emerald.700');
+  --shiki-token-punctuation: theme('colors.zinc.800');
+  --shiki-token-link: theme('colors.zinc.700');
+}
+```
+
+## Code Hike
+
+Ok, now we have everything together let's test it.
+Most of the colors are now loaded from our variables, but not all.
+
+![background and text color not loaded](./assets/01-bg-and-text-not-loaded.png)
+
+The background and the default text color are always very dark.
+Why is that?
+After some time of searching in the source code of [Code Hike](https://github.com/code-hike/codehike), i found the answer.
+It reads some color information from the theme itself ([theme.ts](https://github.com/code-hike/codehike/blob/b3350c399b963b0ca0647b452ec737c89f1f81df/packages/mdx/src/utils/theme.ts#L73)).
+But shouldn't it then get variables instead of hard coded blackish color codes?
+After a look into the [Shiki theme](https://github.com/shikijs/shiki/blob/main/packages/shiki/themes/css-variables.json),
+I have to realize that there are no variables defined.
+After another research phase, I found out that [Shiki](https://github.com/shikijs/shiki) does some weird color code to variable replacement.
+
+https://github.com/shikijs/shiki/pull/314
+
+This explains why [Code Hike](https://github.com/code-hike/codehike) uses blackish color codes instead of variables.
+But what if we write a variable directly into the theme instead of the color code.
+
+### Custom theme
+
+At first we copy the [css-variables theme](https://github.com/shikijs/shiki/blob/main/packages/shiki/themes/css-variables.json) from [Shiki](https://shiki.matsu.io/) and
+modify the values of `editor.foreground` and `editor.background` from the blackish color codes to variables.
+
+```json
+{
+  "name": "css-variables",
+  "type": "css",
+  "colors": {
+    "editor.foreground": "var(--shiki-color-text)",
+    "editor.background": "var(--shiki-color-background)",
+  },
+  ...
+}
+```
+
+Now we can load our custom theme.
+
+```javascript
+import { remarkCodeHike } from "@code-hike/mdx";
+import theme from "./lib/ch-theme.json" assert { type: "json" };
+
+const options = {
+  remarkPlugins: [
+    [remarkCodeHike, { theme }]
+  ],
+}
+
+// configure mdx ...
+```
+
+Great, that seems to work.
+But what about tabs, if we use `CH.Code`?
+
+![tab colors are broken](./assets/02-tabs.png)
+
+After some research in the source code,
+we add some more variables to our theme and to our css:
+
+<CH.Code>
+
+```json theme.json
+"colors": {
+  "editor.foreground": "var(--shiki-color-text)",
+  "editor.background": "var(--shiki-color-background)",
+
+  "editorGroupHeader.tabsBackground": "var(--ch-tabs-bg)",
+  "tab.activeBackground": "var(--ch-tab-active-bg)",
+  "tab.inactiveForeground": "var(--ch-tab-inactive-color)",
+  "tab.inactiveBackground": "var(--ch-tab-inactive-bg)",
+  "icon.foreground": "var(--ch-icon-text)",
+
+  "tab.border": "var(--ch-tab-border)",
+  "tab.activeBorder": "var(--ch-tab-active-border)",
+},
+```
+
+```postcss styles.css
+:root {
+  --ch-icon-text: theme("colors.zinc.700");
+  --ch-tabs-bg: theme("colors.zinc.200");
+  --ch-tab-border: theme("colors.zinc.300");
+  --ch-tab-active-border: theme("colors.white");
+  --ch-tab-active-bg: theme("colors.white");
+  --ch-tab-active-color: theme("colors.zinc.700");
+  --ch-tab-inactive-color: theme("colors.zinc.500");
+  --ch-tab-inactive-bg: theme("colors.zinc.200");
+}
+```
+
+</CH.Code>
+
+But the color definition for `tab.activeForeground` caused problems.
+[Code Hike](https://codehike.org/) tries to convert the color from hex to rgba in order to add opacity to the color ([transparent](https://github.com/code-hike/codehike/blob/next/packages/mdx/src/utils/color.ts#L68)).
+But our color definition (`var(--ch-tab-active-color`) is not a hex color code and the function throws an error.
+With a bit of css we are able to workaround the problem:
+
+```css
+div.ch-editor-tab-active {
+  color: var(--ch-tab-active-color);
+}
+```
+
+That's it we can now use CSS variables for the style of our syntax highlighting
+and we can use different themes for light and dark mode.
+
+<Notification type="warning">
+  I've tested not all feature of Code Hike.
+  It is very likely that there will still be problems at one point or another.
+</Notification>

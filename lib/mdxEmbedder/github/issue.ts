@@ -2,9 +2,9 @@ import { Paragraph } from "mdast";
 import { createJSONParseAST } from "../utils";
 import { Author, queryGitHub, Repository } from "./core";
 
-const query = `query pullRequest($owner: String!, $repo: String!, $id: Int!) {
+const query = `query issue($owner: String!, $repo: String!, $id: Int!) {
   repository(owner: $owner, name: $repo) {
-    pullRequest(number: $id) {
+    issue(number: $id) {
       number
       url
       titleHTML
@@ -18,7 +18,8 @@ const query = `query pullRequest($owner: String!, $repo: String!, $id: Int!) {
   }
 }`;
 
-export type PullRequest = {
+
+export type Issue = {
   number: number;
   url: string;
   titleHTML: string;
@@ -29,12 +30,12 @@ export type PullRequest = {
 type Result = {
   data: {
     repository: {
-      pullRequest: PullRequest;
+      issue: Issue;
     };
   };
 };
 
-const fetchPullRequest = async (owner: string, repo: string, id: string) => {
+const fetchIssue = async (owner: string, repo: string, id: string) => {
   const variables = {
     owner,
     repo,
@@ -42,11 +43,11 @@ const fetchPullRequest = async (owner: string, repo: string, id: string) => {
   };
 
   const result = await queryGitHub<Result>(query, variables)
-  return result.data.repository.pullRequest;
+  return result.data.repository.issue;
 };
 
-const fetchAndTransformPullRequest = async (node: Paragraph, owner: string, repo: string, id: string) => {
-  const pullRequest = await fetchPullRequest(owner, repo, id);
+const fetchAndTransformIssue = async (node: Paragraph, owner: string, repo: string, id: string) => {
+  const pullRequest = await fetchIssue(owner, repo, id);
   const repository: Repository = {
     owner,
     name: repo,
@@ -54,11 +55,11 @@ const fetchAndTransformPullRequest = async (node: Paragraph, owner: string, repo
 
   Object.assign(node, {
     type: "mdxJsxFlowElement",
-    name: "GitHubPullRequest",
+    name: "GitHubIssue",
     attributes: [
       {
         type: "mdxJsxAttribute",
-        name: "pullRequest",
+        name: "issue",
         value: {
           type: "mdxJsxAttributeValueExpression",
           data: {
@@ -82,4 +83,4 @@ const fetchAndTransformPullRequest = async (node: Paragraph, owner: string, repo
   });
 };
 
-export default fetchAndTransformPullRequest;
+export default fetchAndTransformIssue;

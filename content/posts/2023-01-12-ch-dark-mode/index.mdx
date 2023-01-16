@@ -10,6 +10,15 @@ tags:
   - react
 ---
 
+<Notification type="warning">
+  This article refers to versions of [Code Hike](https://codehike.org/) before
+  [0.8.0](https://github.com/code-hike/codehike/releases/tag/v0.8.0). Since version
+  [0.8.0](https://github.com/code-hike/codehike/releases/tag/v0.8.0), Code Hike uses
+  [lighter](https://github.com/code-hike/lighter) instead of [Shiki](https://shiki.matsu.io/). The approach presented in
+  this article uses [shiki's color replacement method](https://github.com/shikijs/shiki/pull/314), which no longer works
+  with [lighter](https://github.com/code-hike/lighter).
+</Notification>
+
 I'm using [Code Hike](https://codehike.org/) for the code snippets in my blog and i love this library.
 It has many nice features, like [tabs](https://codehike.org/demo/filenames) or [focus](https://codehike.org/demo/code).
 But it is laking support for switching themes at runtime, which i want to have for my dark mode implementation.
@@ -102,15 +111,15 @@ html.dark {
 :root {
   --shiki-color-text: theme("colors.zinc.700");
   --shiki-color-background: theme("colors.white");
-  --shiki-token-constant: theme('colors.emerald.700');
-  --shiki-token-string: theme('colors.emerald.700');
-  --shiki-token-comment: theme('colors.zinc.500');
-  --shiki-token-keyword: theme('colors.cyan.700');
-  --shiki-token-parameter: theme('colors.pink.700');
-  --shiki-token-function: theme('colors.violet.700');
-  --shiki-token-string-expression: theme('colors.emerald.700');
-  --shiki-token-punctuation: theme('colors.zinc.800');
-  --shiki-token-link: theme('colors.zinc.700');
+  --shiki-token-constant: theme("colors.emerald.700");
+  --shiki-token-string: theme("colors.emerald.700");
+  --shiki-token-comment: theme("colors.zinc.500");
+  --shiki-token-keyword: theme("colors.cyan.700");
+  --shiki-token-parameter: theme("colors.pink.700");
+  --shiki-token-function: theme("colors.violet.700");
+  --shiki-token-string-expression: theme("colors.emerald.700");
+  --shiki-token-punctuation: theme("colors.zinc.800");
+  --shiki-token-link: theme("colors.zinc.700");
 }
 ```
 
@@ -159,10 +168,8 @@ import { remarkCodeHike } from "@code-hike/mdx";
 import theme from "./lib/ch-theme.json" assert { type: "json" };
 
 const options = {
-  remarkPlugins: [
-    [remarkCodeHike, { theme }]
-  ],
-}
+  remarkPlugins: [[remarkCodeHike, { theme }]],
+};
 
 // configure mdx ...
 ```
@@ -223,6 +230,5 @@ That's it we can now use CSS variables for the style of our syntax highlighting
 and we can use different themes for light and dark mode.
 
 <Notification type="warning">
-  I've tested not all feature of Code Hike.
-  It is very likely that there will still be problems at one point or another.
+  I've tested not all feature of Code Hike. It is very likely that there will still be problems at one point or another.
 </Notification>

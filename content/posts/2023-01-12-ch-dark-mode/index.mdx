@@ -232,3 +232,42 @@ and we can use different themes for light and dark mode.
 <Notification type="warning">
   I've tested not all feature of Code Hike. It is very likely that there will still be problems at one point or another.
 </Notification>
+
+## Existing Themes
+
+That is all nice, but how can we use existing VS Code Themes with this approach (Shiki and Code Hike using VS Code Themes).
+We have to read the theme and copy the color codes from the theme to our css variables.
+But this is a very tedious work, so I have written a small tool that can take this task from us.
+
+```bash
+$ npx convert-sh-theme https://raw.githubusercontent.com/shikijs/shiki/main/packages/shiki/themes/dracula.json
+
+style.css
+=======================================
+
+:root {
+  --shiki-color-text: #F8F8F2;
+  --shiki-color-background: #282A36;
+
+  --shiki-token-constant: #BD93F9;
+  --shiki-token-string: #8BE9FD;
+  --shiki-token-comment: #6272A4;
+  --shiki-token-keyword: #FF79C6;
+  --shiki-token-parameter: #F8F8F2;
+  --shiki-token-function: #8BE9FD;
+  --shiki-token-string-expression: #FF79C6;
+  --shiki-token-punctuation: #F8F8F2;
+  --shiki-token-link: #8BE9FD;
+}
+```
+
+To create styles and the theme for Code Hike:
+
+```bash
+$ pnpx convert-sh-theme --code-hike --out output https://raw.githubusercontent.com/shikijs/shiki/main/packages/shiki/themes/dracula.json
+
+... write file style.css
+... write file theme.json
+```
+
+For more information about the converter tool, have a look at [convert-sh-theme](https://github.com/sdorra/convert-sh-theme).

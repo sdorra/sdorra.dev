@@ -29,31 +29,6 @@ div.ch-editor-tab-active {
 }
 
 :root {
-  --shiki-color-text: theme("colors.zinc.700");
-  --shiki-color-background: theme("colors.white");
-  --shiki-token-constant: theme('colors.emerald.700');
-  --shiki-token-string: theme('colors.emerald.700');
-  --shiki-token-comment: theme('colors.zinc.500');
-  --shiki-token-keyword: theme('colors.cyan.700');
-  --shiki-token-parameter: theme('colors.pink.700');
-  --shiki-token-function: theme('colors.violet.700');
-  --shiki-token-string-expression: theme('colors.emerald.700');
-  --shiki-token-punctuation: theme('colors.zinc.800');
-  --shiki-token-link: theme('colors.zinc.700');
-
-  --ch-icon-text: theme("colors.zinc.700");
-  --ch-tabs-bg: theme("colors.zinc.200");
-  --ch-tab-border: theme("colors.zinc.300");
-  --ch-tab-active-border: theme("colors.white");
-  --ch-tab-active-bg: theme("colors.white");
-  --ch-tab-active-color: theme("colors.zinc.700");
-  --ch-tab-inactive-color: theme("colors.zinc.500");
-  --ch-tab-inactive-bg: theme("colors.zinc.200");
-
-  --ch-debug: theme("colors.red.500");
-}
-
-html.dark {
   --shiki-color-text: theme('colors.zinc.100');
   --shiki-color-background: theme("colors.zinc.700");
   --shiki-token-constant: theme('colors.emerald.300');

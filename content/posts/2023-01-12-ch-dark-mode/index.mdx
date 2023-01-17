@@ -19,9 +19,9 @@ tags:
   with [lighter](https://github.com/code-hike/lighter).
 </Notification>
 
-I'm using [Code Hike](https://codehike.org/) for the code snippets in my blog and i love this library.
+I'm using [Code Hike](https://codehike.org/) for the code snippets in my blog and I love this library.
 It has many nice features, like [tabs](https://codehike.org/demo/filenames) or [focus](https://codehike.org/demo/code).
-But it is laking support for switching themes at runtime, which i want to have for my dark mode implementation.
+But it is lacking support for switching themes at runtime, which I want to use for my dark mode implementation.
 
 https://github.com/code-hike/codehike/issues/271
 
@@ -132,7 +132,7 @@ Most of the colors are now loaded from our variables, but not all.
 
 The background and the default text color are always very dark.
 Why is that?
-After some time of searching in the source code of [Code Hike](https://github.com/code-hike/codehike), i found the answer.
+After some time of searching in the source code of [Code Hike](https://github.com/code-hike/codehike), I found the answer.
 It reads some color information from the theme itself ([theme.ts](https://github.com/code-hike/codehike/blob/b3350c399b963b0ca0647b452ec737c89f1f81df/packages/mdx/src/utils/theme.ts#L73)).
 But shouldn't it then get variables instead of hard coded blackish color codes?
 After a look into the [Shiki theme](https://github.com/shikijs/shiki/blob/main/packages/shiki/themes/css-variables.json),
@@ -226,7 +226,7 @@ div.ch-editor-tab-active {
 }
 ```
 
-That's it we can now use CSS variables for the style of our syntax highlighting
+That's it, we can now use CSS variables for the style of our syntax highlighting
 and we can use different themes for light and dark mode.
 
 <Notification type="warning">
@@ -235,7 +235,7 @@ and we can use different themes for light and dark mode.
 
 ## Existing Themes
 
-That is all nice, but how can we use existing VS Code Themes with this approach (Shiki and Code Hike using VS Code Themes).
+That is all nice, but how can we use existing VS Code themes with this approach (Shiki and Code Hike are using VS Code themes).
 We have to read the theme and copy the color codes from the theme to our css variables.
 But this is a very tedious work, so I have written a small tool that can take this task from us.
 

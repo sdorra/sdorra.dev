@@ -105,7 +105,8 @@ html.dark {
 }
 ```
 
-**Bonus**: You can use colors from [Tailwind CSS](https://tailwindcss.com/docs/customizing-colors) by using the [theme function](https://tailwindcss.com/docs/functions-and-directives#theme):
+<Notification type="info" title="Bonus" prose>
+You can use colors from [Tailwind CSS](https://tailwindcss.com/docs/customizing-colors) by using the [theme function](https://tailwindcss.com/docs/functions-and-directives#theme):
 
 ```postcss
 :root {
@@ -122,6 +123,7 @@ html.dark {
   --shiki-token-link: theme("colors.zinc.700");
 }
 ```
+</Notification>
 
 ## Code Hike
 
@@ -141,6 +143,7 @@ After another research phase, I found out that [Shiki](https://github.com/shikij
 
 https://github.com/shikijs/shiki/pull/314
 
+Shiki does this because the underlying library [vscode-textmate](https://github.com/microsoft/vscode-textmate) or [vscode-oniguruma](https://github.com/microsoft/vscode-oniguruma) returns black if the value is not a valid color.
 This explains why [Code Hike](https://github.com/code-hike/codehike) uses blackish color codes instead of variables.
 But what if we write a variable directly into the theme instead of the color code.
 
@@ -200,16 +203,16 @@ we add some more variables to our theme and to our css:
 },
 ```
 
-```postcss styles.css
+```css styles.css
 :root {
-  --ch-icon-text: theme("colors.zinc.700");
-  --ch-tabs-bg: theme("colors.zinc.200");
-  --ch-tab-border: theme("colors.zinc.300");
-  --ch-tab-active-border: theme("colors.white");
-  --ch-tab-active-bg: theme("colors.white");
-  --ch-tab-active-color: theme("colors.zinc.700");
-  --ch-tab-inactive-color: theme("colors.zinc.500");
-  --ch-tab-inactive-bg: theme("colors.zinc.200");
+  --ch-icon-text: #3f3f46;
+  --ch-tabs-bg: #e4e4e7;
+  --ch-tab-border: #d4d4d8;
+  --ch-tab-active-border: #ffffff;
+  --ch-tab-active-bg: #ffffff;
+  --ch-tab-active-color: #3f3f46;
+  --ch-tab-inactive-color: #71717a;
+  --ch-tab-inactive-bg: #e4e4e7;
 }
 ```
 

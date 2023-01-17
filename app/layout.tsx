@@ -34,13 +34,7 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
         }}
       />
     </head>
-    <body
-      className={clsx(
-        "bg-white font-body text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-        raleway.variable,
-        cabin.variable
-      )}
-    >
+    <body className={clsx(raleway.variable, cabin.variable)}>
       <div className="mx-auto flex h-full max-w-3xl flex-col gap-5 p-5 sm:p-10">
         <header className="relative">
           <Navigation />

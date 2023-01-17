@@ -3,7 +3,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import clsx from "clsx";
 import { Check, Copy, Facebook, Linkedin, Mail, Pocket, Share2, Twitter, XCircle } from "lucide-react";
-import { Fragment, ReactNode, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import { IconButton, IconExternalLink } from "./icons";
 
 type Props = {
@@ -36,6 +36,13 @@ const fqdn = process.env.NEXT_PUBLIC_FQDN ? process.env.NEXT_PUBLIC_FQDN : "sdor
 
 const CopyButton = ({ url }: { url: string }) => {
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (copied) {
+      const id = setTimeout(() => setCopied(false), 2000);
+      return () => clearTimeout(id);
+    }
+  }, [copied]);
 
   const copy = () => {
     setCopied(true);
@@ -101,7 +108,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-zinc-700 p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-zinc-700">
                   <Dialog.Title as="h3" className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
                     Share post
                   </Dialog.Title>
@@ -124,13 +131,17 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                     </ShareIcon>
                     <ShareIcon
                       title="Share on Facebook"
-                      url={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(completeUrl + "facebook")}`}
+                      url={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                        completeUrl + "facebook"
+                      )}`}
                     >
                       <Facebook />
                     </ShareIcon>
                     <ShareIcon
                       title="Share on LinkedIn"
-                      url={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(completeUrl + "linkedin")}`}
+                      url={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                        completeUrl + "linkedin"
+                      )}`}
                     >
                       <Linkedin />
                     </ShareIcon>

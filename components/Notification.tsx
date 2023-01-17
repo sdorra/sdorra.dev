@@ -2,11 +2,15 @@ import clsx from "clsx";
 import { AlertTriangle, CheckCircle, Lightbulb, XOctagon } from "lucide-react";
 import { ReactNode } from "react";
 
-type Type = "info" | "success" | "warning" | "error";
+export const types = ["info", "success", "warning", "error"] as const;
+
+type Type = typeof types[number];
 
 type Props = {
   type?: Type;
+  title?: string;
   children: ReactNode;
+  prose?: boolean;
 };
 
 const icons = {
@@ -16,30 +20,33 @@ const icons = {
   error: XOctagon,
 };
 
-const Notification = ({ children, type = "warning" }: Props) => {
+const Notification = ({ title, children, type = "warning", prose = false}: Props) => {
   const Icon = icons[type];
   return (
     <div
       className={clsx(
-        "not-prose relative overflow-x-scroll rounded-md border-2 p-5 shadow-md [&_a]:underline [&_a]:hover:decoration-2",
+        "rounded-md border-l-8 border-r border-t border-b p-5 shadow-md [&_a]:underline hover:[&_a]:decoration-2",
         {
-          "border-sky-800 bg-sky-300 text-sky-900 [&>*:not(svg)]:text-sky-900": type === "info",
-          "border-amber-800 bg-amber-300 text-amber-900 [&>*:not(svg)]:text-amber-900": type === "warning",
-          "border-red-800 bg-red-300 text-red-900 [&>*:not(svg)]:text-red-900": type === "error",
-          "border-emerald-800 bg-emerald-300 text-emerald-900 [&>*:not(svg)]:text-emerald-900": type === "success",
+          "border-sky-600 dark:border-sky-500 hover:[&_a]:decoration-sky-500": type === "info",
+          "border-amber-600 dark:border-amber-500 hover:[&_a]:decoration-amber-500": type === "warning",
+          "border-red-600 dark:border-red-500 hover:[&_a]:decoration-red-500": type === "error",
+          "border-emerald-600 dark:border-emerald-500 hover:[&_a]:decoration-emerald-500": type === "success",
+          "not-prose": !prose
         }
       )}
     >
-      {children}
-      <Icon
-        size={"1.25rem"}
-        className={clsx("absolute right-1 top-1 text-xs", {
-          "text-sky-700": type === "info",
-          "text-amber-700": type === "warning",
-          "text-red-700": type === "error",
-          "text-emerald-700": type === "success",
+      <div
+        className={clsx("mb-2 flex items-center justify-between", {
+          "text-sky-700 dark:text-sky-500": type === "info",
+          "text-amber-700 dark:text-amber-500": type === "warning",
+          "text-red-600 dark:text-red-500": type === "error",
+          "text-emerald-700 dark:text-emerald-500": type === "success",
         })}
-      />
+      >
+        <div className="font-semibold first-letter:uppercase">{title ? title : type}</div>
+        <Icon />
+      </div>
+      {children}
     </div>
   );
 };

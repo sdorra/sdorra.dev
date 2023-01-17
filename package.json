@@ -11,7 +11,8 @@
     "feed": "node scripts/feed.mjs",
     "start": "next start",
     "lint": "next lint",
-    "cmp": "ladle dev"
+    "cmp-dev": "ladle dev",
+    "cmp-build": "ladle build"
   },
   "dependencies": {
     "@code-hike/mdx": "^0.7.4",

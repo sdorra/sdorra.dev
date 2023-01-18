@@ -10,5 +10,5 @@ export const Provider: GlobalProvider = ({ children, globalState }) => {
       document.documentElement.classList.remove("dark");
     }
   }, [globalState.theme]);
-  return <React.Fragment>{children}</React.Fragment>;
+  return <div className="p-4">{children}</div>;
 };

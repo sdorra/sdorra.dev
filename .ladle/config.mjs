@@ -1,5 +1,6 @@
 export default {
   stories: "components/**/*.stories.{js,jsx,ts,tsx}",
+  viteConfig: ".ladle/vite.config.ts",
   addons: {
     rtl: {
       enabled: false,

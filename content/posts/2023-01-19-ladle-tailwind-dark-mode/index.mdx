@@ -1,0 +1,53 @@
+---
+title: Dark mode with Ladle and TailwindCSS
+summary: Leverage the dark mode switch of Ladle for components using TailwindCSS
+date: 2023-01-19
+image: https://images.unsplash.com/photo-1504764060-099d0ed17a20
+tags:
+  - ladle
+  - tailwindcss
+  - react
+---
+
+In [Ladle](https://ladle.dev/) there is a handy button which is able to switch between light and dark mode.
+However, this only switches the ui of [Ladle](https://ladle.dev/).
+Wouldn't it be great if it could also switch the mode of our [TailwindCSS](https://tailwindcss.com/) components, with the same button?
+It turns out that we can.
+We only have to create a [GlobalProvider](https://ladle.dev/docs/providers).
+
+## The GlobalProvider
+
+A global provider can be used to enhance stories or provide additional context to them.
+In this example we use the [class strategy](https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually) to toggle the dark mode in [TailwindCSS](https://tailwindcss.com/).
+So we want to add the `dark` class to the `html` element when dark mode is active in [Ladle](https://ladle.dev/) and
+we want to make sure it is not present when light mode is active.
+
+To create the global provider we create a file at `.ladle/components.tsx`.
+Then we have to export a component called `Provider` of type `GlobalProvider`.
+The `Provider` receives the following props:
+
+* **children**: The current story
+* **globalState**: The global state of [Ladle](https://ladle.dev/), which contains the active theme
+* **storyMeta**: The metadata of the story, such as the name
+
+To achieve our goal we have to create a component which uses an [Effect Hook](https://reactjs.org/docs/hooks-effect.html)
+which toggles the `dark` class whenever the theme in [Ladle](https://ladle.dev/) changes.
+
+```tsx .ladle/components.tsx
+import type { GlobalProvider } from "@ladle/react";
+import React, { useEffect } from "react";
+import "tailwindcss/tailwind.css";
+
+export const Provider: GlobalProvider = ({ children, globalState }) => {
+  useEffect(() => {
+    if (globalState.theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [globalState.theme]);
+  return <div className="p-4">{children}</div>;
+};
+```
+
+That's all, have fun developing components in light and dark mode.

@@ -41,7 +41,7 @@
   "devDependencies": {
     "@ladle/react": "^2.4.5",
     "@next/bundle-analyzer": "13.1.2",
-    "@tailwindcss/typography": "^0.5.8",
+    "@tailwindcss/typography": "^0.5.9",
     "@types/hast": "^2.3.4",
     "@types/mdast": "^3.0.10",
     "@types/sharp": "^0.31.1",

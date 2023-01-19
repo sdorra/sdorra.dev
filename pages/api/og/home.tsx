@@ -3,7 +3,7 @@
 import { ImageResponse } from "@vercel/og";
 
 export const config = {
-  runtime: "experimental-edge",
+  runtime: "edge",
 };
 
 const ralewayBold = fetch(new URL(`../../../content/fonts/Raleway-Bold.ttf`, import.meta.url)).then((res) =>

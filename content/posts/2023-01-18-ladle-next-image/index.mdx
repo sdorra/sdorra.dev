@@ -1,0 +1,345 @@
+---
+title: Component development with ladle and next/image
+summary: Learn how to develop react components which are using next/image with ladle
+date: 2023-01-18
+image: https://images.unsplash.com/photo-1586969593928-1c87c1f9c2ef
+tags:
+  - ladle
+  - nextjs
+  - react
+  - typescript
+---
+
+Sometimes it is easier to build a component in isolation than in the place where it will be used.
+It is much easier to test all variations and edge cases of the component.
+There are tools out there which can help us to build our components in isolation.
+The most famous is [Storybook](https://storybook.js.org/),
+but I like to use [Ladle](https://ladle.dev/).
+[Ladle](https://ladle.dev/) is much smaller than [Storybook](https://storybook.js.org/) and it is built for speed.
+In this post we will set up [Ladle](https://ladle.dev/) and
+we will learn how we can use [next/image](https://nextjs.org/docs/api-reference/next/image) within [Ladle](https://ladle.dev/).
+
+## Setup
+
+First we have to install [Ladle](https://ladle.dev/):
+
+<CH.Code>
+
+```bash pnpm
+pnpm add -D @ladle/react
+```
+
+```bash yarn
+yarn add -D @ladle/react
+```
+
+```bash npm
+npm install --save-dev @ladle/react
+```
+
+</CH.Code>
+
+And for most installations, that's it.
+Ladle has a useful default configuration,
+you only need to create a configuration if your installation differs from the default.
+But for most [Next.js](https://nextjs.org/) installations the default does not fit.
+[Ladle](https://ladle.dev/) expects [stories](https://ladle.dev/docs/stories) and components in the "src" folder,
+but in many Next.js installations they are in a folder called components.
+So we have to create a [configuration](https://ladle.dev/docs/config#ladleconfigmjs) at `.ladle/config.mjs`:
+
+```js .ladle/config.mjs
+export default {
+  stories: "components/**/*.stories.{js,jsx,ts,tsx}",
+};
+```
+
+With this configuration ladle is able to find our stories.
+A good time to write our first story.
+
+## First Story
+
+We want to create our first Story for the following component.
+
+```tsx components/Avatar.tsx
+type Props = {
+  src: string;
+  alt: string;
+  size?: "sm" | "md" | "lg" | "xl";
+};
+
+const sizes = {
+  sm: 16,
+  md: 32,
+  lg: 64,
+  xl: 128,
+};
+
+const Avatar = ({ src, alt, size = "md" }: Props) => (
+  <img
+    className="rounded-full shadow-md ring-2 ring-zinc-300 dark:ring-zinc-700"
+    src={src}
+    width={sizes[size]}
+    height={sizes[size]}
+    alt={alt}
+  />
+);
+
+export default Avatar;
+```
+
+We want to create a story which shows us all sizes of the `Avatar` component next to each other.
+To create a new story we have to create a story file next to our component:
+
+```tsx components/Avatar.stories.tsx
+import Avatar from "./Avatar";
+
+export const Default = () => <Avatar src="https://robohash.org/sdorra.dev" alt="Robohash of sdorra.dev" />;
+
+export const Sizes = () => (
+  <div className="flex gap-4">
+    <Avatar src="https://robohash.org/sdorra.dev" alt="Robohash of sdorra.dev" size="sm" />
+    <Avatar src="https://robohash.org/sdorra.dev" alt="Robohash of sdorra.dev" size="md" />
+    <Avatar src="https://robohash.org/sdorra.dev" alt="Robohash of sdorra.dev" size="lg" />
+    <Avatar src="https://robohash.org/sdorra.dev" alt="Robohash of sdorra.dev" size="xl" />
+  </div>
+);
+```
+
+Now it is time to start [Ladle](https://ladle.dev/).
+
+<CH.Code>
+
+```bash pnpm
+pnpm ladle dev
+```
+
+```bash yarn
+yarn ladle dev
+```
+
+```bash npm
+npm ladle dev
+```
+
+</CH.Code>
+
+[Ladle](https://ladle.dev/) should show 2 stories below `Avatar`.
+`Default` which shows our component within its default size and
+`Sizes` which shows the component in all available sizes next to each other.
+
+<Notification type="info" title="Bonus" prose>
+With a little bit of typescript magic, we can avoid the duplicate definitions of the sizes.
+
+<CH.Code>
+
+```tsx components/Avatar.tsx
+// we export sizes so that we can reuse it in our story
+export const sizes = {
+  sm: 16,
+  md: 32,
+  lg: 64,
+  xl: 128,
+};
+
+// we can infer the union type of Size from the sizes object
+export type Size = keyof typeof sizes;
+
+type Props = {
+  src: string;
+  alt: string;
+  // we can use our inferred type
+  size?: Size;
+};
+
+const Avatar = ({ src, alt, size = "md" }: Props) => (
+  <img
+    className="rounded-full shadow-md ring-2 ring-zinc-300 dark:ring-zinc-700"
+    src={src}
+    width={sizes[size]}
+    height={sizes[size]}
+    alt={alt}
+  />
+);
+
+export default Avatar;
+```
+
+```tsx components/Avatar.stories.tsx
+import Avatar, { sizes } from "./Avatar";
+
+export const Default = () => (
+  <Avatar src="https://robohash.org/sdorra.dev" alt="Robohash of sdorra.dev" />
+);
+
+// We can now create an array of sizes from the exported object.
+// Unfortunately we have to cast the array using `as`,
+// because `Object.keys` only returns `string[]`.
+// https://github.com/Microsoft/TypeScript/issues/12870
+const sizeKeys = Object.keys(sizes) as Size[];
+
+export const Sizes = () => (
+  <div className="flex gap-4">
+    {/* We can loop over the array of sizes */}
+    {sizeKeys.map(size) => (
+      <Avatar key={size} src="https://robohash.org/sdorra.dev" alt="Robohash of sdorra.dev" size={size} />
+    )}
+  </div>
+);
+```
+
+</CH.Code>
+
+</Notification>
+
+### next/image
+
+After we got [Ladle](https://ladle.dev/) running and wrote our first story,
+we want to develop our component further.
+We want to use [next/image](https://nextjs.org/docs/api-reference/next/image) instead of `img` to get all the advantages of [next/image](https://nextjs.org/docs/api-reference/next/image).
+So we just replace the `img` tag with the `Image` tag from [next/image](https://nextjs.org/docs/api-reference/next/image).
+
+```tsx components/Avatar.tsx
+import Image from "next/image";
+
+// Types and props remain unchanged
+
+const Avatar = ({ src, alt, size = "md" }: Props) => (
+  <Image
+    className="rounded-full shadow-md ring-2 ring-zinc-300 dark:ring-zinc-700"
+    src={src}
+    width={sizes[size]}
+    height={sizes[size]}
+    alt={alt}
+  />
+);
+```
+
+But now we get an error in ladle.
+
+<Notification type="error">
+  Uncaught ReferenceError: process is not defined
+</Notification>
+
+After a short research session I found the following issue on GitHub.
+
+https://github.com/tajo/ladle/issues/100
+
+One of the comments provided the following solution.
+We have to create a file called `vite.config.ts` in the root of our project.
+
+```ts vite.config.ts
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  define: {
+    "process.env": process.env,
+  },
+});
+```
+
+That fixes the `process is not defined` error,
+but we immediately get the next error.
+
+<Notification type="error">
+  Uncaught Error: Invalid src prop (https://robohash.org/sdorra.dev) on `next/image`,
+  hostname "robohash.org" is not configured under images in your `next.config.js`
+  See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+</Notification>
+
+All right, but we don't want to add the entry to `next.config.js`` at all,
+since this is just test data and besides,
+we still get the same error when we make the entry.
+
+After another look at [issue #100](https://github.com/tajo/ladle/issues/100),
+we can tell [next/image](https://nextjs.org/docs/api-reference/next/image) that it should skip the optimization if the component is rendered in ladle.
+That is fine, because the bandwidth does not play a big role during the development.
+With the following code placed inside `.ladle/components.tsx` ...
+
+```tsx .ladle/components.tsx
+import * as NextImage from "next/image";
+
+const OriginalNextImage = NextImage.default;
+
+Object.defineProperty(NextImage, "default", {
+  configurable: true,
+  value: (props) => (
+    <OriginalNextImage
+      {...props}
+      unoptimized
+    />
+  ),
+});
+```
+
+... we can add the `unoptimized` to each usage of `next/image`.
+Great, that fixed our problem.
+But unfortunately only in the development mode of [Ladle](https://ladle.dev/).
+If we run the production build (`ladle build` and `ladle preview`), we get the next error.
+
+<Notification type="error">
+  Uncaught TypeError: Cannot redefine property: default
+</Notification>
+
+Our solution does not work with the production build, we have to find another solution.
+
+#### The solution
+
+Fortunately, I thought of another way to get the `unoptimized` prop to all image instances.
+We can create an alias for the `next/image` import and resolve `next/image` to a custom component.
+This can be done in the `vite.config.ts`:
+
+```ts vite.config.ts focus=5:9
+import path from "path";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "next/image": path.resolve(__dirname, "./UnoptimizedImage.tsx"),
+    },
+  },
+  define: {
+    "process.env": process.env,
+  },
+});
+```
+
+Now we can write our own image component to `UnoptimizedImage.tsx`.
+But what if we want to use the original `next/image` component in our component?
+In order to achieve this we can define another alias in the `vite.config.ts`:
+
+```ts vite.config.ts focus=7
+import path from "path";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "next/original-image": require.resolve('next/image'),
+      "next/image": path.resolve(__dirname, "./UnoptimizedImage.tsx"),
+    },
+  },
+  define: {
+    "process.env": process.env,
+  },
+});
+```
+
+Now we should have everything together to make our `UnoptimizedImage`.
+
+```tsx .ladle/UnoptimizedImage.tsx
+import React from "react";
+// @ts-ignore have a look in vite.config.ts
+import OriginalImage from "next/original-image";
+
+const UnoptimizedImage = (props: any) => {
+  return <OriginalImage {...props} unoptimized />;
+};
+
+export default UnoptimizedImage;
+```
+
+After that we only have to remove the workaround from `.ladle/components.tsx` or
+we can remove the complete file if it has no other content.
+After a quick look into [Ladle](https://ladle.dev/) (production and development mode),
+we can see that we have finally solved the problem.

@@ -17,6 +17,10 @@
   }
 }
 
+.ch-code-wrapper {
+  color: var(--shiki-color-text) !important;
+}
+
 .ch-codegroup .ch-editor-button,
 .ch-codeblock .ch-code-button {
   display: none;

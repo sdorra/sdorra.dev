@@ -216,9 +216,7 @@ const Avatar = ({ src, alt, size = "md" }: Props) => (
 
 But now we get an error in ladle.
 
-<Notification type="error">
-  Uncaught ReferenceError: process is not defined
-</Notification>
+<Notification type="error">Uncaught ReferenceError: process is not defined</Notification>
 
 After a short research session I found the following issue on GitHub.
 
@@ -241,17 +239,17 @@ That fixes the `process is not defined` error,
 but we immediately get the next error.
 
 <Notification type="error">
-  Uncaught Error: Invalid src prop (https://robohash.org/sdorra.dev) on `next/image`,
-  hostname "robohash.org" is not configured under images in your `next.config.js`
-  See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+  Uncaught Error: Invalid src prop (https://robohash.org/sdorra.dev) on `next/image`, hostname "robohash.org" is not
+  configured under images in your `next.config.js` See more info:
+  https://nextjs.org/docs/messages/next-image-unconfigured-host
 </Notification>
 
-All right, but we don't want to add the entry to `next.config.js`` at all,
+All right, but we don't want to add the entry to `next.config.js` at all,
 since this is just test data and besides,
 we still get the same error when we make the entry.
 
 After another look at [issue #100](https://github.com/tajo/ladle/issues/100),
-we can tell [next/image](https://nextjs.org/docs/api-reference/next/image) that it should skip the optimization if the component is rendered in ladle.
+we can tell [next/image](https://nextjs.org/docs/api-reference/next/image) that it should skip the optimization if the component is rendered in [Ladle](https://ladle.dev/).
 That is fine, because the bandwidth does not play a big role during the development.
 With the following code placed inside `.ladle/components.tsx` ...
 
@@ -262,12 +260,7 @@ const OriginalNextImage = NextImage.default;
 
 Object.defineProperty(NextImage, "default", {
   configurable: true,
-  value: (props) => (
-    <OriginalNextImage
-      {...props}
-      unoptimized
-    />
-  ),
+  value: (props) => <OriginalNextImage {...props} unoptimized />,
 });
 ```
 
@@ -276,9 +269,7 @@ Great, that fixed our problem.
 But unfortunately only in the development mode of [Ladle](https://ladle.dev/).
 If we run the production build (`ladle build` and `ladle preview`), we get the next error.
 
-<Notification type="error">
-  Uncaught TypeError: Cannot redefine property: default
-</Notification>
+<Notification type="error">Uncaught TypeError: Cannot redefine property: default</Notification>
 
 Our solution does not work with the production build, we have to find another solution.
 
@@ -305,7 +296,7 @@ export default defineConfig({
 ```
 
 Now we can write our own image component to `UnoptimizedImage.tsx`.
-But what if we want to use the original `next/image` component in our component?
+But what if we want to use the original `next/image` in our component?
 In order to achieve this we can define another alias in the `vite.config.ts`:
 
 ```ts vite.config.ts focus=7
@@ -315,8 +306,8 @@ import { defineConfig } from "vite";
 export default defineConfig({
   resolve: {
     alias: {
-      "next/original-image": require.resolve('next/image'),
-      "next/image": path.resolve(__dirname, "./UnoptimizedImage.tsx"),
+      "next/original-image": require.resolve("next/image"),
+      "next/image": path.resolve(__dirname, "./.ladle/UnoptimizedImage.tsx"),
     },
   },
   define: {

@@ -17,7 +17,8 @@
   }
 }
 
-.ch-code-wrapper {
+.ch-code-wrapper,
+.ch-code {
   color: var(--shiki-color-text) !important;
 }
 

@@ -46,7 +46,7 @@ specifiers:
   tailwindcss: ^3.2.4
   typescript: ^4.9.5
   unified: ^10.1.2
-  unist-util-visit: ^4.1.2
+  unist-util-visit: 4.1.1
   vite: ^4.0.4
 
 dependencies:
@@ -94,7 +94,7 @@ devDependencies:
   tailwindcss: 3.2.4_postcss@8.4.21
   typescript: 4.9.5
   unified: 10.1.2
-  unist-util-visit: 4.1.2
+  unist-util-visit: 4.1.1
   vite: 4.0.4_@types+node@18.11.18
 
 packages:
@@ -7495,12 +7495,21 @@ packages:
       unist-util-visit-parents: 3.1.1
     dev: false
 
+  /unist-util-visit/4.1.1:
+    resolution: {integrity: sha512-n9KN3WV9k4h1DxYR1LoajgN93wpEi/7ZplVe02IoB4gH5ctI1AaF2670BLHQYbwj+pY83gFtyeySFiyMHJklrg==}
+    dependencies:
+      '@types/unist': 2.0.6
+      unist-util-is: 5.1.1
+      unist-util-visit-parents: 5.1.1
+    dev: true
+
   /unist-util-visit/4.1.2:
     resolution: {integrity: sha512-MSd8OUGISqHdVvfY9TPhyK2VdUrPgxkUtWSuMHF6XAAFuL4LokseigBnZtPnJMu+FbynTkFNnFlyjxpVKujMRg==}
     dependencies:
       '@types/unist': 2.0.6
       unist-util-is: 5.1.1
       unist-util-visit-parents: 5.1.1
+    dev: false
 
   /unpipe/1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}

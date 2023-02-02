@@ -5,7 +5,6 @@ import Analytics from "components/Analytics";
 import DarkModeToggle from "components/DarkModeToggle";
 import { FeedLink, GitHubLink, TwitterLink } from "components/ExternalLinks";
 import Navigation from "components/Navigation";
-import Script from "next/script";
 import { FC, PropsWithChildren } from "react";
 import "./globals.css";
 
@@ -49,16 +48,21 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
         <footer className="pb-4 text-right">© Sebastian Sdorra</footer>
       </div>
       <Analytics />
-      <Script id="onRouteChange">{`
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
         (function (history) {
           var pushState = history.pushState;
           history.pushState = function(state){
+            console.log("switch ...", state);
             var result = pushState.apply(history, arguments);
             window.dispatchEvent(new Event("routeChange", state));
             return result;
           };
         })(window.history);
-      `}</Script>
+      `,
+        }}
+      />
     </body>
   </html>
 );

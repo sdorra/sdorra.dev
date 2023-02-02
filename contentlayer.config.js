@@ -1,13 +1,17 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 
 import { remarkCodeHike } from "@code-hike/mdx";
+import { exec as syncExec } from "child_process";
 import path from "path";
 import readingTime from "reading-time";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+import { promisify } from "util";
 import resolveImageBlurDataURL from "./lib/imageBlurDataURL";
 import mdxEmbedder from "./lib/mdxEmbedder";
 import staticImages from "./lib/static-images";
+
+const exec = promisify(syncExec);
 
 import theme from "./lib/ch-theme.json" assert { type: "json" };
 
@@ -55,6 +59,19 @@ export const Post = defineDocumentType(() => ({
     imageBlurDataURL: {
       type: "string",
       resolve: resolveImageBlurDataURL,
+    },
+    lastModification: {
+      type: "string",
+      required: false,
+      resolve: async (post) => {
+        try {
+          const { stdout } = await exec(`git log -1 --date=iso-strict --pretty="format:%cd" "content/posts/${post._raw.sourceFilePath}"`);
+          return stdout.trim();
+        } catch (e) {
+          console.error(`Failed to get last modification date for ${post._raw.sourceFilePath}: ${e}`);
+          return;
+        }
+      },
     },
   },
 }));

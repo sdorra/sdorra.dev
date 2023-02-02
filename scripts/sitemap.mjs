@@ -5,11 +5,25 @@ import { allPosts } from "../.contentlayer/generated/index.mjs";
 
 const PAGE = "https://sdorra.dev";
 
-const expandPath = (p) => {
+const createUrl = (p) => PAGE + p;
+
+const mapPathToEntries = (p) => {
   if (p === "/posts/[slug]") {
-    return allPosts.map((p) => `/posts/${p._raw.flattenedPath}`);
+    return allPosts.map((p) => {
+      const url = {
+        loc: createUrl(`/posts/${p._raw.flattenedPath}`),
+      };
+      if (p.lastModification) {
+        url.lastmod = p.lastModification;
+      }
+      return url;
+    });
   }
-  return [p];
+  return [
+    {
+      loc: createUrl(p),
+    },
+  ];
 };
 
 const createPath = (p) => {
@@ -21,11 +35,11 @@ const createPath = (p) => {
   return path;
 };
 
-const createPaths = async () => {
+const createEntries = async () => {
   const paths = await globby("./**/page.tsx", {
     cwd: "app",
   });
-  return paths.map(createPath).flatMap(expandPath);
+  return paths.map(createPath).flatMap(mapPathToEntries);
 };
 
 const createSitemap = async (routes) => {
@@ -34,11 +48,12 @@ const createSitemap = async (routes) => {
   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
       ${routes
         .map((route) => {
-          return `
-            <url>
-                <loc>${`${PAGE}${route}`}</loc>
-            </url>
-          `;
+          let url = "<url>\n";
+          for (const [key, value] of Object.entries(route)) {
+            url += `<${key}>${value}</${key}>\n`;
+          }
+          url += "</url>\n";
+          return url;
         })
         .join("")}
   </urlset>
@@ -52,9 +67,9 @@ const createSitemap = async (routes) => {
 };
 
 (async () => {
-  const paths = await createPaths();
-  console.log(`create sitemap for ${paths.length} paths`);
-  const sitemap = await createSitemap(paths);
+  const entries = await createEntries();
+  console.log(`create sitemap for ${entries.length} entries`);
+  const sitemap = await createSitemap(entries);
 
   await writeFile("./public/sitemap.xml", sitemap, { encoding: "utf-8" });
 })();

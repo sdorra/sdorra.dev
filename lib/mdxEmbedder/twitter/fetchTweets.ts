@@ -1,55 +1,58 @@
-interface Response {
-  data: Data;
-  includes: Includes;
-}
-
-interface Data {
+interface Tweet {
+  __typename: string;
+  lang: string;
+  favorite_count: number;
   created_at: string;
+  display_text_range: number[];
+  entities: Entities;
+  id_str: string;
   text: string;
-  id: string;
-  edit_history_tweet_ids: string[];
-  author_id: string;
+  user: User;
+  edit_control: Edit_control;
+  conversation_count: number;
+  news_action_type: string;
+  isEdited: boolean;
+  isStaleEdit: boolean;
 }
-
-interface Includes {
-  users: UsersItem[];
+interface Entities {
+  hashtags: any[];
+  urls: any[];
+  user_mentions: any[];
+  symbols: any[];
 }
-
-interface UsersItem {
-  profile_image_url: string;
+interface User {
+  id_str: string;
   name: string;
-  id: string;
-  username: string;
+  profile_image_url_https: string;
+  screen_name: string;
+  verified: boolean;
+  is_blue_verified: boolean;
 }
+interface Edit_control {
+  edit_tweet_ids: string[];
+  editable_until_msecs: string;
+  is_edit_eligible: boolean;
+  edits_remaining: string;
+}
+
 
 const fetchTweet = async (id: string) => {
-  const options = "?expansions=author_id&tweet.fields=created_at&user.fields=profile_image_url";
-
-  const response = await fetch(`https://api.twitter.com/2/tweets/${id}${options}`, {
-    headers: { Authorization: `Bearer ${process.env.TWITTER_TOKEN}` },
-  });
-
+  const response = await fetch(`https://cdn.syndication.twimg.com/tweet-result?id=${id}`);
   if (!response.ok) {
     throw new Error("Twitter response is not ok");
   }
 
-  const body: Response = await response.json();
-  const tweet: Data = body.data;
-  const author = body.includes.users.find((a) => a.id === tweet.author_id);
-  if (!author) {
-    throw new Error(`Could not find author with id ${tweet.author_id}`);
-  }
-
+  const tweet: Tweet = await response.json();
   return {
-    id: tweet.id,
+    id: tweet.id_str,
     text: tweet.text,
     createdAt: tweet.created_at,
     author: {
-      name: author.name,
-      username: author.username,
-      profileImageUrl: author.profile_image_url,
+      name: tweet.user.name,
+      username: tweet.user.screen_name,
+      profileImageUrl: tweet.user.profile_image_url_https,
     },
-    url: `https://twitter.com/${author.username}/status/${tweet.id}`,
+    url: `https://twitter.com/${tweet.user.name}/status/${tweet.id_str}`,
   };
 };
 

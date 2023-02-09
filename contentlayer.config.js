@@ -17,7 +17,7 @@ import theme from "./lib/ch-theme.json" assert { type: "json" };
 
 export const Post = defineDocumentType(() => ({
   name: "Post",
-  filePathPattern: `**/*.mdx`,
+  filePathPattern: `posts/*/*.mdx`,
   contentType: "mdx",
   fields: {
     title: {
@@ -50,7 +50,11 @@ export const Post = defineDocumentType(() => ({
   computedFields: {
     url: {
       type: "string",
-      resolve: (post) => `/posts/${post._raw.flattenedPath}`,
+      resolve: (post) => `/${post._raw.flattenedPath}`,
+    },
+    slug: {
+      type: "string",
+      resolve: (post) => post._raw.flattenedPath.replace("posts/", ""),
     },
     readingTime: {
       type: "string",
@@ -65,7 +69,9 @@ export const Post = defineDocumentType(() => ({
       required: false,
       resolve: async (post) => {
         try {
-          const { stdout } = await exec(`git log -1 --date=iso-strict --pretty="format:%cd" "content/posts/${post._raw.sourceFilePath}"`);
+          const { stdout } = await exec(
+            `git log -1 --date=iso-strict --pretty="format:%cd" "content/${post._raw.sourceFilePath}"`
+          );
           return stdout.trim();
         } catch (e) {
           console.error(`Failed to get last modification date for ${post._raw.sourceFilePath}: ${e}`);
@@ -76,13 +82,36 @@ export const Post = defineDocumentType(() => ({
   },
 }));
 
+export const Page = defineDocumentType(() => ({
+  name: "Page",
+  filePathPattern: `pages/*.mdx`,
+  contentType: "mdx",
+  fields: {
+    title: {
+      type: "string",
+      description: "The title of the page",
+      required: true,
+    },
+  },
+  computedFields: {
+    url: {
+      type: "string",
+      resolve: (page) => `/${page._raw.flattenedPath}`,
+    },
+    slug: {
+      type: "string",
+      resolve: (page) => page._raw.flattenedPath.replace("pages/", ""),
+    },
+  }
+}));
+
 export default makeSource({
-  contentDirPath: "content/posts",
-  documentTypes: [Post],
+  contentDirPath: "content",
+  documentTypes: [Post, Page],
   mdx: {
     rehypePlugins: [
       rehypeSlug,
-      [staticImages, { publicDir: path.join(process.cwd(), "public", "posts"), resourcePath: "/posts" }],
+      [staticImages, { source: path.join(process.cwd(), "content"), target: path.join(process.cwd(), "public") }],
     ],
     remarkPlugins: [remarkGfm, mdxEmbedder, [remarkCodeHike, { theme, showCopyButton: true }]],
   },

@@ -6,6 +6,9 @@ const Navigation = () => (
       <li>
         <NavigationLink href="/">Home</NavigationLink>
       </li>
+      <li>
+        <NavigationLink href="/about">About</NavigationLink>
+      </li>
     </ul>
   </nav>
 );

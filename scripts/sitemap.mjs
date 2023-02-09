@@ -11,7 +11,7 @@ const mapPathToEntries = (p) => {
   if (p === "/posts/[slug]") {
     return allPosts.map((p) => {
       const url = {
-        loc: createUrl(`/posts/${p._raw.flattenedPath}`),
+        loc: createUrl(p.url),
       };
       if (p.lastModification) {
         url.lastmod = p.lastModification;

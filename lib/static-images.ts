@@ -24,10 +24,6 @@ const checksum = (content: Buffer) => {
   return crypto.createHash("sha256").update(content).digest("hex");
 };
 
-const findRoot = (file: VFileWithOutput<unknown>) => {
-  return file.dirname || process.cwd();
-};
-
 const findPath = (file: VFileWithOutput<unknown>, image: Element) => {
   const data = file.data as FileData;
 
@@ -48,7 +44,7 @@ const copy = async (source: string, sha256sum: string, target: string) => {
   }
 };
 
-const metadata = async (resourcePath: string, source: string, pathname: string) => {
+const metadata = async (source: string, pathname: string) => {
   const content = await fs.readFile(source);
   const image = await sharp(content);
 
@@ -58,8 +54,6 @@ const metadata = async (resourcePath: string, source: string, pathname: string) 
     return null;
   }
 
-  const src = resourcePath + "/" + pathname;
-
   const sha256 = checksum(content);
 
   const blurDataURL = await createPlaceholder(image);
@@ -68,24 +62,24 @@ const metadata = async (resourcePath: string, source: string, pathname: string) 
     props: {
       width,
       height,
-      src,
+      src: "/" + pathname,
       blurDataURL,
     },
   };
 };
 
 const processImage = async (options: Options, file: VFileWithOutput<unknown>, node: Element): Promise<void> => {
-  const root = findRoot(file);
+  const root = options.source;
 
   const pathname = findPath(file, node);
   const source = path.join(root, pathname);
 
-  const meta = await metadata(options.resourcePath, source, pathname);
+  const meta = await metadata(source, pathname);
   if (!meta) {
     return;
   }
 
-  const target = path.join(options.publicDir, pathname);
+  const target = path.join(options.target, pathname);
   await copy(source, meta.sha256, target);
 
   if (!node.properties) {
@@ -98,8 +92,8 @@ const processImage = async (options: Options, file: VFileWithOutput<unknown>, no
 };
 
 type Options = {
-  publicDir: string;
-  resourcePath: string;
+  source: string;
+  target: string;
 };
 
 const staticImages: Plugin<[Options], Root> = (options) => (tree, file, done) => {

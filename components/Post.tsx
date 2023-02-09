@@ -40,7 +40,7 @@ const NavigationButton = ({ post, type }: NavigationButtonProps) => {
         "text-left": type === "prev",
         "flex-row-reverse text-right": type === "next",
       })}
-      href={`/posts/${post._raw.flattenedPath}`}
+      href={post.url}
       title={`Navigate to post "${post.title}"`}
     >
       <Icon className="w-6 shrink-0 group-hover:stroke-[3]" />

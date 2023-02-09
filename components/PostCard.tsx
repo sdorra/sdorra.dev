@@ -11,7 +11,7 @@ type Props = {
 const PostCard = ({ post }: Props) => (
   <article>
     <Link
-      href={`/posts/${post._raw.flattenedPath}`}
+      href={post.url}
       className={clsx(
         "group mt-10 flex flex-col gap-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700",
         "border-2 border-zinc-300 p-4 hover:border-cyan-500 dark:border-zinc-700 dark:hover:border-cyan-400"

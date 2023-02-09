@@ -8,7 +8,7 @@ type Props = {
 };
 
 const Head = ({ params }: Props) => {
-  const post = allPosts.find((p) => p._raw.flattenedPath === params.slug);
+  const post = allPosts.find((p) => p.slug === params.slug);
   if (!post) {
     return null;
   }
@@ -16,9 +16,9 @@ const Head = ({ params }: Props) => {
     <Meta
       title={post.title}
       description={post.summary}
-      url={`/posts/${post._raw.flattenedPath}`}
+      url={post.url}
       ogType="article"
-      ogImage={`/api/og/posts/${post._raw.flattenedPath}`}
+      ogImage={`/api/og/posts/${post.slug}`}
     />
   );
 };

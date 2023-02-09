@@ -39,7 +39,7 @@ const createFeed = () => {
   allPosts
     .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
     .forEach((post) => {
-      const id = `https://sdorra.dev/posts/${post._raw.flattenedPath}`;
+      const id = `https://sdorra.dev${post.url}`;
       const url = createPostUrl(id);
       feed.addItem({
         title: post.title,

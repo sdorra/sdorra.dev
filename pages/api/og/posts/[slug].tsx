@@ -29,7 +29,7 @@ const createImageUrl = (src: string, width: number, height: number) => {
 
 const Image = async (req: NextRequest) => {
   const slug = req.nextUrl.pathname.replace("/api/og/posts/", "");
-  const post = allPosts.find((p) => slug === p._raw.flattenedPath);
+  const post = allPosts.find((p) => slug === p.slug);
   if (!post) {
     return new Response(
       JSON.stringify({

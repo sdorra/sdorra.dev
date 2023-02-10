@@ -15,7 +15,7 @@ const SiteHeading = ({ isTitle = false }: Props) => {
         src="https://avatars.githubusercontent.com/u/493333"
         alt="Avatar of Sebastian"
       />
-      <Heading className="mb-2 text-5xl font-bold sm:text-6xl">
+      <Heading className="mb-2 font-display text-5xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-6xl">
         sdorra<span className="text-cyan-600 dark:text-cyan-400">.dev</span>
       </Heading>
       <p className="col-span-2 mt-2 text-xl sm:col-span-1 sm:mt-0">A site about development by Sebastian Sdorra</p>

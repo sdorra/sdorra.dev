@@ -5,7 +5,7 @@ import { compareDesc } from "date-fns";
 
 const Home = () => (
   <>
-    <SiteHeading />
+    <SiteHeading isTitle />
 
     <p className="text-xl">
       Welcome to my site. On this page I will share my experiences and learnings on my way as a developer. Most of the

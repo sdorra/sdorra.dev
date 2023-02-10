@@ -1,6 +1,6 @@
 type Props = {
   title: string;
-  description: string;
+  description?: string;
   url?: string;
   ogType?: "website" | "article";
   ogImage?: string;
@@ -16,7 +16,7 @@ const Meta = ({ title, description, ogType = "website", url = "/", ogImage }: Pr
       <title>{title}</title>
       <link rel="canonical" href={`https://sdorra.dev${url}`} />
 
-      <meta name="description" content={description} />
+      {description ? <meta name="description" content={description} /> : null}
 
       <meta property="og:url" content={completeUrl} />
       <meta property="og:type" content={ogType} />

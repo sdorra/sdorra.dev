@@ -92,6 +92,10 @@ export const Page = defineDocumentType(() => ({
       description: "The title of the page",
       required: true,
     },
+    description: {
+      type: "string",
+      description: "Description used for SEO meta tag"
+    }
   },
   computedFields: {
     url: {

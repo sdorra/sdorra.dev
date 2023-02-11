@@ -15,6 +15,11 @@ const exec = promisify(syncExec);
 
 import theme from "./lib/ch-theme.json" assert { type: "json" };
 
+const calculateReadingTime = (content) => {
+  const contentWithoutSvg = content.replace(/<svg+.+?(?=<\/svg>)<\/svg>/sg, "");
+  return readingTime(contentWithoutSvg).text;
+};
+
 export const Post = defineDocumentType(() => ({
   name: "Post",
   filePathPattern: `**/*.mdx`,
@@ -54,7 +59,7 @@ export const Post = defineDocumentType(() => ({
     },
     readingTime: {
       type: "string",
-      resolve: (post) => readingTime(post.body.raw).text,
+      resolve: (post) => calculateReadingTime(post.body.raw),
     },
     imageBlurDataURL: {
       type: "string",
@@ -65,7 +70,9 @@ export const Post = defineDocumentType(() => ({
       required: false,
       resolve: async (post) => {
         try {
-          const { stdout } = await exec(`git log -1 --date=iso-strict --pretty="format:%cd" "content/posts/${post._raw.sourceFilePath}"`);
+          const { stdout } = await exec(
+            `git log -1 --date=iso-strict --pretty="format:%cd" "content/posts/${post._raw.sourceFilePath}"`
+          );
           return stdout.trim();
         } catch (e) {
           console.error(`Failed to get last modification date for ${post._raw.sourceFilePath}: ${e}`);

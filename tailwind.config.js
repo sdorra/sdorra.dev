@@ -12,6 +12,10 @@ module.exports = {
       colors: {
         primary: colors.cyan,
         base: colors.zinc,
+        info: colors.sky,
+        warn: colors.amber,
+        error: colors.red,
+        success: colors.green,
       },
     },
   },

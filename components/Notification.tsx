@@ -27,20 +27,20 @@ const Notification = ({ title, children, type = "warning", prose = false}: Props
       className={clsx(
         "rounded-md border-l-8 border-r border-t border-b p-5 shadow-md [&_a]:underline hover:[&_a]:decoration-2",
         {
-          "border-sky-600 dark:border-sky-500 hover:[&_a]:decoration-sky-500": type === "info",
-          "border-amber-600 dark:border-amber-500 hover:[&_a]:decoration-amber-500": type === "warning",
-          "border-red-600 dark:border-red-500 hover:[&_a]:decoration-red-500": type === "error",
-          "border-emerald-600 dark:border-emerald-500 hover:[&_a]:decoration-emerald-500": type === "success",
+          "border-info-600 dark:border-info-500 hover:[&_a]:decoration-info-500": type === "info",
+          "border-warn-600 dark:border-warn-500 hover:[&_a]:decoration-warn-500": type === "warning",
+          "border-error-600 dark:border-error-500 hover:[&_a]:decoration-error-500": type === "error",
+          "border-success-600 dark:border-success-500 hover:[&_a]:decoration-success-500": type === "success",
           "not-prose": !prose
         }
       )}
     >
       <div
         className={clsx("mb-2 flex items-center justify-between", {
-          "text-sky-700 dark:text-sky-500": type === "info",
-          "text-amber-700 dark:text-amber-500": type === "warning",
-          "text-red-600 dark:text-red-500": type === "error",
-          "text-emerald-700 dark:text-emerald-500": type === "success",
+          "text-info-700 dark:text-info-500": type === "info",
+          "text-warn-700 dark:text-warn-500": type === "warning",
+          "text-error-600 dark:text-error-500": type === "error",
+          "text-success-700 dark:text-success-500": type === "success",
         })}
       >
         <div className="font-semibold first-letter:uppercase">{title ? title : type}</div>

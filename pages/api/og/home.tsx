@@ -34,20 +34,20 @@ const Image = async () => {
               fontFamily: '"Raleway"',
             }}
           >
-            <span tw="text-zinc-50">sdorra</span>
-            <span tw="text-cyan-400">.dev</span>
+            <span tw="text-stone-50">sdorra</span>
+            <span tw="text-orange-400">.dev</span>
           </div>
         </div>
         <div tw="absolute bottom-8 flex flex-col items-center justify-center">
-          <p tw="text-xl text-zinc-200">A blog about web development by</p>
+          <p tw="text-xl text-stone-200">A blog about web development by</p>
           <div tw="flex items-center justify-center w-full">
             <img
-              tw="rounded-full border-2 border-zinc-700"
+              tw="rounded-full border-2 border-stone-700"
               width="72"
               height="72"
               src="https://avatars.githubusercontent.com/u/493333"
             />
-            <p tw="ml-4 text-4xl font-semibold text-zinc-200 text-center">Sebastian Sdorra</p>
+            <p tw="ml-4 text-4xl font-semibold text-stone-200 text-center">Sebastian Sdorra</p>
           </div>
         </div>
       </div>

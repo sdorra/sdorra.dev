@@ -50,27 +50,27 @@ const Image = async (req: NextRequest) => {
           fontFamily: '"Cabin"',
         }}
       >
-        <div tw="rounded-xl border-2 border-zinc-700 w-full h-full p-4 flex bg-zinc-800 shadow-lg">
+        <div tw="rounded-xl border-2 border-stone-700 w-full h-full p-4 flex bg-stone-800 shadow-lg">
           <img
             width="375"
             height="562"
             src={createImageUrl(post.image, 375, 562)}
-            tw="rounded-xl border-2 border-zinc-700"
+            tw="rounded-xl border-2 border-stone-700"
             style={{ objectFit: "cover" }}
           />
           <div tw="flex flex-col px-6 w-[740px] h-full justify-between">
             <div tw="flex flex-col">
               <span
-                tw="text-7xl font-bold text-zinc-50 mb-6"
+                tw="text-7xl font-bold text-stone-50 mb-6"
                 style={{
                   fontFamily: '"Raleway"',
                 }}
               >
                 {post.title}
               </span>
-              <span tw="text-5xl text-zinc-300">{post.summary}</span>
+              <span tw="text-5xl text-stone-300">{post.summary}</span>
             </div>
-            <div tw="flex justify-between items-end w-full text-zinc-400 text-xl">
+            <div tw="flex justify-between items-end w-full text-stone-400 text-xl">
               <span>{post.readingTime}</span>
               <div
                 tw="flex text-4xl font-bold"
@@ -78,26 +78,26 @@ const Image = async (req: NextRequest) => {
                   fontFamily: '"Raleway"',
                 }}
               >
-                <span tw="text-zinc-50">sdorra</span>
-                <span tw="text-cyan-400">.dev</span>
+                <span tw="text-stone-50">sdorra</span>
+                <span tw="text-orange-400">.dev</span>
               </div>
               <span>{post.date.substring(0, post.date.indexOf("T"))}</span>
             </div>
           </div>
           <div
-            tw="w-32 h-32 border-t-2 border-t-zinc-700 border-l-2 border-l-zinc-700 bg-zinc-800 rounded-full absolute left-[324px] bottom-[59px]"
+            tw="w-32 h-32 border-t-2 border-t-stone-700 border-l-2 border-l-stone-700 bg-stone-800 rounded-full absolute left-[324px] bottom-[59px]"
             style={{
               transform: "rotate(-45deg)",
             }}
           />
           <div tw="absolute left-[338px] bottom-[68px] flex items-center">
             <img
-              tw="rounded-full border-2 border-zinc-700"
+              tw="rounded-full border-2 border-stone-700"
               width="110"
               height="110"
               src="https://avatars.githubusercontent.com/u/493333"
             />
-            <p tw="ml-6 text-4xl font-semibold text-zinc-400">Sebastian Sdorra</p>
+            <p tw="ml-6 text-4xl font-semibold text-stone-400">Sebastian Sdorra</p>
           </div>
         </div>
       </div>

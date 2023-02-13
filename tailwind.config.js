@@ -10,10 +10,10 @@ module.exports = {
     },
     extend: {
       colors: {
-        primary: colors.cyan,
-        base: colors.zinc,
+        primary: colors.orange,
+        base: colors.stone,
         info: colors.sky,
-        warn: colors.amber,
+        warn: colors.yellow,
         error: colors.red,
         success: colors.green,
       },

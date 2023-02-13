@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-white font-body text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300;
+    @apply bg-white font-body text-base-700 dark:bg-base-800 dark:text-base-300;
   }
 
   h1,
@@ -13,7 +13,7 @@
   h4,
   h5,
   h6 {
-    @apply font-display text-zinc-900 dark:text-zinc-50;
+    @apply font-display text-base-900 dark:text-base-50;
   }
 }
 
@@ -38,24 +38,24 @@ div.ch-editor-tab-active {
 }
 
 :root {
-  --shiki-color-text: theme('colors.zinc.100');
-  --shiki-color-background: theme("colors.zinc.700");
+  --shiki-color-text: theme('colors.base.100');
+  --shiki-color-background: theme("colors.base.700");
   --shiki-token-constant: theme('colors.emerald.300');
   --shiki-token-string: theme('colors.emerald.300');
-  --shiki-token-comment: theme('colors.zinc.400');
+  --shiki-token-comment: theme('colors.base.400');
   --shiki-token-keyword: theme('colors.cyan.300');
   --shiki-token-parameter: theme('colors.pink.300');
   --shiki-token-function: theme('colors.violet.300');
   --shiki-token-string-expression: theme('colors.emerald.300');
-  --shiki-token-punctuation: theme('colors.zinc.200');
-  --shiki-token-link: theme('colors.zinc.200');
+  --shiki-token-punctuation: theme('colors.base.200');
+  --shiki-token-link: theme('colors.base.200');
 
-  --ch-icon-text: theme("colors.zinc.300");
-  --ch-tabs-bg: theme("colors.zinc.900");
-  --ch-tab-border: theme("colors.zinc.700");
-  --ch-tab-active-border: theme("colors.zinc.700");
-  --ch-tab-active-bg: theme("colors.zinc.700");
-  --ch-tab-active-color: theme("colors.zinc.100");
-  --ch-tab-inactive-color: theme("colors.zinc.500");
-  --ch-tab-inactive-bg: theme("colors.zinc.900");
+  --ch-icon-text: theme("colors.base.300");
+  --ch-tabs-bg: theme("colors.base.900");
+  --ch-tab-border: theme("colors.base.700");
+  --ch-tab-active-border: theme("colors.base.700");
+  --ch-tab-active-bg: theme("colors.base.700");
+  --ch-tab-active-color: theme("colors.base.100");
+  --ch-tab-inactive-color: theme("colors.base.500");
+  --ch-tab-inactive-bg: theme("colors.base.900");
 }

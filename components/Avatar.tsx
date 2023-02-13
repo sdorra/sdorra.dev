@@ -10,7 +10,7 @@ type Props = {
 
 const Avatar = ({ src, alt, size = 32, className }: Props) => (
   <Image
-    className={clsx("flex-shrink-0 rounded-full shadow-md ring-2 ring-zinc-300 dark:ring-zinc-700", className)}
+    className={clsx("flex-shrink-0 rounded-full shadow-md ring-2 ring-base-300 dark:ring-base-700", className)}
     src={src}
     width={size}
     height={size}

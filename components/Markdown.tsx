@@ -23,7 +23,7 @@ const heading = (As: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => {
   const Heading = ({ id, children }: HeadingProps) => (
     <a href={`#${id}`} className="group relative no-underline">
       <Hash
-        className="absolute -left-5 hidden h-full p-1 text-cyan-500 group-hover:block dark:text-cyan-400 sm:-left-6"
+        className="absolute -left-5 hidden h-full p-1 text-primary-500 group-hover:block dark:text-primary-400 sm:-left-6"
         strokeWidth="3"
       />
       <As id={id}>{children}</As>

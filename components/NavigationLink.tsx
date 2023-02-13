@@ -15,7 +15,7 @@ const NavigationLink: FC<Props> = ({ href, className, children }) => {
   return (
     <Link
       className={clsx(
-        "underline decoration-2 hover:decoration-cyan-500",
+        "underline decoration-2 hover:decoration-primary-500",
         {
           "font-semibold": path === href,
           "decoration-transparent": path !== href,

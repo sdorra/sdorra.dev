@@ -11,7 +11,7 @@ type Props = {
 const StaticTweet = ({ tweet }: Props) => (
   <EmbeddedCard href={tweet.url} className="gap-5">
     <EmbeddedCard.Title icon={Twitter}>
-      <p className="text-zinc-500 dark:text-zinc-400">Tweet from <DateTime value={tweet.createdAt}/></p>
+      <p className="text-base-500 dark:text-base-400">Tweet from <DateTime value={tweet.createdAt}/></p>
     </EmbeddedCard.Title>
     <blockquote dangerouslySetInnerHTML={{ __html: tweet.text }} />
     <EmbeddedCard.Author

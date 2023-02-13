@@ -13,8 +13,8 @@ const PostCard = ({ post }: Props) => (
     <Link
       href={`/posts/${post._raw.flattenedPath}`}
       className={clsx(
-        "group mt-10 grid gap-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 sm:grid-cols-[8.5rem,1fr]",
-        "border-2 border-zinc-300 p-4 hover:border-cyan-500 dark:border-zinc-700 dark:hover:border-cyan-400"
+        "group mt-10 grid gap-2 rounded-md hover:bg-base-100 dark:hover:bg-base-700 sm:grid-cols-[8.5rem,1fr]",
+        "border-2 border-base-300 p-4 hover:border-primary-500 dark:border-base-700 dark:hover:border-primary-400"
       )}
     >
       <figure className="flex items-stretch justify-center gap-4 sm:row-span-2 sm:justify-start">
@@ -27,8 +27,8 @@ const PostCard = ({ post }: Props) => (
           height={128}
           priority={true}
           className={clsx(
-            "relative -mt-10 mb-2 h-32 w-64 flex-shrink-0 rounded-md bg-white object-cover dark:bg-zinc-800 sm:mb-0 sm:w-32",
-            "border-2 border-zinc-300 group-hover:border-cyan-500 dark:border-zinc-700 dark:group-hover:border-cyan-400"
+            "relative -mt-10 mb-2 h-32 w-64 flex-shrink-0 rounded-md bg-white object-cover dark:bg-base-800 sm:mb-0 sm:w-32",
+            "border-2 border-base-300 group-hover:border-primary-500 dark:border-base-700 dark:group-hover:border-primary-400"
           )}
         />
       </figure>

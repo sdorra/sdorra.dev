@@ -13,7 +13,7 @@ type IconExternalLinkProps = Props & {
 
 const createClassName = (className?: string) =>
   clsx(
-    "hover:[&>*]:stroke-[3px] border-b-2 pb-0.5 border-b-transparent hover:border-b-cyan-500 dark:hover:border-b-cyan-400",
+    "hover:[&>*]:stroke-[3px] border-b-2 pb-0.5 border-b-transparent hover:border-b-primary-500 dark:hover:border-b-primary-400",
     className
   );
 

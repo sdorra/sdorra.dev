@@ -26,7 +26,7 @@ type ShareIconProps = {
 
 const ShareIcon = ({ title, url, children }: ShareIconProps) => (
   <li>
-    <IconExternalLink title={title} href={url} className="block hover:text-zinc-800 dark:hover:text-zinc-200">
+    <IconExternalLink title={title} href={url} className="block hover:text-base-800 dark:hover:text-base-200">
       {children}
     </IconExternalLink>
   </li>
@@ -51,7 +51,7 @@ const CopyButton = ({ url }: { url: string }) => {
 
   return (
     <li>
-      <IconButton title="Copy url to clipboard" onClick={copy} className="hover:text-zinc-800 dark:hover:text-zinc-200">
+      <IconButton title="Copy url to clipboard" onClick={copy} className="hover:text-base-800 dark:hover:text-base-200">
         {copied ? <Check /> : <Copy />}
       </IconButton>
     </li>
@@ -80,7 +80,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
     <>
       <button onClick={onClick} className={clsx("group flex items-center gap-1", className)}>
         <Share2 className="h-5 w-5 group-hover:stroke-[3px]" />
-        <span className="underline group-hover:decoration-cyan-500 group-hover:decoration-2">share</span>
+        <span className="underline group-hover:decoration-primary-500 group-hover:decoration-2">share</span>
       </button>
 
       <Transition appear show={isOpen} as={Fragment}>
@@ -94,7 +94,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-zinc-900/80" />
+            <div className="fixed inset-0 bg-base-900/80" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
@@ -108,13 +108,13 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-zinc-700">
-                  <Dialog.Title as="h3" className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                <Dialog.Panel className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-base-700">
+                  <Dialog.Title as="h3" className="text-xl font-bold text-base-900 dark:text-base-50">
                     Share post
                   </Dialog.Title>
-                  <Dialog.Description className="mt-2 text-zinc-700 dark:text-zinc-300">{title}</Dialog.Description>
+                  <Dialog.Description className="mt-2 text-base-700 dark:text-base-300">{title}</Dialog.Description>
 
-                  <ul className="mt-6 flex justify-around gap-2 text-zinc-500 dark:text-zinc-400">
+                  <ul className="mt-6 flex justify-around gap-2 text-base-500 dark:text-base-400">
                     <ShareIcon
                       title="Add to Pocket"
                       url={`https://getpocket.com/save?url=${encodeURIComponent(completeUrl + "pocket")}`}
@@ -156,7 +156,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                     <CopyButton url={completeUrl + "copy"} />
                   </ul>
                   <button className="group absolute top-4 right-4" aria-label="Close" onClick={() => setIsOpen(false)}>
-                    <XCircle className="text-zinc-400 group-hover:stroke-[3px] group-hover:text-zinc-700 dark:group-hover:text-zinc-200" />
+                    <XCircle className="text-base-400 group-hover:stroke-[3px] group-hover:text-base-700 dark:group-hover:text-base-200" />
                   </button>
                 </Dialog.Panel>
               </Transition.Child>

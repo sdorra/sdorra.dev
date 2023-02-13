@@ -44,7 +44,7 @@ const NavigationButton = ({ post, type }: NavigationButtonProps) => {
       title={`Navigate to post "${post.title}"`}
     >
       <Icon className="w-6 shrink-0 group-hover:stroke-[3]" />
-      <span className="hidden group-hover:underline group-hover:decoration-cyan-500 group-hover:decoration-2 md:block">
+      <span className="hidden group-hover:underline group-hover:decoration-primary-500 group-hover:decoration-2 md:block">
         {post.title}
       </span>
     </Link>
@@ -63,9 +63,9 @@ const Post = ({ post }: Props) => {
           width={256}
           height={160}
           alt="Feature blog image"
-          className="h-40 w-64 flex-shrink-0 rounded-md border-2 border-zinc-200 object-cover dark:border-zinc-700"
+          className="h-40 w-64 flex-shrink-0 rounded-md border-2 border-base-200 object-cover dark:border-base-700"
         />
-        <h1 className="-ml-52 rounded-md border border-zinc-200 bg-white/80 p-2 text-4xl font-bold dark:border-zinc-700 dark:bg-zinc-800/80 sm:-ml-32">
+        <h1 className="-ml-52 rounded-md border border-base-200 bg-white/80 p-2 text-4xl font-bold dark:border-base-700 dark:bg-base-800/80 sm:-ml-32">
           {post.title}
         </h1>
       </figure>
@@ -74,11 +74,11 @@ const Post = ({ post }: Props) => {
         <DateTime title="Posted at" value={post.date} />
       </div>
       <Markdown code={post.body.code} />
-      <div className="mt-4 flex justify-between text-sm text-zinc-500 dark:text-zinc-400">
+      <div className="mt-4 flex justify-between text-sm text-base-500 dark:text-base-400">
         <p>Posted in: {post.tags.join(", ")}</p>
         <ShareButton title={post.title} text={post.summary} url={post.url} />
       </div>
-      <nav className="my-5 grid grid-cols-3 place-items-center border-t border-t-zinc-300 pt-4 dark:border-t-zinc-700">
+      <nav className="my-5 grid grid-cols-3 place-items-center border-t border-t-base-300 pt-4 dark:border-t-base-700">
         <NavigationButton type="prev" post={prev} />
         <ScrollToTop />
         <NavigationButton type="next" post={next} />

@@ -55,7 +55,7 @@ const LeafNode = ({ node, depth }: NodeProps) => {
     <li className="flex gap-1">
       {depth > 0 ? (
         <div className="flex items-center justify-end" style={{ width: depth * 24 }}>
-          <CornerDownRight className="w-4 text-zinc-300 dark:text-zinc-600" />
+          <CornerDownRight className="w-4 text-base-300 dark:text-base-600" />
         </div>
       ) : null}
       <Icon className="w-6" />
@@ -83,7 +83,7 @@ const NonLeafNode = ({ node, depth }: NodeProps) => (
 const FileTree = ({ nodes, className }: Props) => (
   <div
     className={clsx(
-      "not-prose flex flex-col gap-2 overflow-x-scroll rounded-md border-2 border-zinc-300 p-5 shadow-md dark:border-zinc-700",
+      "not-prose flex flex-col gap-2 overflow-x-scroll rounded-md border-2 border-base-300 p-5 shadow-md dark:border-base-700",
       className
     )}
   >

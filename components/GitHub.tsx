@@ -20,7 +20,7 @@ const EmbeddedEntity = ({ repository, entity, type }: Props) => (
   <EmbeddedCard href={entity.url}>
     <EmbeddedCard.Title icon={Github}>
       <p className="text-lg font-bold">
-        <span className="text-zinc-500 dark:text-zinc-400">
+        <span className="text-base-500 dark:text-base-400">
           {repository.owner}/{repository.name}
         </span>{" "}
         <span dangerouslySetInnerHTML={{ __html: entity.titleHTML }} />

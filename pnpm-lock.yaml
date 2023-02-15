@@ -12,9 +12,9 @@ specifiers:
   '@tailwindcss/typography': ^0.5.9
   '@types/hast': ^2.3.4
   '@types/mdast': ^3.0.10
-  '@types/node': 18.11.18
-  '@types/react': 18.0.27
-  '@types/react-dom': 18.0.10
+  '@types/node': 18.13.0
+  '@types/react': 18.0.28
+  '@types/react-dom': 18.0.11
   '@types/sharp': ^0.31.1
   '@vercel/og': 0.1.0
   autoprefixer: ^10.4.13
@@ -70,14 +70,14 @@ dependencies:
   remark-gfm: 3.0.1
 
 devDependencies:
-  '@ladle/react': 2.5.1_gkjzc5kkpbuaafw6p6qyth4wbi
+  '@ladle/react': 2.5.1_xth4ryr3ditb2pflignr5ahlaq
   '@next/bundle-analyzer': 13.1.6
   '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.4
   '@types/hast': 2.3.4
   '@types/mdast': 3.0.10
-  '@types/node': 18.11.18
-  '@types/react': 18.0.27
-  '@types/react-dom': 18.0.10
+  '@types/node': 18.13.0
+  '@types/react': 18.0.28
+  '@types/react-dom': 18.0.11
   '@types/sharp': 0.31.1
   autoprefixer: 10.4.13_postcss@8.4.21
   concurrently: 7.6.0
@@ -95,7 +95,7 @@ devDependencies:
   typescript: 4.9.5
   unified: 10.1.2
   unist-util-visit: 4.1.1
-  vite: 4.0.4_@types+node@18.11.18
+  vite: 4.0.4_@types+node@18.13.0
 
 packages:
 
@@ -2002,7 +2002,7 @@ packages:
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
       '@grpc/proto-loader': 0.7.3
-      '@types/node': 18.11.18
+      '@types/node': 18.13.0
     dev: false
 
   /@grpc/proto-loader/0.6.13:
@@ -2117,7 +2117,7 @@ packages:
       react-dom: 18.2.0_react@18.2.0
     dev: true
 
-  /@ladle/react/2.5.1_gkjzc5kkpbuaafw6p6qyth4wbi:
+  /@ladle/react/2.5.1_xth4ryr3ditb2pflignr5ahlaq:
     resolution: {integrity: sha512-xTSs5dUIK+zQzHNo6i3SDuA9lu0k8nUJ7/RNeNJ7oTkX05FfBSxCUeIKeUAjaVNm/axvylVhdGDm+yLBIxq8EA==}
     engines: {node: '>=16.0.0'}
     hasBin: true
@@ -2160,7 +2160,7 @@ packages:
       react-dom: 18.2.0_react@18.2.0
       react-frame-component: 5.2.6_v2m5e27vhdewzwhryxwfaorcca
       react-inspector: 6.0.1_react@18.2.0
-      vite: 4.0.4_@types+node@18.11.18
+      vite: 4.0.4_@types+node@18.13.0
       vite-tsconfig-paths: 4.0.5_typescript@4.9.5
     transitivePeerDependencies:
       - '@types/node'
@@ -2672,21 +2672,21 @@ packages:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: false
 
-  /@types/node/18.11.18:
-    resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==}
+  /@types/node/18.13.0:
+    resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==}
 
   /@types/prop-types/15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
     dev: true
 
-  /@types/react-dom/18.0.10:
-    resolution: {integrity: sha512-E42GW/JA4Qv15wQdqJq8DL4JhNpB3prJgjgapN3qJT9K2zO5IIAQh4VXvCEDupoqAwnz0cY4RlXeC/ajX5SFHg==}
+  /@types/react-dom/18.0.11:
+    resolution: {integrity: sha512-O38bPbI2CWtgw/OoQoY+BRelw7uysmXbWvw3nLWO21H1HSh+GOlqPuXshJfjmpNlKiiSDG9cc1JZAaMmVdcTlw==}
     dependencies:
-      '@types/react': 18.0.27
+      '@types/react': 18.0.28
     dev: true
 
-  /@types/react/18.0.27:
-    resolution: {integrity: sha512-3vtRKHgVxu3Jp9t718R9BuzoD4NcQ8YJ5XRzsSKxNDiDonD2MXIT1TmSkenxuCycZJoQT5d2vE8LwWJxBC1gmA==}
+  /@types/react/18.0.28:
+    resolution: {integrity: sha512-RD0ivG1kEztNBdoAK7lekI9M+azSnitIn85h4iOiaLjaTrMjzslhaqCGaI4IyCJ1RljWiLCEu4jyrLLgqxBTew==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
@@ -2704,7 +2704,7 @@ packages:
   /@types/sharp/0.31.1:
     resolution: {integrity: sha512-5nWwamN9ZFHXaYEincMSuza8nNfOof8nmO+mcI+Agx1uMUk4/pQnNIcix+9rLPXzKrm1pS34+6WRDbDV0Jn7ag==}
     dependencies:
-      '@types/node': 18.11.18
+      '@types/node': 18.13.0
     dev: true
 
   /@types/unist/2.0.6:
@@ -2792,7 +2792,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.19.6_@babel+core@7.20.12
       magic-string: 0.27.0
       react-refresh: 0.14.0
-      vite: 4.0.4_@types+node@18.11.18
+      vite: 4.0.4_@types+node@18.13.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6377,7 +6377,7 @@ packages:
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
       '@types/long': 4.0.2
-      '@types/node': 18.11.18
+      '@types/node': 18.13.0
       long: 4.0.0
     dev: false
 
@@ -6396,7 +6396,7 @@ packages:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 18.11.18
+      '@types/node': 18.13.0
       long: 5.2.1
     dev: false
 
@@ -7612,7 +7612,7 @@ packages:
       - typescript
     dev: true
 
-  /vite/4.0.4_@types+node@18.11.18:
+  /vite/4.0.4_@types+node@18.13.0:
     resolution: {integrity: sha512-xevPU7M8FU0i/80DMR+YhgrzR5KS2ORy1B4xcX/cXLsvnUWvfHuqMmVU6N0YiJ4JWGRJJsLCgjEzKjG9/GKoSw==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -7637,7 +7637,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 18.11.18
+      '@types/node': 18.13.0
       esbuild: 0.16.17
       postcss: 8.4.21
       resolve: 1.22.1

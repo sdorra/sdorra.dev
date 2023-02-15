@@ -18,7 +18,7 @@
     "@code-hike/mdx": "0.7.4",
     "@headlessui/react": "^1.7.8",
     "@next/font": "13.1.6",
-    "@vercel/og": "0.0.22",
+    "@vercel/og": "0.1.0",
     "clsx": "^1.2.1",
     "contentlayer": "^0.3.0",
     "date-fns": "^2.29.3",

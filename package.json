@@ -24,7 +24,7 @@
     "date-fns": "^2.29.3",
     "eslint": "^8.34.0",
     "fathom-client": "^3.5.0",
-    "lucide-react": "^0.108.0",
+    "lucide-react": "^0.114.0",
     "next": "13.1.6",
     "next-contentlayer": "^0.3.0",
     "react": "18.2.0",

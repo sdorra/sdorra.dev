@@ -28,7 +28,7 @@ specifiers:
   fathom-client: ^3.5.0
   feed: ^4.2.2
   globby: ^13.1.3
-  lucide-react: ^0.108.0
+  lucide-react: ^0.114.0
   markdown-wasm: ^1.2.0
   next: 13.1.6
   next-contentlayer: ^0.3.0
@@ -59,7 +59,7 @@ dependencies:
   date-fns: 2.29.3
   eslint: 8.34.0
   fathom-client: 3.5.0
-  lucide-react: 0.108.0_react@18.2.0
+  lucide-react: 0.114.0_react@18.2.0
   next: 13.1.6_biqbaboplfbrettd7655fr4n2y
   next-contentlayer: 0.3.0_uu7v3zaf5wcwedy5bx64vte4fu
   react: 18.2.0
@@ -4164,8 +4164,8 @@ packages:
     dependencies:
       yallist: 4.0.0
 
-  /lucide-react/0.108.0_react@18.2.0:
-    resolution: {integrity: sha512-dL8F1DZibvqcWRhCrMghFSYpovsKLcoAcLbh1oZNWo1UxadrDesl8K8Eh6qYrWJwvj95bdSA69ZKc8k+KRxrvg==}
+  /lucide-react/0.114.0_react@18.2.0:
+    resolution: {integrity: sha512-q+KzNGjFINMim7inE4jcTfgDMhXTOjzthHes4UaYoS7hyYcQl79f2KrdKoj5Z/Uuc0A6yt7JQ0R1w6I+tPDhsg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:

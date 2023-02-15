@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@code-hike/mdx": "0.7.4",
-    "@headlessui/react": "^1.7.8",
+    "@headlessui/react": "^1.7.11",
     "@next/font": "13.1.6",
     "@vercel/og": "0.1.0",
     "clsx": "^1.2.1",

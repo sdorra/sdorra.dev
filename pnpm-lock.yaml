@@ -5,7 +5,7 @@ overrides:
 
 specifiers:
   '@code-hike/mdx': 0.7.4
-  '@headlessui/react': ^1.7.8
+  '@headlessui/react': ^1.7.11
   '@ladle/react': ^2.7.0
   '@next/bundle-analyzer': 13.1.6
   '@next/font': 13.1.6
@@ -51,7 +51,7 @@ specifiers:
 
 dependencies:
   '@code-hike/mdx': 0.7.4_react@18.2.0
-  '@headlessui/react': 1.7.8_biqbaboplfbrettd7655fr4n2y
+  '@headlessui/react': 1.7.11_biqbaboplfbrettd7655fr4n2y
   '@next/font': 13.1.6
   '@vercel/og': 0.1.0
   clsx: 1.2.1
@@ -984,8 +984,8 @@ packages:
       yargs: 16.2.0
     dev: false
 
-  /@headlessui/react/1.7.8_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-zcwb0kd7L05hxmoAMIioEaOn235Dg0fUO+iGbLPgLVSjzl/l39V6DTpC2Df49PE5aG5/f5q0PZ9ZHZ78ENNV+A==}
+  /@headlessui/react/1.7.11_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-EaDbVgcyiylhtskZZf4Qb/JiiByY7cYbd0qgZ9xm2pm2X7hKojG0P4TaQYKgPOV3vojPhd/pZyQh3nmRkkcSyw==}
     engines: {node: '>=10'}
     peerDependencies:
       react: ^16 || ^17 || ^18

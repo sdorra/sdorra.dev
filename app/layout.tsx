@@ -4,7 +4,7 @@ import Analytics from "components/Analytics";
 import DarkModeToggle from "components/DarkModeToggle";
 import { FeedLink, GitHubLink, TwitterLink } from "components/ExternalLinks";
 import Navigation from "components/Navigation";
-import { fqdn, scheme } from "lib/config";
+import { baseUrl } from "lib/config";
 import { Cabin, Raleway } from "next/font/google";
 import { FC, PropsWithChildren } from "react";
 import "./globals.css";
@@ -51,7 +51,7 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
 );
 
 export const metadata = {
-  metadataBase: new URL(`${scheme}://${fqdn}`),
+  metadataBase: new URL(baseUrl),
   title: {
     default: "sdorra.dev",
     template: "%s | sdorra.dev",

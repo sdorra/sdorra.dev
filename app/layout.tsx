@@ -1,5 +1,5 @@
 import "@code-hike/mdx/dist/index.css";
-import { Cabin, Raleway } from "@next/font/google";
+import { Cabin, Raleway } from "next/font/google";
 import clsx from "clsx";
 import Analytics from "components/Analytics";
 import DarkModeToggle from "components/DarkModeToggle";

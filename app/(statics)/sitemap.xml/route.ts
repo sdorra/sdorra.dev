@@ -2,6 +2,7 @@ import { allPosts } from "contentlayer/generated";
 import { globby } from "globby";
 import { baseUrl } from "lib/config";
 import { join } from "path";
+import { readdirSync } from "fs";
 
 type SitemapEntry = {
   loc: string;
@@ -53,6 +54,10 @@ const createEntries = async () => {
   const paths = await globby("./**/page.tsx", {
     cwd: join(process.cwd(), "app"),
   });
+  console.log("sitemap");
+  console.log(process.cwd());
+  console.log(join(process.cwd(), "app"));
+  console.log(readdirSync(join(process.cwd(), "app")))
   return paths.map(createPath).flatMap(mapPathToEntries);
 };
 

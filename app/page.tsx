@@ -2,6 +2,7 @@ import PostCard from "components/PostCard";
 import SiteHeading from "components/SiteHeading";
 import { allPosts } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
+import createMetadata from "lib/metadata";
 
 const Home = () => (
   <>
@@ -16,5 +17,12 @@ const Home = () => (
     </section>
   </>
 );
+
+export const generateMetadata = () =>
+  createMetadata({
+    title: "sdorra.dev",
+    description: "A site about software development by Sebastian Sdorra",
+    image: "/api/og/home",
+  });
 
 export default Home;

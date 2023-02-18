@@ -38,6 +38,5 @@ next-env.d.ts
 .vscode
 .scripts
 
-public/sitemap.xml
 public/rss.xml
 public/posts

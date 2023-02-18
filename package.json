@@ -5,9 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "pnpm run build-site && pnpm run build-static-files",
-    "build-static-files": "concurrently \"pnpm run sitemap\" \"pnpm run feed\"",
+    "build-static-files": "pnpm run feed",
     "build-site": "contentlayer build && node scripts/posts-withoutbody.mjs && next build",
-    "sitemap": "node scripts/sitemap.mjs",
     "feed": "node scripts/feed.mjs",
     "start": "next start",
     "lint": "next lint",

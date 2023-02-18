@@ -4,10 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "pnpm run build-site && pnpm run build-static-files",
-    "build-static-files": "pnpm run feed",
-    "build-site": "contentlayer build && node scripts/posts-withoutbody.mjs && next build",
-    "feed": "node scripts/feed.mjs",
+    "build": "contentlayer build && node scripts/posts-withoutbody.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "cmp-dev": "ladle dev",

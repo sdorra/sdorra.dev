@@ -4,6 +4,7 @@ import Analytics from "components/Analytics";
 import DarkModeToggle from "components/DarkModeToggle";
 import { FeedLink, GitHubLink, TwitterLink } from "components/ExternalLinks";
 import Navigation from "components/Navigation";
+import { fqdn, scheme } from "lib/config";
 import { Cabin, Raleway } from "next/font/google";
 import { FC, PropsWithChildren } from "react";
 import "./globals.css";
@@ -48,9 +49,6 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
     </body>
   </html>
 );
-
-const scheme = process.env.NEXT_PUBLIC_SCHEME ? process.env.NEXT_PUBLIC_SCHEME : "https";
-const fqdn = process.env.NEXT_PUBLIC_FQDN ? process.env.NEXT_PUBLIC_FQDN : "sdorra.dev";
 
 export const metadata = {
   metadataBase: new URL(`${scheme}://${fqdn}`),

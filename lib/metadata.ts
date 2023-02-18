@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { fqdn, scheme } from "./config";
 
 type PageType = "article" | "website";
 
@@ -10,8 +11,7 @@ type Config = {
   image?: string;
 };
 
-const scheme = process.env.NEXT_PUBLIC_SCHEME ? process.env.NEXT_PUBLIC_SCHEME : "https";
-const fqdn = process.env.NEXT_PUBLIC_FQDN ? process.env.NEXT_PUBLIC_FQDN : "sdorra.dev";
+
 
 const createMetadata = ({ title, description, image, url = "/", type = "website" }: Config): Metadata => {
   return {

@@ -1,8 +1,5 @@
 import { allPosts } from "contentlayer/generated";
-import { globby } from "globby";
 import { baseUrl } from "lib/config";
-import { join } from "path";
-import { readdirSync } from "fs";
 
 type SitemapEntry = {
   loc: string;
@@ -12,53 +9,26 @@ type SitemapEntry = {
 
 const createUrl = (p: string) => baseUrl + p;
 
-const mapPathToEntries = (p: string) => {
-  if (p === "/posts/[slug]") {
-    return allPosts.map((p) => {
-      const url: SitemapEntry = {
-        loc: createUrl(`/posts/${p._raw.flattenedPath}`),
-      };
-      if (p.lastModification) {
-        url.lastmod = p.lastModification;
-      }
-      url.priority = "0.64";
-      return url;
-    });
-  } else if (p === "/") {
-    return [
-      {
-        loc: createUrl(p),
-        lastmod: new Date().toISOString(),
-        priority: "1.00",
-      },
-    ];
-  }
-  return [
-    {
-      loc: createUrl(p),
-      priority: "0.80",
-    },
-  ];
+const rootEntry: SitemapEntry = {
+  loc: baseUrl,
+  lastmod: new Date().toISOString(),
+  priority: "1.00",
 };
 
-const createPath = (p: string) => {
-  const path = "/" + p.replace("page.tsx", "");
-
-  if (path.endsWith("/") && path.length > 1) {
-    return path.substring(0, path.length - 1);
-  }
-  return path;
-};
-
-const createEntries = async () => {
-  const paths = await globby("./**/page.tsx", {
-    cwd: join(process.cwd(), "app"),
+const createPostEntries = (): SitemapEntry[] =>
+  allPosts.map((p) => {
+    const url: SitemapEntry = {
+      loc: createUrl(p.url),
+    };
+    if (p.lastModification) {
+      url.lastmod = p.lastModification;
+    }
+    url.priority = "0.64";
+    return url;
   });
-  console.log("sitemap");
-  console.log(process.cwd());
-  console.log(join(process.cwd(), "app"));
-  console.log(readdirSync(join(process.cwd(), "app")))
-  return paths.map(createPath).flatMap(mapPathToEntries);
+
+const createEntries = () => {
+  return [rootEntry, ...createPostEntries()];
 };
 
 const createSitemap = async (entries: SitemapEntry[]) => {

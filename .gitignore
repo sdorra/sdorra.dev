@@ -38,5 +38,4 @@ next-env.d.ts
 .vscode
 .scripts
 
-public/rss.xml
 public/posts

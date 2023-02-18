@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { fqdn, scheme } from "./config";
+import { baseUrl } from "./config";
 
 type PageType = "article" | "website";
 
@@ -16,7 +16,7 @@ type Config = {
 const createMetadata = ({ title, description, image, url = "/", type = "website" }: Config): Metadata => {
   return {
     // https://github.com/vercel/next.js/issues/45824
-    metadataBase: new URL(`${scheme}://${fqdn}`),
+    metadataBase: new URL(baseUrl),
     title,
     description,
     alternates: {

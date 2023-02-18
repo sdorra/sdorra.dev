@@ -1,6 +1,7 @@
-import { globby } from "globby";
 import { allPosts } from "contentlayer/generated";
+import { globby } from "globby";
 import { baseUrl } from "lib/config";
+import { join } from "path";
 
 type SitemapEntry = {
   loc: string;
@@ -50,7 +51,7 @@ const createPath = (p: string) => {
 
 const createEntries = async () => {
   const paths = await globby("./**/page.tsx", {
-    cwd: "app",
+    cwd: join(process.cwd(), "app"),
   });
   return paths.map(createPath).flatMap(mapPathToEntries);
 };
@@ -72,7 +73,6 @@ const createSitemap = async (entries: SitemapEntry[]) => {
       .join("")}
 </urlset>
   `;
-
 };
 
 export const GET = async () => {

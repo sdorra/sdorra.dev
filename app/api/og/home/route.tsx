@@ -2,23 +2,17 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "@vercel/og";
 
-export const config = {
-  runtime: "edge",
-};
+export const runtime = "edge";
 
-const ralewayBold = fetch(new URL(`../../../content/fonts/Raleway-Bold.ttf`, import.meta.url)).then((res) =>
+const ralewayBold = fetch(new URL("content/fonts/Raleway-Bold.ttf", import.meta.url)).then((res) => res.arrayBuffer());
+
+const cabinSemiBold = fetch(new URL("content/fonts/Cabin-SemiBold.ttf", import.meta.url)).then((res) =>
   res.arrayBuffer()
 );
 
-const cabinSemiBold = fetch(new URL(`../../../content/fonts/Cabin-SemiBold.ttf`, import.meta.url)).then((res) =>
-  res.arrayBuffer()
-);
+const cabinMedium = fetch(new URL("content/fonts/Cabin-Medium.ttf", import.meta.url)).then((res) => res.arrayBuffer());
 
-const cabinMedium = fetch(new URL(`../../../content/fonts/Cabin-Medium.ttf`, import.meta.url)).then((res) =>
-  res.arrayBuffer()
-);
-
-const Image = async () => {
+export const GET = async () => {
   return new ImageResponse(
     (
       <div
@@ -79,5 +73,3 @@ const Image = async () => {
     }
   );
 };
-
-export default Image;

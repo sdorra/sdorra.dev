@@ -1,24 +1,18 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
-import { ImageResponse } from "@vercel/og";
 import allPosts from ".scripts/Post/withoutbody.json";
+import { ImageResponse } from "@vercel/og";
 import { NextRequest } from "next/server";
 
-export const config = {
-  runtime: "edge",
-};
+export const runtime = "edge";
 
-const ralewayBold = fetch(new URL(`../../../../content/fonts/Raleway-Bold.ttf`, import.meta.url)).then((res) =>
+const ralewayBold = fetch(new URL("content/fonts/Raleway-Bold.ttf", import.meta.url)).then((res) => res.arrayBuffer());
+
+const cabinSemiBold = fetch(new URL("content/fonts/Cabin-SemiBold.ttf", import.meta.url)).then((res) =>
   res.arrayBuffer()
 );
 
-const cabinSemiBold = fetch(new URL(`../../../../content/fonts/Cabin-SemiBold.ttf`, import.meta.url)).then((res) =>
-  res.arrayBuffer()
-);
-
-const cabinMedium = fetch(new URL(`../../../../content/fonts/Cabin-Medium.ttf`, import.meta.url)).then((res) =>
-  res.arrayBuffer()
-);
+const cabinMedium = fetch(new URL("content/fonts/Cabin-Medium.ttf", import.meta.url)).then((res) => res.arrayBuffer());
 
 const createImageUrl = (src: string, width: number, height: number) => {
   if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
@@ -27,8 +21,14 @@ const createImageUrl = (src: string, width: number, height: number) => {
   return src;
 };
 
-const Image = async (req: NextRequest) => {
-  const slug = req.nextUrl.pathname.replace("/api/og/posts/", "");
+type Context = {
+  params: {
+    slug: string;
+  };
+};
+
+export const GET = async (request: NextRequest, { params }: Context) => {
+  const slug = params.slug;
   const post = allPosts.find((p) => slug === p._raw.flattenedPath);
   if (!post) {
     return new Response(
@@ -129,5 +129,3 @@ const Image = async (req: NextRequest) => {
     }
   );
 };
-
-export default Image;

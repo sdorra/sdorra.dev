@@ -1,10 +1,10 @@
 import "@code-hike/mdx/dist/index.css";
-import { Cabin, Raleway } from "next/font/google";
 import clsx from "clsx";
 import Analytics from "components/Analytics";
 import DarkModeToggle from "components/DarkModeToggle";
 import { FeedLink, GitHubLink, TwitterLink } from "components/ExternalLinks";
 import Navigation from "components/Navigation";
+import { Cabin, Raleway } from "next/font/google";
 import { FC, PropsWithChildren } from "react";
 import "./globals.css";
 
@@ -18,14 +18,6 @@ const cabin = Cabin({
 const RootLayout: FC<PropsWithChildren> = ({ children }) => (
   <html lang="en" className="h-full" suppressHydrationWarning={true}>
     <head>
-      <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="alternate" type="application/rss+xml" title="sdorra.dev rss feed" href="/rss.xml" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-      <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
-      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-      <link rel="manifest" href="/site.webmanifest" />
       <script
         dangerouslySetInnerHTML={{
           __html: `
@@ -71,5 +63,47 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
     </body>
   </html>
 );
+
+const scheme = process.env.NEXT_PUBLIC_SCHEME ? process.env.NEXT_PUBLIC_SCHEME : "https";
+const fqdn = process.env.NEXT_PUBLIC_FQDN ? process.env.NEXT_PUBLIC_FQDN : "sdorra.dev";
+
+export const metadata = {
+  metadataBase: new URL(`${scheme}://${fqdn}`),
+  title: {
+    default: "sdorra.dev",
+    template: "%s | sdorra.dev",
+  },
+  creator: "Sebastian Sdorra",
+  manifest: "/site.webmanifest",
+  alternates: {
+    types: {
+      "application/rss+xml": "/rss.xml",
+    },
+  },
+  icons: {
+    apple: {
+      url: "/apple-touch-icon.png",
+      type: "image/png",
+      sizes: "180x180",
+    },
+    icon: [
+      {
+        url: "/favicon-16x16.png",
+        type: "image/png",
+        sizes: "16x16",
+      },
+      {
+        url: "/favicon-32x32.png",
+        type: "image/png",
+        sizes: "32x32",
+      },
+      {
+        url: "/favicon-192x192.png",
+        type: "image/png",
+        sizes: "192x192",
+      },
+    ],
+  },
+};
 
 export default RootLayout;

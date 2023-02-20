@@ -53,21 +53,6 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
         <footer className="pb-4 text-right">© Sebastian Sdorra</footer>
       </div>
       <Analytics />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-        (function (history) {
-          var pushState = history.pushState;
-          history.pushState = function(state){
-            console.log("switch ...", state);
-            var result = pushState.apply(history, arguments);
-            window.dispatchEvent(new Event("routeChange", state));
-            return result;
-          };
-        })(window.history);
-      `,
-        }}
-      />
     </body>
   </html>
 );

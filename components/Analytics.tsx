@@ -8,12 +8,8 @@ const Analytics = () => {
     Fathom.load("XBTBKWMG", {
       includedDomains: ["sdorra.dev"],
       url: "https://ice-idea.sdorra.dev/script.js",
+      spa: "auto",
     });
-
-    const onRouteChange = () => Fathom.trackPageview();
-
-    window.addEventListener("routeChange", onRouteChange);
-    return () => window.removeEventListener("routeChange", onRouteChange);
   }, []);
 
   return null;

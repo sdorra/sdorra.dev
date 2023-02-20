@@ -12,6 +12,11 @@ tags:
 We will explore how to integrate analytic tools such as [Google Analytics](https://analytics.google.com), [Matomo](https://matomo.org) or [Fathom](https://usefathom.com/) with the Next.js 13 app directory.
 In this article we will use [Fathom](https://usefathom.com/), but the same principles could be applied to [Google Analytics](https://analytics.google.com), [Matomo](https://matomo.org) or similar tools.
 
+<Notification type="info" title="Update">
+  In the case of [Fathom](https://usefathom.com/), I have since found a [simpler solution](#fathom-spa-mode).
+  But the solution described here should still work and especially with adaptations for other tools.
+</Notification>
+
 The new app directory of Next.js 13 comes with a lot of exiting new features,
 but the new router (`next/navigation`) unfortunately does not support events.
 
@@ -91,3 +96,30 @@ export default Analytics;
 ```
 
 We have to use a custom component instead of a hook in order to annotate the component with [use client](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components).
+
+## Fathom SPA mode
+
+The method described in this post can be significantly simplified for [Fathom](https://usefathom.com).
+I'm not sure if Fathom introduced the feature after writing the post or if I just missed it.
+Fathom has a [SPA mode](https://usefathom.com/docs/script/script-advanced#spa) that does the same thing we did in our script.
+So we can remove the script from the layout and simplify our Analytics component as follows:
+
+```tsx app/Analytics.tsx
+"use client";
+
+import { useEffect } from "react";
+import * as Fathom from "fathom-client";
+
+const Analytics = () => {
+  useEffect(() => {
+    Fathom.load("YOUR_FATHOM_TRACKING_CODE", {
+      includedDomains: ["yourdomain.com"],
+      spa: "auto"
+    });
+  }, []);
+
+  return null;
+};
+
+export default Analytics;
+```

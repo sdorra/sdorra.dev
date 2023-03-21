@@ -1,0 +1,244 @@
+---
+title: TypeScript undefined to null
+summary: Learn how to create a type helper which converts undefined to null
+date: 2023-03-20
+image: https://images.unsplash.com/photo-1551012895-1df56864aabe
+tags:
+  - typescript
+  - next.js
+---
+
+In certain scenarios, it becomes necessary to convert object properties that are undefined to null.
+This is particularly relevant in the case of [Next.js](https://nextjs.org/),
+where `getStaticProps` or `getServerSideProps` must not return `undefined` properties.
+Returning an undefined property results in a runtime error.
+However, manually checking for possibly undefined properties is error-prone and can lead to oversights if the object changes.
+
+## The Example
+
+Lets say we have an Calendar API which return events of the following type:
+
+<CH.Section>
+
+
+```tsx
+type CalendarEvent = {
+  summary: string;
+  description: string | undefined;
+  location?: string;
+  date: {
+    start: Date;
+    end: Date | undefined;
+  };
+};
+```
+
+There a three problems in the `CalendarEvent` type.
+
+1. [The description is a union type which can be undefined](focus://3[23:34])
+1. [Location is a optional property and can be undefined as well](focus://4[11])
+1. [The end date is union type which is inside an nested object and can be undefined as well](focus://7[15:26])
+
+</CH.Section>
+
+Wouldn't be nice if we can use a TypeScript helper which turns those `undefined` instances into `null`.
+If we had such a helper, we could not forget to convert a property which possibly `undefined`.
+
+Let's try to write such a helper.
+
+## The TypeScript Helper
+
+First we have to iterate over all properties of our object. This can be done with a mapped type:
+
+```tsx
+type UndefinedToNull<T extends object> = {
+  [Prop in keyof T]: T[Prop];
+};
+```
+
+First we define a new type called `UndefinedToNull` which requires a generic `T` which must be a object (`extends object`).
+Then we define a new object (the curly braces) and define a property for each key of `T` (`[Prop in keyof T]`).
+For simplicity we start by returning the same type which was passed in `T[Prop]`.
+Our type helper returns now the same type which is passed in:
+
+```tsx
+type CalendarEventStaticProps = UndefinedToNull<CalendarEvent>;
+
+// CalendarEventStaticProps has the following shape:
+
+{
+  summary: string;
+  description: string | undefined;
+  location?: string;
+  date: {
+    start: Date;
+    end: Date | undefined;
+  }
+}
+```
+
+Not much useful, but a good starting point to modify the returned type.
+
+## Replace undefined with null
+
+Now that we mapping each property of our object, we can start to modify the resulting type.
+We try now to map `undefined` to `null`. For this we need an additional type helper `UnionUndefinedToNull`.
+
+```tsx
+type UnionUndefinedToNull<T> = T extends undefined ? null : T;
+```
+
+This type helper gets again a generic and returns null if it is undefined in all other cases it returns the type as it is.
+
+```tsx
+type One = UnionUndefinedToNull<undefined>;
+// One = null
+type Two = UnionUndefinedToNull<string>;
+// Two = string
+```
+
+It also works if we pass a union type:
+
+```tsx
+type Three = UnionUndefinedToNull<string | undefined>;
+// Three = string | null
+```
+
+This is exactly what we need for our use case. So we can add this type helper to our `UndefinedToNull` type helper.
+
+```tsx
+type UndefinedToNull<T extends object> = {
+  [Prop in keyof T]: UnionUndefinedToNull<T[Prop]>
+};
+
+type CalendarEventStaticProps = UndefinedToNull<CalendarEvent>;
+
+// CalendarEventStaticProps has the following shape:
+
+{
+  summary: string;
+  description: string | null;
+  location?: string | null | undefined;
+  date: {
+    start: Date;
+    end: Date | undefined;
+  }
+}
+```
+
+Ok, the description looks good now, but what about location and the end date?
+
+## Optional Properties
+
+Optional properties like `location` need an extra step. We have to remove them from the resulting type.
+
+```tsx
+type UndefinedToNull<T extends object> = {
+  [Prop in keyof T]-?: UnionUndefinedToNull<T[Prop]>;
+};
+
+type CalendarEventStaticProps = UndefinedToNull<CalendarEvent>;
+
+// CalendarEventStaticProps has the following shape:
+
+{
+  summary: string;
+  description: string | null;
+  location: string | null;
+  date: {
+    start: Date;
+    end: Date | undefined;
+  }
+}
+```
+
+The litte `-?` removes the `?` from the resulting type and with it the additional `undefined`.
+Now we have to fix the end date.
+
+## Recursion
+
+The problem with the end date is that we check if the whole date object is undefined and not its properties.
+We have to call our type helper recursive if the property is an object.
+
+```tsx
+type UndefinedToNull<T extends object> = {
+  [Prop in keyof T]-?: T[Prop] extends object ? UndefinedToNull<T[Prop]> : UnionUndefinedToNull<T[Prop]>;
+};
+```
+
+Now we check the type of each property if it is an object (`T[Prop] extends object`).
+If it is an object we call the `UndefinedToNull` again with the property (`UndefinedToNull<T[Prop]>`).
+If it is not an object we keep the `UnionUndefinedToNull<T[Prop]>`.
+With the recursion call we get the following result:
+
+```tsx
+type CalendarEventStaticProps = UndefinedToNull<CalendarEvent>;
+
+// CalendarEventStaticProps has the following shape:
+
+{
+  summary: string;
+  description: string | null;
+  location: string | null;
+  date: {
+    start: Date;
+    end: Date | null;
+  }
+}
+```
+
+Pretty nice.
+But what if our input type is not an object? At the moment typescript jells at us,
+but wouldn't it be better if we could pass any Type and our Type helper decides what needs to happen to Type.
+
+## Input type
+
+To allow every type as input, we only have to remove the constraint from the generic.
+
+```tsx
+type UndefinedToNull<T> = {
+  [Prop in keyof T]-?: T[Prop] extends object ? UndefinedToNull<T[Prop]> : UnionUndefinedToNull<T[Prop]>;
+};
+```
+
+If `T` is an object we map the type as described in the sections above,
+if it is not an object pass `T` directly to the `UnionUndefinedToNull`.
+Doing so we can pass whatever we want.
+
+```tsx
+type One = UndefinedToNull<string>;
+// One = string
+type Two = UndefinedToNull<undefined>;
+// Two = null
+type Three = UndefinedToNull<string | undefined>;
+// Three = string | null
+type Four = UndefinedToNull<{ name?: string }>;
+// Four = {name: string | null}
+```
+
+Now we can use our type helper in any situation.
+
+
+## Usage within getStaticProps
+
+Now we can use  our type helper in within the `getStaticProps` function.
+
+```tsx
+export const getStaticProps: GetStaticProps<UndefinedToNull<CalendarEvent>> = async () => {
+  const calendarEvent = await getCalendarEvent();
+
+  return {
+    props: {
+      ...calendarEvent,
+      description: calendarEvent.description || null,
+      location: calendarEvent.location || null,
+      date: {
+        ...calendarEvent.date,
+        end: calendarEvent.date.end || null,
+      },
+    },
+  };
+};
+```
+
+If the calendar api changes and another property can be undefined, TypeScript will complain and we can fix it.

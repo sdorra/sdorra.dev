@@ -15,6 +15,10 @@
   h6 {
     @apply font-display text-base-900 dark:text-base-50;
   }
+
+  ::selection {
+    @apply bg-cyan-500 text-base-50;
+  }
 }
 
 .ch-code-wrapper,
@@ -58,4 +62,5 @@ div.ch-editor-tab-active {
   --ch-tab-active-color: theme("colors.base.100");
   --ch-tab-inactive-color: theme("colors.base.500");
   --ch-tab-inactive-bg: theme("colors.base.900");
+  --ch-selection-background: theme("colors.cyan.700");
 }

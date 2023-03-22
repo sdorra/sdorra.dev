@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
     @apply bg-white font-body text-base-700 dark:bg-base-800 dark:text-base-300;
   }
@@ -42,17 +46,17 @@ div.ch-editor-tab-active {
 }
 
 :root {
-  --shiki-color-text: theme('colors.base.100');
+  --shiki-color-text: theme("colors.base.100");
   --shiki-color-background: theme("colors.base.700");
-  --shiki-token-constant: theme('colors.emerald.300');
-  --shiki-token-string: theme('colors.emerald.300');
-  --shiki-token-comment: theme('colors.base.400');
-  --shiki-token-keyword: theme('colors.cyan.300');
-  --shiki-token-parameter: theme('colors.pink.300');
-  --shiki-token-function: theme('colors.violet.300');
-  --shiki-token-string-expression: theme('colors.emerald.300');
-  --shiki-token-punctuation: theme('colors.base.200');
-  --shiki-token-link: theme('colors.base.200');
+  --shiki-token-constant: theme("colors.emerald.300");
+  --shiki-token-string: theme("colors.emerald.300");
+  --shiki-token-comment: theme("colors.base.400");
+  --shiki-token-keyword: theme("colors.cyan.300");
+  --shiki-token-parameter: theme("colors.pink.300");
+  --shiki-token-function: theme("colors.violet.300");
+  --shiki-token-string-expression: theme("colors.emerald.300");
+  --shiki-token-punctuation: theme("colors.base.200");
+  --shiki-token-link: theme("colors.base.200");
 
   --ch-icon-text: theme("colors.base.300");
   --ch-tabs-bg: theme("colors.base.900");

@@ -198,11 +198,10 @@ but wouldn't it be better if we could pass any type and our type helper decides 
 
 To allow every type as input, we only have to remove the constraint from the generic.
 
-```
+```ts
 type UndefinedToNull<T> = {
   [Prop in keyof T]-?: T[Prop] extends object ? UndefinedToNull<T[Prop]> : UnionUndefinedToNull<T[Prop]>;
 };
-
 ```
 
 If `T` is an object, we map the type as described in the sections above;

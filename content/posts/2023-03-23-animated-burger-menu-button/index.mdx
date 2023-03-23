@@ -1,0 +1,155 @@
+---
+title: Animated burger menu button with TailwindCSS
+summary: Lets create an animated and accessible burger menu button with React and TailwindCSS
+date: 2023-03-23
+image: https://images.unsplash.com/photo-1550547660-d9450f859349
+tags:
+  - tailwindcss
+  - react
+  - css
+---
+
+In this article, we will learn how to create an animated and accessible burger menu button with [TailwindCSS](https://tailwindcss.com/) and [React](https://react.dev).
+If the menu is closed, our button consists of three horizontal lines.
+If the button is clicked and the menu opens, the first and last lines should turn into an X, and the middle line should fade out.
+The result should look like this:
+
+<div className="not-prose flex justify-center">![Animated burger menu button](assets/burger-menu-button.gif)</div>
+
+Let's start with the following skeleton:
+
+```tsx
+type Props = {
+  isOpen: boolean;
+  onClick: () => void;
+};
+
+const BurgerButton = ({ isOpen, onClick }: Props) => <button onClick={onClick}>{isOpen ? "Open" : "Closed"}</button>;
+```
+
+We leave the state management outside of the button because the button is normally part of a menu that manages the state. The usage within the menu could look like the following:
+
+```tsx
+const Menu = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <nav>
+      <MenuLinks isOpen={isOpen} />
+      <BurgerButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
+    </nav>
+  );
+};
+```
+
+Now we have a button that toggles the state every time we click. This is a good starting point. The next step is to add the horizontal lines.
+
+## The closed state
+
+```tsx
+const BurgerButton = ({ isOpen, onClick }: Props) => (
+  <button className="w-5 space-y-1" onClick={onClick}>
+    <div className="h-0.5 w-5 bg-current" />
+    <div className="h-0.5 w-5 bg-current" />
+    <div className="h-0.5 w-5 bg-current" />
+  </button>
+);
+```
+
+First, we use a fixed width for the button (`w-5`), then we add a `div` for each horizontal line. Each `div` becomes a fixed height (`h-0.5`) and the same width `w-5`, and we use the current text color for the background `bg-current`. This is nice, but it is hard to turn the horizontal lines into an X. So we have to modify the button so that the transition becomes easier.
+
+```tsx
+const BurgerButton = ({ isOpen, onClick }: Props) => (
+  <button className="h-5 w-5" onClick={onClick}>
+    <div className="absolute h-0.5 w-5 -translate-y-1.5 bg-current" />
+    <div className="absolute h-0.5 w-5 bg-current" />
+    <div className="absolute h-0.5 w-5 translate-y-1.5 bg-current" />
+  </button>
+);
+```
+
+Now the horizontal lines have an `absolute` position, which makes it easier to rotate them later. But if we use position absolute, all the horizontal lines are stacked together. To separate them again, we translate the y-axis of the first one (`-translate-y-1.5`) and the last one (`translate-y-1.5`). At least we have to specify a fixed height for the button (`h-5`), if we forget this, we could only click on the lines and not between them. Now it's time to define the open state.
+
+## The open state
+
+```tsx
+const BurgerButton = ({ isOpen, onClick }: Props) => (
+  <button className="h-5 w-5" onClick={onClick}>
+    <div className={`absolute h-0.5 w-5 bg-current ${isOpen ? "rotate-45" : "-translate-y-1.5"}`} />
+    <div className={`absolute h-0.5 w-5 bg-current ${isOpen ? "opacity-0" : "opacity-100"}`} />
+    <div className={`absolute h-0.5 w-5 bg-current ${isOpen ? "-rotate-45" : "translate-y-1.5"}`} />
+  </button>
+);
+```
+
+Now that we want to display the lines differently based on the `isOpen` state, we have to turn our `className` attributes into template literals. For the first line, we want to rotate the line by 45 degrees (`rotate-45`) and we no longer want to translate the y-axis of the line because the line should now be placed in the middle. The last line is handled similarly to the first one, but it is rotated with -45 degrees (`-rotate-45`). The middle line should be invisible (`opacity-0`) if the menu is open and visible (`opacity-100`) if the menu is closed. Looks good, but we should talk about accessibility.
+
+## Accessibility
+
+Our button looks nice, but it is not accessible. Let's change that.
+
+```tsx
+const BurgerButton = ({ isOpen, onClick }: Props) => (
+  <button className="h-5 w-5" onClick={onClick}>
+    <div className="sr-only">{isOpen ? "Close menu" : "Open menu"}</div>
+    <div
+      aria-hidden="true"
+      className={`absolute h-0.5 w-5 bg-current transition duration-300 ease-in-out ${
+        isOpen ? "rotate-45" : "-translate-y-1.5"
+      }`}
+    />
+    <div
+      aria-hidden="true"
+      className={`absolute h-0.5 w-5 bg-current transition duration-300 ease-in-out ${
+        isOpen ? "opacity-0" : "opacity-100"
+      }`}
+    />
+    <div
+      aria-hidden="true"
+      className={`absolute h-0.5 w-5 bg-current transition duration-300 ease-in-out ${
+        isOpen ? "-rotate-45" : "translate-y-1.5"
+      }`}
+    />
+  </button>
+);
+```
+
+First, we add a new `div` with the `sr-only` class. This class specifies that this element is only visible for screen readers. The `div` contains textual information about what the button does, and this information is based on the state. A screen reader is now able to read the current state of the menu. We also have added the `aria-hidden` attribute to each horizontal line because they are meaningless for a screen reader. Now we have an accessible, nice-looking button. But the transition from one state to the other is quite bumpy.
+
+## Animation
+
+We can make the transition much smoother with a few Tailwind classes.
+
+```tsx
+const BurgerButton = ({ isOpen, onClick }: Props) => (
+  <button className="h-5 w-5" onClick={onClick}>
+    <div className="sr-only">{isOpen ? "Close menu" : "Open menu"}</div>
+    <div
+      aria-hidden="true"
+      className={`absolute h-0.5 w-5 bg-current transition duration-300 ease-in-out ${
+        isOpen ? "rotate-45" : "-translate-y-1.5"
+      }`}
+    />
+    <div
+      aria-hidden="true"
+      className={`absolute h-0.5 w-5 bg-current transition duration-300 ease-in-out ${
+        isOpen ? "opacity-0" : "opacity-100"
+      }`}
+    />
+    <div
+      aria-hidden="true"
+      className={`absolute h-0.5 w-5 bg-current transition duration-300 ease-in-out ${
+        isOpen ? "-rotate-45" : "translate-y-1.5"
+      }`}
+    />
+  </button>
+);
+```
+
+We add the following classes to each of our horizontal lines:
+
+- `transition`: This class specifies that the element is animated.
+- `duration-300`: Specifies the duration of the animation.
+- `ease-in-out`: Defines the speed of the animation.
+
+That's it! Our burger button is ready to use.

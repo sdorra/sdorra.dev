@@ -24,7 +24,9 @@ type Props = {
   onClick: () => void;
 };
 
-const BurgerButton = ({ isOpen, onClick }: Props) => <button onClick={onClick}>{isOpen ? "Open" : "Closed"}</button>;
+const BurgerButton = ({ isOpen, onClick }: Props) => (
+  <button onClick={onClick}>{isOpen ? "Open" : "Closed"}</button>
+);
 ```
 
 We leave the state management outside of the button because the button is normally part of a menu that manages the state. The usage within the menu could look like the following:

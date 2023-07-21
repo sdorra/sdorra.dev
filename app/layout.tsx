@@ -11,9 +11,11 @@ import "./globals.css";
 
 const raleway = Raleway({
   variable: "--display-font",
+  subsets: ["latin"],
 });
 const cabin = Cabin({
   variable: "--body-font",
+  subsets: ["latin"],
 });
 
 const RootLayout: FC<PropsWithChildren> = ({ children }) => (

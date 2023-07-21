@@ -49,7 +49,7 @@
     "prettier": "^2.8.4",
     "prettier-plugin-organize-imports": "^3.2.2",
     "prettier-plugin-tailwindcss": "^0.2.3",
-    "prop-types": "^15.7.2",
+    "prop-types": "^15.8.1",
     "sharp": "^0.31.3",
     "tailwindcss": "^3.2.6",
     "typescript": "^4.9.5",
@@ -58,6 +58,7 @@
     "vite": "^4.1.1"
   },
   "pnpm": {
+    "//": "https://github.com/contentlayerdev/contentlayer/issues/506",
     "overrides": {
       "shiki": "^0.12.1",
       "@opentelemetry/api": "1.4.1",

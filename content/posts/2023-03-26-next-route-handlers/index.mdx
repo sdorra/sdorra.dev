@@ -1,0 +1,140 @@
+---
+title: Creating static files with Next.js route handlers
+summary: Next.js 13.2.0 introduces route handlers, let's see how we can use it to create sitemap.xml, robots.txt and a feed
+date: 2023-03-26
+image: https://images.unsplash.com/photo-1519376108558-7b6471e87264
+tags:
+  - next.js
+  - react
+  - vercel
+---
+
+In previous articles i've shown how to create static files with an extra build step.
+
+- [sitemap.xml](/posts/2022-11-15-sitemaps-with-appdir)
+- [rss.xml](/posts/2022-12-06-next-rss-feed)
+
+[Next.js](https://nextjs.org/) 13.2.0 introduces [route handlers](https://beta.nextjs.org/docs/routing/route-handlers).
+With [route handlers](https://beta.nextjs.org/docs/routing/route-handlers) it is possible to create static files without an extra build step.
+
+> Route Handlers are statically evaluated by default when using the GET method with the Response object.
+
+Lets see how we can use it to create a [robots.txt](#robotstxt), [sitemap.xml](#sitemapxml) and a [feed (rss.xml)](#rssxml).
+
+## robots.txt
+
+The following example shows how to create a robots.txt,
+which allows all traffic on production and disallows all traffic on other environments.
+
+```ts app/robots.txt/route.ts
+const content = `User-Agent: *
+${process.env.VERCEL_ENV === "production" ? "Allow: /" : "Disallow: /"}
+
+Sitemap: https://${process.env.VERCEL_URL}/sitemap.xml
+`;
+
+export const GET = () => new Response(content, { status: 200 });
+```
+
+The example uses environment variables provided by the [vercel platform](https://vercel.com/docs/concepts/projects/environment-variables/system-environment-variables#system-environment-variables).
+
+## sitemap.xml
+
+The next example shows how to create a sitemap.xml.
+The sitemap.xml is generated from the [contentlayer](https://www.contentlayer.dev/) generated files.
+
+```ts app/sitemap.xml/route.ts
+import { allPosts } from "contentlayer/generated";
+
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  <url>
+    <loc>https://${process.env.VERCEL_URL}</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <priority>1.00</priority>
+  </url>
+
+  ${allPosts
+    .map(
+      (p) => `
+  <url>
+    <loc>https://${process.env.VERCEL_URL}${p.url}</loc>
+    ${p.lastModification ? `<lastmod>${p.lastModification}</lastmod>` : ""}
+    <priority>0.64</priority>
+  </url>
+  `
+    )
+    .join("")}
+</urlset>
+`;
+
+export const GET = () =>
+  new Response(sitemap, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/xml",
+    },
+  });
+```
+
+## rss.xml
+
+The last example shows how to create a rss feed from [contentlayer](https://www.contentlayer.dev/) blog posts.
+
+```ts app/rss.xml/route.ts
+import { compareDesc, parseISO } from "date-fns";
+import { Feed } from "feed";
+import { allPosts } from "contentlayer/generated";
+
+const feed = new Feed({
+  title: "Example blog",
+  description: "Description for the awesome example blog",
+  id: "https://blog.example.com",
+  link: "https://blog.example.com",
+  language: "en",
+  favicon: "https://blog.example.com/favicon.ico",
+  copyright: "All rights reserved 2022, Your Name",
+  author: {
+    name: "Your Name",
+    email: "your.name@exmaple.com",
+    link: "https://blog.example.com",
+  },
+});
+
+allPosts
+  .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
+  .forEach((post) => {
+    const url = `https://example.com/posts/${post._raw.flattenedPath}`;
+    feed.addItem({
+      id: url,
+      link: url,
+      title: post.title,
+      description: post.summary,
+      date: parseISO(post.date),
+      category: post.tags.map((name) => ({ name })),
+      image: post.coverImage,
+      author: [
+        {
+          name: "Your Name",
+          email: "your.name@exmaple.com",
+          link: "https://blog.example.com",
+        },
+      ],
+    });
+  });
+
+export const GET = () =>
+  new Response(feed.rss2(), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/rss+xml",
+    },
+  });
+```
+
+## Conclusion
+
+It is much easier to create static files with [route handlers](https://beta.nextjs.org/docs/routing/route-handlers) than with an extra build step.
+We can use [TypeScript](https://www.typescriptlang.org/) without extra configuration or workarounds for imports.

@@ -1,0 +1,244 @@
+---
+title: Google authentication on the edge
+summary: Authenticate a google service account within an edge function
+date: 2023-08-03
+image: https://cdn.discordapp.com/attachments/1093967710758641734/1136562653293187092/sdorra_space_with_the_upper_half_of_the_earth_in_the_background_9c3af3bf-c24a-4e2b-ad3c-161bc40c5437.png
+tags:
+  - google
+  - authentication
+  - edge
+  - fetch
+---
+
+Recently, I had to retrieve data from a [Google Spreadsheet](https://www.google.de/intl/de/sheets/about/) in one of my applications.
+The data needed to be fetched in an edge function running on [Vercel](https://vercel.com).
+To accomplish this, I installed the `googleapis` package,
+which I typically use to access Google APIs.
+
+```bash
+pnpm add googleapis
+```
+
+Before writing the code to fetch data from the sheet,
+we need to create a service account, download its credentials, and grant it access to our sheet.
+The process is well explained in the [Installation and Setup Guide from Robocorp](https://robocorp.com/docs/development-guide/google-sheets/interacting-with-google-sheets#installation-and-setup).
+
+Now, we can set the client email and private key from the downloaded JSON credentials of the service account as environment variables.
+
+```ini .env.local
+GOOGLE_SA_CLIENT_EMAIL=projectname@random-string-123.iam.gserviceaccount.com
+GOOGLE_SA_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n
+```
+
+<Notification type="warning">
+  Make sure that the line breaks of the private key are stored as `\n` in the environment variable.
+</Notification>
+
+Now lets write the edge function:
+
+```ts
+import { google } from "googleapis";
+
+// make the function an edge function
+export const runtime = "edge";
+
+const sheets = google.sheets("v4");
+
+const jwtClient = new google.auth.JWT(
+  process.env.GOOGLE_SA_CLIENT_EMAIL,
+  undefined,
+  process.env.GOOGLE_SA_PRIVATE_KEY,
+  ["https://www.googleapis.com/auth/spreadsheets"]
+);
+
+export async function GET() {
+  try {
+    await jwtClient.authorize();
+
+    const data = await sheets.spreadsheets.values.get({
+      auth: jwtClient,
+      spreadsheetId: "idofthespreadsheets",
+      range: "A1",
+    });
+
+    if (!data.data.values) {
+      return new Response("Sheet has no data", {
+        status: 400,
+      });
+    }
+
+    return new Response(data.data.values[0][0], {
+      status: 200,
+    });
+  } catch (e) {
+    return new Response("Failed to fetch data", {
+      status: 500,
+    });
+  }
+}
+```
+
+That's it. The function above utilizes the Google API to authenticate the service account and subsequently retrieves the data.
+However, upon starting our application, we immediately encounter the following error:
+
+<Notification type="error">
+
+```
+Module not found: Can't resolve 'https'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/.pnpm/gaxios@5.1.3_encoding@0.1.13/node_modules/gaxios/build/src/index.js
+./node_modules/.pnpm/googleapis-common@6.0.4_encoding@0.1.13/node_modules/googleapis-common/build/src/index.js
+./node_modules/.pnpm/googleapis@122.0.0_encoding@0.1.13/node_modules/googleapis/build/src/index.js
+```
+
+</Notification>
+
+We see this error because the `googleapis` package uses the `https` module from Node under the hood,
+but edge functions have a limited API set compared to normal Node.js serverless functions.
+
+Okay, that is sad.
+We can't use the `googleapis` package to fetch the data.
+However, that package is just a wrapper around a REST API, so I decided to use straight-up `fetch` to get our data.
+
+## Plain old fetch
+
+I had to delve into the sources of the `googleapis` package in order to correctly authenticate the service account.
+First, we need to create a [JWT token](https://jwt.io/) with the client email as the `iss` and the appropriate scope to access the spreadsheet.
+This token should be signed with the private key of the service account.
+I chose to use the [jose](https://github.com/dvsekhvalnov/jose-jwt) library for the JWT functionality because I saw this library in a few of the edge demos of Vercel.
+
+```ts
+import { SignJWT, importPKCS8 } from "jose";
+
+const payload = {
+  iss: process.env.GOOGLE_SA_CLIENT_EMAIL,
+  scope: "https://www.googleapis.com/auth/spreadsheets.readonly",
+  aud: "https://www.googleapis.com/oauth2/v4/token",
+  exp: Math.floor(Date.now() / 1000) + 60 * 60,
+  iat: Math.floor(Date.now() / 1000),
+};
+
+async function authenticate() {
+  const rawPrivateKey = env.GOOGLE_SA_PRIVATE_KEY.replace(/\\n/g, "\n");
+  const privateKey = await importPKCS8(rawPrivateKey, "RS256");
+
+  const jwt = await new SignJWT(payload)
+    .setProtectedHeader({ alg: "RS256" })
+    .setIssuedAt()
+    .setIssuer(env.GOOGLE_SA_CLIENT_EMAIL)
+    .setAudience("https://www.googleapis.com/oauth2/v4/token")
+    .setExpirationTime("1h")
+    .sign(privateKey);
+}
+```
+
+With the jwt we are now able to fetch a bearer token.
+
+```ts
+const tokenResponse = await fetch("https://www.googleapis.com/oauth2/v4/token", {
+  method: "POST",
+  body: JSON.stringify({
+    grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+    assertion: jwt,
+  }),
+  headers: { "Content-Type": "application/json" },
+});
+
+const token = await tokenResponse.json();
+```
+
+Now we have a token, which should look like the following:
+
+```json
+{
+  "access_token": "ya29.c.b0Aa...",
+  "expires_in": 3599,
+  "token_type": "Bearer"
+}
+```
+
+This token can now be used for authentication:
+
+```ts
+const apiResponse = await fetch("https://mygoogleapiurl", {
+  headers: {
+    Authorization: `${token.token_type} ${token.access_token}`,
+  },
+});
+```
+
+Now, we can access Google APIs with the limited set of APIs in an edge function.
+
+<Notification type="info" title="Bonus" prose>
+If we call more than one api, we can store the token until it is expired.
+
+```ts
+import { SignJWT, importPKCS8 } from "jose";
+
+type Token = {
+  access_token: string;
+  expires_in: number;
+  token_type: string;
+};
+
+type TokenWithExpiration = Token & {
+  expires_at: number;
+};
+
+const payload = {
+  iss: env.GOOGLE_SA_CLIENT_EMAIL,
+  scope: "https://www.googleapis.com/auth/spreadsheets.readonly",
+  aud: "https://www.googleapis.com/oauth2/v4/token",
+  exp: Math.floor(Date.now() / 1000) + 60 * 60,
+  iat: Math.floor(Date.now() / 1000),
+};
+
+let token: TokenWithExpiration | null = null;
+
+async function createToken() {
+  const rawPrivateKey = env.GOOGLE_SA_PRIVATE_KEY.replace(/\\n/g, "\n");
+  const privateKey = await importPKCS8(rawPrivateKey, "RS256");
+
+  const token = await new SignJWT(payload)
+    .setProtectedHeader({ alg: "RS256" })
+    .setIssuedAt()
+    .setIssuer(env.GOOGLE_SA_CLIENT_EMAIL)
+    .setAudience("https://www.googleapis.com/oauth2/v4/token")
+    .setExpirationTime("1h")
+    .sign(privateKey);
+
+  // Form data for the token request
+  const form = {
+    grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+    assertion: token,
+  };
+
+  // Make the token request
+  const tokenResponse = await fetch("https://www.googleapis.com/oauth2/v4/token", {
+    method: "POST",
+    body: JSON.stringify(form),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  const json = (await tokenResponse.json()) as Token;
+
+  return {
+    ...json,
+    expires_at: Math.floor(Date.now() / 1000) + json.expires_in,
+  };
+}
+
+export async function authenticate(): Promise<Token> {
+  if (token === null) {
+    token = await createToken();
+  } else if (token.expires_at < Math.floor(Date.now() / 1000)) {
+    token = await createToken();
+  }
+  return token;
+}
+```
+
+</Notification>

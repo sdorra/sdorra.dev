@@ -15,9 +15,21 @@ The data needed to be fetched in an edge function running on [Vercel](https://ve
 To accomplish this, I installed the `googleapis` package,
 which I typically use to access Google APIs.
 
-```bash
+<CH.Code>
+
+```bash pnpm
 pnpm add googleapis
 ```
+
+```bash yarn
+yarn add googleapis
+```
+
+```bash npm
+npm install googleapis
+```
+
+</CH.Code>
 
 Before writing the code to fetch data from the sheet,
 we need to create a service account, download its credentials, and grant it access to our sheet.

@@ -1,0 +1,344 @@
+---
+title: Refetch on window focus
+summary: Automatically refresh data when the tab or browser window is focused
+date: 2023-08-04
+image: https://images.unsplash.com/photo-1487622750296-6360190669a1
+tags:
+  - react
+  - focus
+  - web
+---
+
+Sometimes, you want to refetch data when the tab or browser window is focused.
+This is especially useful if we have data that changes frequently and we want to show the latest information.
+Normally, I would use [TanStack Query](https://tanstack.com/query) for this purpose,
+but for just one fetch, it is a bit excessive.
+Therefore, I have decided to write a custom hook for this task.
+
+## The API
+
+Let's start by focusing on the API.
+The API should be a hook that is flexible enough to be used in different scenarios.
+So, I decided to go with a hook that takes a function which returns a promise.
+The hook should return the data, an error, and a loading state.
+Let's start with the types.
+
+```ts
+type FetchDataFunction<T> = () => Promise<T>;
+
+type State<T> = {
+  data?: T;
+  error?: Error;
+  isLoading: boolean;
+};
+
+type useRefreshOnFocus = <T>(fn: FetchDataFunction<T>) => State<T>;
+```
+
+Looks good so far, but I don't like the `State` type because it is not clear enough.
+With this `State` type, it is not clear that `data` and `error` are mutually exclusive,
+and `isLoading` should only be true if both are undefined.
+So let's change it to a discriminated union.
+
+```ts
+type State<T> =
+  | {
+      data: T;
+      error?: undefined;
+      isLoading: false;
+    }
+  | {
+      data?: undefined;
+      error: Error;
+      isLoading: false;
+    }
+  | {
+      data?: undefined;
+      error?: undefined;
+      isLoading: true;
+    };
+```
+
+This looks much better. Let's implement the hook.
+
+## State management
+
+The data fetching is done in a `useEffect` hook.
+For the state, we use the `useState` hook.
+
+We could do something like this:
+
+```ts
+const [data, setData] = useState<T>();
+const [error, setError] = useState<Error>();
+const [isLoading, setIsLoading] = useState(true);
+```
+But this makes it hard to update the state based on the previous state because we have to define data as part of the dependency array of the effect,
+which causes the effect to run every time the data changes.
+Having multiple state variables also makes it very easy to return an inconsistent state.
+However, with a single state variable, we can easily update the state based on the previous state.
+To achieve this, we pass a function to the `setState` function that receives the previous state as an argument, for example:
+
+```ts
+const [state, setState] = useState<State<T>>({
+  isLoading: true,
+});
+
+setState((prevState) => {
+  if (!prevState.data) {
+    return {
+      isLoading: true,
+    };
+  }
+  return s;
+});
+```
+
+Now, we can add the `useEffect` hook.
+
+```ts
+export const useRefreshOnFocus = <T>(fn: FetchDataFunction<T>) => {
+  const [state, setState] = useState<State<T>>({
+    isLoading: true,
+  });
+
+  useEffect(() => {}, [fn]);
+
+  return state;
+};
+```
+
+The only dependency of the effect is the function that fetches the data.
+Okay, let's implement the effect.
+
+```ts
+useEffect(() => {
+  const fetchData = async () => {
+    // implementation comes next
+  };
+
+  // fetch initial data
+  fetchData();
+
+  // refetch data when the tab or browser window is focused
+  const handleVisibilityChange = () => {
+    if (!document.hidden) {
+      fetchData();
+    }
+  };
+
+  // register event listeners
+  window.addEventListener("focus", handleVisibilityChange);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  return () => {
+    // unregister event listeners when the component is unmounted
+    window.removeEventListener("focus", handleVisibilityChange);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
+}, [fn]);
+```
+
+The code snippet above calls fetches the initial data and set up event listeners for the `focus` and `visibilitychange` events.
+The `window focus` event is triggered when the tab or browser window gains focus, while the `visibilitychange` event is triggered when the tab is switched.
+If either of these events is triggered and the tab is visible, the data is re-fetched.
+Let's proceed with the implementation of the `fetchData` function.
+
+## Fetching the data
+
+Our data-fetching function begins by setting the loading state.
+However, we should only set the loading state if we don't have any data.
+his is crucial because we don't want to display a loading spinner when the user switches back to the tab.
+Nevertheless, we need to set the loading state again because the function may change between renders.
+
+```ts
+setState((prevState) => {
+  if (!prevState.data) {
+    return {
+      isLoading: true,
+    };
+  }
+  return prevState;
+});
+```
+
+Then, we can call our function to fetch the data and update the state.
+
+```ts
+const data = await fn();
+setState({
+  data,
+  isLoading: false,
+});
+```
+
+But we should keep in mind that the function could fail and throw an error, so we have to catch the error.
+However, we only want to set the error state if we don't have data,
+because in most cases, it is better to show stale data than an error message.
+
+```ts
+try {
+  const data = await fn();
+  setState({
+    data,
+    isLoading: false,
+  });
+} catch (e) {
+  let error: Error;
+  if (e instanceof Error) {
+    error = e;
+  } else {
+    error = new Error(`Failed to fetch data: ${e}`);
+  }
+
+  setState((prevState) => {
+    if (!prevState.data) {
+      return {
+        isLoading: false,
+        error,
+      };
+    }
+    return prevState;
+  });
+}
+```
+
+## All together
+
+Finally, we can put everything together.
+Here is the complete code for our hook.
+
+```ts useRefreshOnFocus.ts
+import { useEffect, useState } from "react";
+
+type State<T> =
+  | {
+      data: T;
+      error?: undefined;
+      isLoading: false;
+    }
+  | {
+      data?: undefined;
+      error: Error;
+      isLoading: false;
+    }
+  | {
+      data?: undefined;
+      error?: undefined;
+      isLoading: true;
+    };
+
+type FetchDataFunction<T> = () => Promise<T>;
+
+const useRefreshOnFocus = <T>(fn: FetchDataFunction<T>) => {
+  const [state, setState] = useState<State<T>>({
+    isLoading: true,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setState((prevState) => {
+        if (!prevState.data) {
+          return {
+            isLoading: true,
+          };
+        }
+        return prevState;
+      });
+
+      try {
+        const data = await fn();
+        setState({
+          data,
+          isLoading: false,
+        });
+      } catch (e) {
+        let error: Error;
+        if (e instanceof Error) {
+          error = e;
+        } else {
+          error = new Error(`Failed to fetch data: ${e}`);
+        }
+
+        setState((prevState) => {
+          if (!prevState.data) {
+            return {
+              isLoading: false,
+              error,
+            };
+          }
+          return prevState;
+        });
+      }
+    };
+
+    fetchData();
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchData();
+      }
+    };
+
+    window.addEventListener("focus", handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.removeEventListener("focus", handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [fn]);
+
+  return state;
+};
+
+export default useRefreshOnFocus;
+```
+
+### Usage
+
+Now, we can use our hook to fetch some data.
+
+```tsx Users.tsx
+import useRefreshOnFocus from "./useRefreshOnFocus";
+
+type User = {
+  username: string;
+  email: string;
+};
+
+async function fetchUsers(): Promise<User[]> {
+  const response = await fetch("https://jsonplaceholder.typicode.com/users");
+  if (!response.ok) {
+    throw new Error("Failed to fetch users");
+  }
+  return response.json();
+}
+
+const Users = () => {
+  const { data, isLoading, error } = useRefreshOnFocus(fetchUsers);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error.message}</div>;
+  }
+
+  return (
+    <ul>
+      {data.map((user) => (
+        <li key={user.username}>
+          <a href={`mailto:${user.email}`}>{user.username}</a>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default Users;
+```
+
+In the example above, we can iterate over the users without having to check if the data is defined.
+This is possible because we return immediately if `isLoading` is `true` or `error` is defined.
+Additionally, our types are well defined in TypeScript,
+so it knows that `data` is defined if `isLoading` is `false` and `error` is undefined.

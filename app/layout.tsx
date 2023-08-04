@@ -33,20 +33,24 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
         }}
       />
     </head>
-    <body className={clsx(raleway.variable, cabin.variable)}>
-      <div className="mx-auto flex h-full max-w-3xl flex-col gap-5 p-5 sm:p-10">
-        <header className="relative">
-          <Navigation />
-          <div className="absolute right-0 top-0 flex gap-2">
-            <GitHubLink />
-            <TwitterLink />
-            <FeedLink />
-            <DarkModeToggle />
-          </div>
-        </header>
-        <main className="flex-1">{children}</main>
-        <footer className="pb-4 text-right">© Sebastian Sdorra</footer>
-      </div>
+    <body
+      className={clsx(
+        "mx-auto flex h-full min-h-screen max-w-3xl flex-col gap-5 p-5 sm:p-10",
+        raleway.variable,
+        cabin.variable
+      )}
+    >
+      <header className="relative">
+        <Navigation />
+        <div className="absolute right-0 top-0 flex gap-2">
+          <GitHubLink />
+          <TwitterLink />
+          <FeedLink />
+          <DarkModeToggle />
+        </div>
+      </header>
+      <main className="flex-1">{children}</main>
+      <footer className="pb-4 text-right">© Sebastian Sdorra</footer>
       <Analytics />
     </body>
   </html>

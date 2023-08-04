@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 import allPosts from ".scripts/Post/withoutbody.json";
 import { ImageResponse } from "@vercel/og";
+import clsx from "clsx";
 import { NextRequest } from "next/server";
 
 export const runtime = "edge";
@@ -61,7 +62,10 @@ export const GET = async (request: NextRequest, { params }: Context) => {
           <div tw="flex flex-col px-6 w-[740px] h-full justify-between">
             <div tw="flex flex-col">
               <span
-                tw="text-7xl font-bold text-stone-50 mb-6"
+                tw={clsx("font-bold text-stone-50 mb-6", {
+                  "text-7xl": post.title.length < 40,
+                  "text-6xl": post.title.length >= 40,
+                })}
                 style={{
                   fontFamily: '"Raleway"',
                 }}

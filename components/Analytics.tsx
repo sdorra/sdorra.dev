@@ -7,7 +7,6 @@ const Analytics = () => {
   useEffect(() => {
     Fathom.load("XBTBKWMG", {
       includedDomains: ["sdorra.dev"],
-      url: "https://ice-idea.sdorra.dev/script.js",
       spa: "auto",
     });
   }, []);

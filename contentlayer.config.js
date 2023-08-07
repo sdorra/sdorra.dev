@@ -10,7 +10,7 @@ import remarkGfm from "remark-gfm";
 import { promisify } from "util";
 import resolveImageBlurDataURL from "./lib/imageBlurDataURL";
 import mdxEmbedder from "./lib/mdxEmbedder";
-import staticImages from "./lib/static-images";
+import staticImages, { staticCoverImage } from "./lib/static-images";
 
 const exec = promisify(syncExec);
 
@@ -61,6 +61,10 @@ export const Post = defineDocumentType(() => ({
     readingTime: {
       type: "string",
       resolve: (post) => calculateReadingTime(post.body.raw),
+    },
+    imageURL: {
+      type: "string",
+      resolve: (post) => staticCoverImage(post),
     },
     imageBlurDataURL: {
       type: "string",

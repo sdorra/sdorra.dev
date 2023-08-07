@@ -17,13 +17,8 @@ const resolveFromFile = async (checksum: string): Promise<string | null> => {
   return null;
 };
 
-const fetchAndResolve = async (imageUrl: string, checksum: string): Promise<string> => {
-  const response = await fetch(imageUrl);
-  if (!response.ok) {
-    throw new Error(`failed to fetch ${imageUrl}`);
-  }
-
-  const image = sharp(Buffer.from(await response.arrayBuffer()));
+const createBlurDataURL = async (buffer: Buffer, checksum: string) => {
+  const image = sharp(buffer);
   const blurDataURL = await createPlaceholder(image);
 
   const file = path.join(".contentlayer", ".cache", "image", checksum);
@@ -34,6 +29,16 @@ const fetchAndResolve = async (imageUrl: string, checksum: string): Promise<stri
   return blurDataURL;
 };
 
+const fetchAndResolve = async (imageUrl: string, checksum: string): Promise<string> => {
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new Error(`failed to fetch ${imageUrl}`);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  return createBlurDataURL(buffer, checksum);
+};
+
 const resolveImageBlurDataURL = async (post: Post) => {
   const image = post.image;
 
@@ -41,7 +46,12 @@ const resolveImageBlurDataURL = async (post: Post) => {
   let blurDataURL = await resolveFromFile(checksum);
 
   if (!blurDataURL) {
-    blurDataURL = await fetchAndResolve(image, checksum);
+    if (!image.includes("://")) {
+      const relativePath = path.join("content", "posts", post._raw.sourceFileDir, image);
+      blurDataURL = await createBlurDataURL(await readFile(relativePath), checksum);
+    } else {
+      blurDataURL = await fetchAndResolve(image, checksum);
+    }
   }
   return blurDataURL;
 };

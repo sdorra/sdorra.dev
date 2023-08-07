@@ -3,6 +3,7 @@
 import allPosts from ".scripts/Post/withoutbody.json";
 import { ImageResponse } from "@vercel/og";
 import clsx from "clsx";
+import { createImageUrl } from "lib/images";
 import { NextRequest } from "next/server";
 
 export const runtime = "edge";
@@ -14,13 +15,6 @@ const cabinSemiBold = fetch(new URL("content/fonts/Cabin-SemiBold.ttf", import.m
 );
 
 const cabinMedium = fetch(new URL("content/fonts/Cabin-Medium.ttf", import.meta.url)).then((res) => res.arrayBuffer());
-
-const createImageUrl = (src: string, width: number, height: number) => {
-  if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
-    return `${src}?fit=crop&w=${width}&h=${height}`;
-  }
-  return src;
-};
 
 type Context = {
   params: {
@@ -55,7 +49,7 @@ export const GET = async (request: NextRequest, { params }: Context) => {
           <img
             width="375"
             height="562"
-            src={createImageUrl(post.image, 375, 562)}
+            src={createImageUrl(post.imageURL, 375, 562)}
             tw="rounded-xl border-2 border-stone-700"
             style={{ objectFit: "cover" }}
           />

@@ -57,7 +57,7 @@ const Post = ({ post }: Props) => {
     <>
       <figure className="relative flex items-center gap-4">
         <Image
-          src={post.image}
+          src={post.imageURL}
           blurDataURL={post.imageBlurDataURL}
           placeholder={post.imageBlurDataURL ? "blur" : "empty"}
           width={256}

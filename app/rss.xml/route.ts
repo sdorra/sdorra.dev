@@ -2,21 +2,14 @@ import { allPosts, Post } from "contentlayer/generated";
 import { compareDesc, parseISO, setHours } from "date-fns";
 import { Feed } from "feed";
 import { baseUrl } from "lib/config";
-
-const createImageUrl = (src: string, width: number, height: number, escape = false) => {
-  if (src.startsWith("https://images.unsplash.com/") && !src.includes("?")) {
-    const amp = escape ? "&amp;" : "&";
-    return `${src}?fit=crop${amp}w=${width}${amp}h=${height}`;
-  }
-  return src;
-};
+import { createImageUrl } from "lib/images";
 
 const createPostUrl = (url: string) => {
   return url + "?utm_campaign=feed&utm_source=rss2";
 };
 
 const createContent = (post: Post, url: string) => `
-<img src="${createImageUrl(post.image, 1000, 420)}" width="1000" height="420" vspace="3" hspace="8" align="center">
+<img src="${createImageUrl(post.imageURL, 1000, 420)}" width="1000" height="420" vspace="3" hspace="8" align="center">
 <p>${post.summary}</p>
 <p>Read the full article on <a href="${url}">sdorra.dev</a></p>`;
 
@@ -52,7 +45,7 @@ const createFeed = () => {
         author: [me],
         date: setHours(parseISO(post.date), 13),
         category: post.tags.map((name) => ({ name })),
-        image: createImageUrl(post.image, 256, 256, true),
+        image: createImageUrl(post.imageURL, 256, 256, true),
       });
     });
 

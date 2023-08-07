@@ -1,3 +1,4 @@
+import { Post } from "contentlayer/generated";
 import { RawDocumentData } from "contentlayer/source-files";
 import fs from "fs/promises";
 import { Element, Root } from "hast";
@@ -113,5 +114,21 @@ const staticImages: Plugin<[Options], Root> = (options) => (tree, file, done) =>
 
   Promise.all(tasks).then(() => done());
 };
+
+export const staticCoverImage = async (post: Post) => {
+  const image = post.image;
+  if (image.includes("://")) {
+    return image;
+  }
+
+  const source = path.join("content", "posts", post._raw.sourceFileDir, image);
+  const content = await fs.readFile(source);
+  const sha256sum = checksum(content);
+  const target = path.join("public", "posts", post._raw.sourceFileDir, image);
+
+  await copy(source, sha256sum, target);
+
+  return path.join("/", "posts", post._raw.sourceFileDir, image);
+}
 
 export default staticImages;

@@ -1,0 +1,193 @@
+---
+title: New DNS registrar
+summary: Why i now use Porkbun for all my domain names
+date: 2023-08-07
+image: https://images.unsplash.com/photo-1593318978060-6532dc118580
+tags:
+  - dns
+  - node
+  - ansible
+  - lets-encrypt
+---
+
+Recently, I was listening to episode [#632](https://syntax.fm/show/632/where-to-register-a-domain) of the [Syntax.fm](https://syntax.fm/) podcast.
+In this episode, [Scott](https://twitter.com/stolinski) and [Wes](https://twitter.com/wesbos) were talking about domain registrars.
+That prompted me to take a closer look at my own domains.
+Over the years, I've registered a few domains with three different providers ([STRATO](https://www.strato.de/), [united-domains](https://www.united-domains.de/), and [GoDaddy](https://www.godaddy.com/)).
+I wasn't happy with any of those providers, so I decided to look for a new one.
+
+## Looking for a new provider
+
+I don't require much from a DNS registrar.
+I need support for `.org`, `.de`, and `.dev` top-level domains (TLDs).
+Additionally, I require an API for automation, and it must be possible to create Let's Encrypt wildcard certificates.
+[Scott](https://twitter.com/stolinski) and [Wes](https://twitter.com/wesbos) mentioned in the episode that they both use [Cloudflare](https://www.cloudflare.com/).
+However, at the time I was searching for a new provider, [Cloudflare](https://www.cloudflare.com/) did not support `.dev` TLDs.
+
+<Notification type="info">
+[Cloudflare](https://www.cloudflare.com/) now offers `.dev`.
+Please have a look at [Cloudflare TLD Policies](https://www.cloudflare.com/tld-policies/).
+</Notification>
+
+But they mentioned [Porkbun](https://porkbun.com/) as a surprisingly cheap alternative. I've never heard of [Porkbun](https://porkbun.com/), so I decided to take a closer look at it.
+
+## Porkbun
+
+The first impression wasn't really good after I visited their website.
+The site itself looks like a [Bootstrap 2](https://getbootstrap.com/2.3.2/) demo application, and the name and logo do not look professional at all.
+But holy shit, the prices are really cheap.
+
+| Domain  | STRATO | united-domains | GoDaddy | Porkbun |
+| ------- | ------ | -------------- | ------- | ------- |
+| **de**  | $13.17 | $20.85         | $11.89  | $4.07   |
+| **org** | $19.76 | $27.44         | $27.57  | $10.72  |
+| **dev** | $26.34 | $31.83         | $24.00  | $10.79  |
+
+<p className="text-xs">Prices from August 2023. STRATO and united-domains prices are converted from Euro (€).</p>
+
+And they offer a simple-looking [API](https://porkbun.com/api/json/v3/documentation).
+So I decided to go down the road and move one of my domains over to [Porkbun](https://porkbun.com/).
+
+<Notification type="info" title="Good to know">
+  You don't need to wait for the domain subscription to expire before changing the domain registrar. When you transfer
+  the domain to a new registrar, you will need to pay for one year of registration at the new registrar. However, this
+  year will be added to the remaining duration of your current subscription. The domain transfer process usually takes a
+  few hours or days, depending on the registrars.
+</Notification>
+
+The transfer from [GoDaddy](https://www.godaddy.com/) to [Porkbun](https://porkbun.com/) went smoothly.
+So i want to try the [API](https://porkbun.com/api/json/v3/documentation).
+
+### API
+
+First, we need to enable the API for our domain, and then we have to create a key pair for authentication.
+The [Getting started with the Porkbun API](https://kb.porkbun.com/article/190-getting-started-with-the-porkbun-api) entry of the knowledge base of [Porkbun](https://porkbun.com/) explains this process very well.
+Let's review the [documentation](https://porkbun.com/api/json/v3/documentation) and begin with a shell script.
+
+#### Shell script
+
+```bash
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{
+    "apikey" : "pk1_...",
+    "secretapikey" : "sk1_...",
+    "name" : "example",
+    "type" : "A",
+    "content" : "1.2.3.4",
+    "ttl" : "600"
+  }' \
+  https://porkbun.com/api/json/v3/dns/create/sdorra.dev
+```
+
+That was not to complicated lets try TypeScript.
+
+#### TypeScript
+
+```ts
+const response = await fetch("https://porkbun.com/api/json/v3/dns/create/sdorra.dev", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    apikey: "pk1_...",
+    secretapikey: "sk1_...",
+    name: "example",
+    type: "A",
+    content: "1.2.3.4",
+    ttl: "600",
+  }),
+});
+
+if (!response.ok) {
+  throw new Error("Failed to create dns record");
+}
+```
+
+This was also easy. Next, ansible.
+
+#### Ansible
+
+```yaml
+- name: Set record name and ip
+  set_fact:
+    domain: "sdorra.dev"
+    porkbun_apikey: "pk1_..."
+    porkbun_secretapikey: "sk1_..."
+    record_name: "example"
+    record_ip: "1.2.3.4"
+
+- name: Get status of record from porkbun
+  uri:
+    url: "https://porkbun.com/api/json/v3/dns/retrieveByNameType/{{domain}}/A/{{ record_name }}"
+    method: POST
+    body_format: json
+    body:
+      apikey: "{{ porkbun_apikey }}"
+      secretapikey: "{{ porkbun_secretapikey }}"
+  register: result
+
+- name: Create porkbun record
+  uri:
+    url: "https://porkbun.com/api/json/v3/dns/create/{{domain}}"
+    method: POST
+    body_format: json
+    body:
+      apikey: "{{ porkbun_apikey }}"
+      secretapikey: "{{ porkbun_secretapikey }}"
+      name: "{{ record_name }}"
+      type: "A"
+      content: "{{ record_ip }}"
+      ttl: "600"
+  when: result.json.records is not defined or result.json.records | length == 0
+
+- name: Update porkbun record
+  uri:
+    url: https://porkbun.com/api/json/v3/dns/editByNameType/{{domain}}/A/{{ record_name }}
+    method: POST
+    body_format: json
+    body:
+      apikey: "{{ porkbun_apikey }}"
+      secretapikey: "{{ porkbun_secretapikey }}"
+      name: "{{ record_name }}"
+      type: "A"
+      content: "{{ record_ip }}"
+      ttl: "600"
+  when: result.json.records is defined and result.json.records | length > 0 and result.json.records[0].content != record_ip
+```
+
+This was more complicated, but it is not the fault of the API; it lies in the nature of Ansible.
+Ansible is a declarative tool, while the API is imperative.
+Therefore, we need to check if the record exists and if the IP is correct.
+If the record does not exist, we need to create it, and if the IP is wrong, we need to update it.
+
+So far, so good. But what about Let's Encrypt wildcard certificates?
+
+#### Let's Encrypt
+
+```bash
+docker run --rm \
+  -v certificates:/var/lib/lego/certificates \
+  -v lego_accounts:/var/lib/lego/accounts \
+  -e PORKBUN_API_KEY="pk1_..." \
+  -e PORKBUN_SECRET_API_KEY="sk1_..." \
+  goacme/lego:v4.12.3 \
+  --accept-tos \
+  --email="email.for.letsencrypt.account@example.com" \
+  --dns="porkbun" \
+  --domains="*.sdorra.dev" \
+  --domains="sdorra.dev" \
+  --path="/var/lib/lego" \
+  run
+```
+
+We use the [LEGO](https://go-acme.github.io/lego/) tool, running in a [Docker](https://www.docker.com/) container, to create the certificates.
+That works like a charm.
+
+### Conclusion
+
+Now, I have tested everything I need for my domains.
+Even if [Porkbun](https://porkbun.com/) does not look professional,
+the service offers everything I need, and the prices are really cheap.
+There are no more excuses not to move all my domains to Porkbun.

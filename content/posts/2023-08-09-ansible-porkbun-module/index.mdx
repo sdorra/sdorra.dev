@@ -164,6 +164,14 @@ ANSIBLE_METADATA = {
 
 In the `main` method, we define the parameters that we want to pass to the module.
 In our case this are the parameters which are required for our `PorkbunAPI` class.
+We define the parameters with the `argument_spec` variable, which is a parameter of the `AnsibleModule` class.
+But before we can use the `AnsibleModule` class, we need to import it at the top of our file.
+
+```python
+from ansible.module_utils.basic import AnsibleModule
+```
+
+Now we can start to implement the `main` method.
 
 ```python
 def main():

@@ -1,0 +1,497 @@
+---
+title: Create an ansible module
+summary: In this article we will see how to create an ansible module to manage porkbun
+date: 2023-08-09
+image: assets/cover.png
+tags:
+- ansible
+- porkbun
+- module
+---
+
+In the [last article](/posts/2023-08-07-new-dns-registrar), I explained why I moved all my domains to [Porkbun](https://porkbun.com/).
+One of the reasons was the [API](http://localhost:3000/posts/2023-08-07-new-dns-registrar#api) and its compatibility with [Ansible](/posts/2023-08-07-new-dns-registrar#ansible).
+I frequently use [Ansible](https://www.ansible.com/) to set up and manage my home server as well as a few remote ones.
+This often involves creating and managing DNS records. However, the method I demonstrated in the [New DNS Registrar](/posts/2023-08-07-new-dns-registrar#ansible) article is quite verbose, requiring at least three tasks with numerous parameters.
+I believe we can improve upon it.
+
+## Ansible modules
+
+Let's write an [Ansible module](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html) to summarize the logic of the three tasks.
+
+In order to create a module we need a single file and a some python knowledge.
+First we create a `library` folder and inside it we create a file with the name of our module.
+In the case of our porkbun module, we choose `porkbun_record.py`.
+We start our module with a class which handles the porkbun api.
+
+### PorkbunAPI class
+
+```python library/porkbun_record.py
+class PorkbunAPI:
+  def __init__(self, api_key, secret_api_key):
+    # TODO implement
+
+  def get_records(self, domain):
+    # TODO implement
+
+  def get_record(self, domain, record_type, name):
+    # TODO implement
+
+  def create_record(self, domain, record_type, name, content, ttl):
+    # TODO implement
+
+  def update_record(self, domain, record_type, name, content, ttl):
+    # TODO implement
+
+  def delete_record(self, domain, record_id):
+    # TODO implement
+```
+
+We need methods to get, create, update, and delete records.
+For each of those methods, we need the `api_key` and the `secret_api_key`.
+Therefore, we pass the keys in the constructor (the `__init__` method).
+To use the keys, we have to store them for later use.
+In addition to the keys, we define the `API_URL` and specify the default headers for our method calls.
+Now, our constructor should look like the following:
+
+```python
+class PorkbunAPI:
+  API_URL = "https://porkbun.com/api/json/v3/dns"
+
+  def __init__(self, api_key, secret_api_key):
+    self.headers = {
+        'Content-Type': 'application/json',
+    }
+
+    self.base_params = {
+        'apikey': api_key,
+        'secretapikey': secret_api_key
+    }
+```
+
+We need methods to get, create, update, and delete records. For each of those methods, we need the `api_key` and the `secret_api_key`.
+Therefore, we pass the keys in the constructor (the `__init__` method).
+To use the keys, we have to store them for later use. In addition to the keys, we define the `API_URL` and specify the default headers for our method calls.
+Now, our constructor should look like the following:
+
+```python
+import json
+from ansible.module_utils.urls import open_url
+```
+
+After that, we can begin the implementation of our methods.
+
+```python
+def get_records(self, domain):
+  response = open_url(f'{self.API_URL}/retrieve/{domain}',
+                      method="POST", headers=self.headers, data=json.dumps(self.base_params))
+  result = json.loads(response.read())
+  return result['records']
+```
+
+As we can see, we use the `open_url` method to make a `POST` request to the Porkbun API.
+We use `f` to format the URL with our `API_URL` and the domain we want to retrieve the records for.
+We also pass the `headers` and the `data` to the `open_url` method, which we defined in the constructor.
+The `open_url` method returns a file-like object that we can read and parse with the `json` module.
+The DNS records are stored in the `records` key of the JSON response.
+
+```python
+def get_record(self, domain, record_type, name):
+  records = self.get_records(domain)
+  for record in records:
+      if record['type'] == record_type and record['name'] == name + "." + domain:
+          return record
+  return None
+```
+
+For the `get_record` method, we use the `get_records` method we just implemented.
+We iterate over the records and return the first record that matches the `record_type` and `name` parameters.
+
+```python
+def create_record(self, domain, record_type, name, content, ttl):
+  data = {
+    **self.base_params,
+    'type': record_type,
+    'name': name,
+    'content': content,
+    'ttl': ttl
+  }
+  response = open_url(f'{self.API_URL}/create/{domain}',
+                      method='POST', headers=self.headers, data=json.dumps(data))
+  return json.loads(response.read())
+```
+
+For the `create_record` method, we create a dictionary with the `base_params` and the parameters we want to pass to the API.
+We then make another `POST` request to the API, as we did in the `get_records` method.
+
+The `update_record` method is very similar to the `create_record` method and does not require further explanation.
+
+```python
+def update_record(self, domain, record_type, name, content, ttl):
+  data = {
+    **self.base_params,
+    'content': content,
+    'ttl': ttl
+  }
+  response = open_url(f'{self.API_URL}/editByNameType/{domain}/{record_type}/{name}',
+                      method='POST', headers=self.headers, data=json.dumps(data))
+  return json.loads(response.read())
+```
+
+For the `delete_record` method, we require the `record_id`, which is returned by the `get_records` method.
+
+```python
+def delete_record(self, domain, record_id):
+  response = open_url(f'{self.API_URL}/delete/{domain}/{record_id}',
+                      method='POST', headers=self.headers, data=json.dumps(self.base_params))
+  return json.loads(response.read())
+```
+
+Now that we have implemented the `PorkbunAPI` class, we can move on to the module itself.
+
+### The main method
+
+An Ansible module requires a `main` method, which is the entry point of the module.
+It also requires some metadata, which we define in the `ANSIBLE_METADATA` variable.
+
+```python
+ANSIBLE_METADATA = {
+    'metadata_version': '1.1',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
+```
+
+In the `main` method, we define the parameters that we want to pass to the module.
+In our case this are the parameters which are required for our `PorkbunAPI` class.
+
+```python
+def main():
+  module = AnsibleModule(
+    argument_spec=dict(
+      state=dict(default='present', choices=['present', 'absent']),
+      domain=dict(required=True, type='str'),
+      record_type=dict(required=True, type='str', choices=[
+                      'A', 'MX', 'CNAME', 'ALIAS', 'TXT', 'NS', 'AAAA', 'SRV', 'TLSA', 'CAA']),
+      name=dict(required=True, type='str'),
+      content=dict(required=True, type='str'),
+      ttl=dict(required=False, type='int', default=600),
+      api_key=dict(required=True, type='str', no_log=True),
+      secret_api_key=dict(required=True, type='str', no_log=True),
+    ),
+  )
+```
+
+The `state` parameter is used to determine whether we want to create or delete a record.
+After we can use the `PorkbunAPI` class to create an instance of the API.
+
+```python
+api_key = module.params['api_key']
+secret_api_key = module.params['secret_api_key']
+
+porkbun = PorkbunAPI(api_key, secret_api_key)
+```
+
+Now we can fetch the state of the record, we want to manage.
+
+```python
+domain = module.params['domain']
+record_type = module.params['record_type']
+name = module.params['name']
+
+record = porkbun.get_record(domain, record_type, name)
+```
+
+Now it is time to implement the logic for the `present` state.
+
+```python
+state = module.params['state']
+
+if state == 'present':
+  if record is None:
+    porkbun.create_record(domain, record_type, name, content, ttl)
+    module.exit_json(changed=True, msg="DNS record created")
+```
+
+If the record does not exist, we create it.
+The `module.exit_json` method is used to return the result of the module.
+The `changed` key indicates whether the module changed the state of the system.
+The `msg` key contains a message that is displayed to the user.
+If the record exists, we check if the content is the same as the one we want to set.
+If it is not, we update the record.
+
+```python
+elif record['content'] != content or int(record['ttl']) != ttl:
+  porkbun.update_record(domain, record_type, name, content, ttl)
+  module.exit_json(changed=True, msg="DNS record updated")
+```
+
+If the content is the same, we do not need to do anything and we can exit the module.
+
+```python
+else:
+  module.exit_json(changed=False, msg="DNS record already exists")
+```
+
+Now we can implement the logic for the `absent` state.
+
+```python
+elif state == 'absent':
+  if record is not None:
+    porkbun.delete_record(domain, record['id'])
+    module.exit_json(changed=True, msg="DNS record deleted")
+```
+
+If the record exists, we delete it.
+If the record does not exist, we do not need to do anything and we can exit the module.
+
+```python
+else:
+  module.exit_json(changed=False, msg="DNS record does not exist")
+```
+
+Finally, we need to call the `main` method.
+
+```python
+if __name__ == '__main__':
+  main()
+```
+
+Now we can test our module.
+
+## Testing the module
+
+To test our module, we create a playbook with the following content.
+
+```yaml playbook.yml
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Create DNS record
+      porkbun_record:
+        state: present
+        domain: sdorra.dev
+        record_type: A
+        name: sample
+        content: 192.168.0.42
+        ttl: 3600
+        api_key: pk1_...
+        secret_api_key: sk1_...
+```
+
+Ok, we are ready to test our module.
+
+```bash
+ansible-playbook playbook.yml
+```
+
+If everything works as expected, we should see that the module created the DNS record.
+That is it, we have created an Ansible module to manage DNS records with the Porkbun API.
+
+After we have tested our module, we can publish it to [Ansible Galaxy](https://galaxy.ansible.com/).
+But before we can publish it, we should add some documentation to our module.
+
+## Documentation
+
+We start with the `DOCUMENTATION` variable.
+The `DOCUMENTATION` variable is a [YAML](https://yaml.org/) string which contains the documentation for our module.
+
+```python
+DOCUMENTATION = r'''
+---
+module: porkbun_record
+short_description: Manage DNS records on Porkbun
+description:
+  - This module allows you to create, update, and delete DNS records on Porkbun using the Porkbun API.
+options:
+  state:
+    description:
+      - Whether the record should exist or not.
+    choices: [ 'present', 'absent' ]
+    default: 'present'
+  domain:
+    description:
+      - The domain to add the DNS record to.
+    required: true
+    type: str
+  record_type:
+    description:
+      - The type of DNS record to manage.
+    choices: [ 'A', 'MX', 'CNAME', 'ALIAS', 'TXT', 'NS', 'AAAA', 'SRV', 'TLSA', 'CAA' ]
+    required: true
+    type: str
+  name:
+    description:
+      - The name of the DNS record.
+    required: true
+    type: str
+  content:
+    description:
+      - The content of the DNS record.
+    required: true
+    type: str
+  ttl:
+    description:
+      - The time-to-live of the DNS record.
+    default: 600
+    type: int
+  api_key:
+    description:
+      - The API key for the Porkbun API.
+    required: true
+    type: str
+    no_log: true
+  secret_api_key:
+    description:
+      - The secret API key for the Porkbun API.
+    required: true
+    type: str
+    no_log: true
+'''
+```
+
+Next we define the `EXAMPLES` variable.
+
+```python
+EXAMPLES = r'''
+# Create an A record
+- porkbun_dns:
+    state: present
+    domain: example.com
+    record_type: A
+    name: www
+    content: 192.0.2.1
+    ttl: 3600
+    api_key: your_api_key
+    secret_api_key: your_secret_api_key
+
+# Delete a TXT record
+- porkbun_dns:
+    state: absent
+    domain: example.com
+    record_type: TXT
+    name: www
+    content: "v=spf1 -all"
+    api_key: your_api_key
+    secret_api_key: your_secret_api_key
+
+# Update an existing MX record
+- porkbun_dns:
+    state: present
+    domain: example.com
+    record_type: MX
+    name: mail
+    content: "10 mail.example.com."
+    ttl: 7200
+    api_key: your_api_key
+    secret_api_key: your_secret_api_key
+'''
+```
+
+We also define the `RETURN` variable.
+
+```python
+RETURNS = r'''
+changed:
+  description: Whether or not the DNS record was changed
+  returned: always
+  type: bool
+msg:
+  description: A message describing what happened
+  returned: always
+  type: str
+'''
+```
+
+We also need a `README.md` file, which should contain a short documentation of our module.
+
+## Publishing
+
+Now we can publish our module to [Ansible Galaxy](https://galaxy.ansible.com/).
+To publish our module, we have to create a [collection](https://docs.ansible.com/ansible/latest/collections_guide/index.html).
+Collections use a different folder structure than our module does.
+Therefore, we have to move our module to a folder called `plugins/modules` folder.
+We also have to create a `galaxy.yml` file in the root of our collection.
+The `galaxy.yml` file contains metadata about our collection.
+
+```yaml galaxy.yml
+# The namespace of the collection.
+namespace: sdorra
+# The name of the collection.
+name: porkbun
+# The version of the collection.
+version: 1.0.0
+# The path to the Markdown (.md) readme file
+readme: README.md
+# A list of the collection's content authors.
+authors:
+- Sebastian Sdorra <s.sdorra@gmail.com>
+# Optional short description of the collection
+description: Ansible collection for managing dns records on porkbun.com
+# Either a single license or a list of licenses for content inside of the collection
+license:
+- GPL-2.0-or-later
+# A list of tags you want to associate with the collection for indexing/searching.
+tags: ['dns', 'porkbun', 'domain', 'module']
+# Collections that this collection requires to be installed for it to be usable.
+dependencies: {}
+# The URL of the originating SCM repository
+repository: https://github.com/sdorra/ansible-collection-porkbun
+# The URL to the collection issue tracker
+issues: hhttps://github.com/sdorra/ansible-collection-porkbun/issues
+# A list of file glob-like patterns used to filter any files or directories that should not be included in the build
+build_ignore: []
+```
+
+Now we can build our collection.
+
+```bash
+ansible-galaxy collection build
+```
+
+The build command creates a tarball with the namespace, name and version of the collection (`sdorra-porkbun-1.0.0.tar.gz`).
+This tarball can be uploaded to [Ansible Galaxy](https://galaxy.ansible.com/).
+To upload the tarball, we have to create an account on [Ansible Galaxy](https://galaxy.ansible.com/) and create an [API key](https://galaxy.ansible.com/me/preferences).
+After we have our API key, we can upload the tarball.
+
+```bash
+ansible-galaxy collection publish sdorra-porkbun-1.0.0.tar.gz --api-key <your-api-key>
+```
+
+### Usage with Ansible Galaxy
+
+After we have published our collection, we can install it with the `ansible-galaxy` command.
+
+```bash
+ansible-galaxy collection install sdorra.porkbun
+```
+
+And use it in our playbooks:
+
+```yaml playbook.yml
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+  - name: Create DNS record
+    sdorra.porkbun.porkbun_record:
+      state: present
+      domain: example.com
+      record_type: A
+      name: www
+      content: 192.168.0.42
+      ttl: 3600
+      api_key: your_api_key
+      secret_api_key: your_secret_api_key
+```
+
+## Conclusion
+
+In this article, we have seen how to create an Ansible module for managing DNS records on [Porkbun](https://porkbun.com/).
+We have also learned how to publish the module to [Ansible Galaxy](https://galaxy.ansible.com/).
+For the complete source code of the module, please visit the [GitHub repository](https://github.com/sdorra/ansible-collection-porkbun).
+The final version of the module is also available on [Ansible Galaxy](https://galaxy.ansible.com/sdorra/porkbun).
+

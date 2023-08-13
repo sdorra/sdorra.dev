@@ -1,0 +1,268 @@
+---
+title: Speeding up a serverless function
+summary: In this article we will speed up a serverless function which fetches data from a google spreadsheet
+date: 2023-08-13
+image: https://images.unsplash.com/photo-1498084393753-b411b2d26b34
+tags:
+  - serverless
+  - google
+  - spreadsheet
+  - edge
+---
+
+Recently, I had a problem with one of my applications. The application was using a Next.js API route to fetch data from a Google Spreadsheet. The data needed to be as up-to-date as possible, so I decided to fetch the data using an API route and refetch it if the browser or tab is refocused (you can find my article about how to do this [here](/posts/2023-08-04-refetch-on-window-focus)).
+
+The problem was that the function sometimes took multiple seconds to respond with the data. So, I decided to take a closer look at the function and see how I could speed it up. Sometimes the function only needed a couple of seconds, but other times it was very fast (under 300ms).
+
+I quickly realized that the problem mostly occurred on the first request after a while. It seemed to be the famous "cold start" problem. Since the page wasn't frequently visited, nearly every user encountered the cold start problem.
+
+My first idea was to use an edge function, which doesn't have the cold start problem.
+
+## Edge functions
+
+Before we delve into the code, let's examine what edge functions are. Edge functions are functions that run on the edge of the network. This means that the function is executed on a server that is close to the user and edge function does not have the cold start problem. However, they do not support all the APIs that a typical Node.js serverless function does. For instance, you cannot utilize `fs` or `child_process` in an edge function. Consequently, I quickly encountered an issue where the dependency I used to retrieve data from the spreadsheet did not function in an edge function (I have written about it [here](/posts/2023-08-03-google-auth-on-the-edge)).
+
+Before we proceed to rewrite the function to make it compatible with the edge, let's examine the code of the original function. I am using the same example as in the article [here](/posts/2023-08-03-google-auth-on-the-edge). If you wish to learn more about the code and the transition to the edge, please refer to that article.
+
+### Original function
+
+```ts app/serverless/route.ts
+import { google } from "googleapis";
+
+const sheets = google.sheets("v4");
+
+const jwtClient = new google.auth.JWT(
+  process.env.GOOGLE_SA_CLIENT_EMAIL,
+  undefined,
+  process.env.GOOGLE_SA_PRIVATE_KEY,
+  ["https://www.googleapis.com/auth/spreadsheets"]
+);
+
+export async function GET() {
+  try {
+    await jwtClient.authorize();
+
+    const data = await sheets.spreadsheets.values.get({
+      auth: jwtClient,
+      spreadsheetId: "idofthespreadsheets",
+      range: "A1",
+    });
+
+    if (!data.data.values) {
+      return new Response("Sheet has no data", {
+        status: 400,
+      });
+    }
+
+    return new Response(data.data.values[0][0], {
+      status: 200,
+    });
+  } catch (e) {
+    return new Response("Failed to fetch data", {
+      status: 500,
+    });
+  }
+}
+```
+
+This is the original function that uses the `googleapis` package to fetch data from a spreadsheet. The function is very simple. It utilizes a service account to authenticate with the Google Sheets API and then retrieves the data from the spreadsheet. If the data is successfully fetched, it returns the data. Otherwise, it returns an error.
+
+### Edge function
+
+```ts app/edge/route.ts
+import { SignJWT, importPKCS8 } from "jose";
+
+export runtime = "edge";
+
+type Token = {
+  access_token: string;
+  expires_in: number;
+  token_type: string;
+};
+
+const payload = {
+  iss: process.env.GOOGLE_SA_CLIENT_EMAIL,
+  scope: "https://www.googleapis.com/auth/spreadsheets.readonly",
+  aud: "https://www.googleapis.com/oauth2/v4/token",
+  exp: Math.floor(Date.now() / 1000) + 60 * 60,
+  iat: Math.floor(Date.now() / 1000),
+};
+
+export async function GET() {
+  const rawPrivateKey = process.env.GOOGLE_SA_PRIVATE_KEY.replace(/\\n/g, "\n");
+  const privateKey = await importPKCS8(rawPrivateKey, "RS256");
+
+  const token = await new SignJWT(payload)
+    .setProtectedHeader({ alg: "RS256" })
+    .setIssuedAt()
+    .setIssuer(process.env.GOOGLE_SA_CLIENT_EMAIL)
+    .setAudience("https://www.googleapis.com/oauth2/v4/token")
+    .setExpirationTime("1h")
+    .sign(privateKey);
+
+  // Form data for the token request
+  const form = {
+    grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+    assertion: token,
+  };
+
+  // Make the token request
+  const tokenResponse = await fetch("https://www.googleapis.com/oauth2/v4/token", {
+    method: "POST",
+    body: JSON.stringify(form),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!tokenResponse.ok) {
+    return new Response("Failed to fetch token", {
+      status: 500,
+    });
+  }
+
+  const tokenData = await tokenResponse.json() as Token;
+
+  // Use the access token to fetch the spreadsheet data
+  const apiResponse = await fetch(apiUrl, {
+    headers: { Authorization: `Bearer ${tokenData.access_token}` }
+  });
+
+  if (!apiResponse.ok) {
+    return new Response("Failed to fetch spreadsheet data", {
+      status: 500,
+    });
+  }
+
+  const data = await apiResponse.json();
+
+  return new Response(data.values[0][0], {
+    status: 200,
+  });
+}
+```
+
+This is the code for the `edge` function. It utilizes the `jose` package to generate a JWT token and then uses the token for authentication with the Google Sheets API. The function performs the same task as the original function, but it doesn't rely on the `googleapis` package as it is incompatible with the edge environment.
+
+After some testing, we see that our cold start problem is gone. The function is now consistently faster, always between 300ms and 500ms. I've never seen a request that takes a couple of seconds as before. However, between 300ms and 500ms is okay, but it is not fast. Let's see if we can speed it up even more.
+
+I've had a second idea to speed up the function. What if we could make the function completely static and rebuild whenever the data has changed? This would mean that the function would be as fast as a static file, which is very fast. Let's see how we can do this.
+
+## ISR
+
+In Next.js, there is a feature called Incremental Static Regeneration (ISR). This feature allows you to build static pages or APIs and then rebuild them after a certain amount of time or use an API to trigger the rebuild. This is exactly what we need. We can build a static API route and then trigger a rebuild whenever the data has changed. This way, we can have a static API that is always up-to-date.
+
+Let's see how we can implement this.
+
+### Static API
+
+To make our API route static, we don't need to do much. We can use the same code as for the edge function, even though edge functions do not support ISR. We use the edge function code because it demonstrates much better what we have to do to make the function static. We have to do the following steps:
+
+<CH.Section>
+
+1. Remove the `runtime` variable
+1. [Add a `revalidate` variable and set it to `false`](focus://3)
+1. [Add a `fetchCache` variable and set it to `"force-cache"`](focus://4)
+1. [Add a `tags` to the `fetch` call](focus://15:17,24:26)
+
+```ts app/isr/route.ts
+import { SignJWT, importPKCS8 } from "jose";
+
+export const revalidate = false;
+export const fetchCache = "force-cache";
+
+// ... unchanged types and payload
+
+export async function GET() {
+  // ... unchanged authentication code
+
+  const tokenResponse = await fetch("https://www.googleapis.com/oauth2/v4/token", {
+    method: "POST",
+    body: JSON.stringify(form),
+    headers: { "Content-Type": "application/json" },
+    next: {
+      tags: ["isr"],
+    },
+  });
+
+  // ... unchanged token handling
+
+  const apiResponse = await fetch(apiUrl, {
+    headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    next: {
+      tags: ["isr"],
+    },
+  });
+
+  // ... unchanged return
+}
+```
+
+</CH.Section>
+
+The `revalidate` constant tells Next.js that the page is static. Setting the `fetchCache` constant to `forceCache` ensures that all of the `fetch` requests will be cached. This is required because Next.js will not cache requests that contain the `Authorization` header. The `tags` property allows us to invalidate the fetch cache later on.
+
+Now, our API route is static, but it will deliver the same data until we redeploy our entire application. We need to include a mechanism to initiate a rebuild whenever the data changes. Let's begin by creating another API route that will trigger the rebuild.
+
+### Trigger rebuild
+
+```ts app/on-update/route.ts
+import { revalidatePath, revalidateTag } from "next/cache";
+
+export async function POST(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get("token");
+
+  if (token !== process.env.ON_UPDATE_TOKEN) {
+    return new Response("Unauthorized", {
+      status: 401,
+    });
+  }
+
+  revalidateTag("isr");
+  revalidatePath("/isr");
+
+  return new Response("OK", {
+    status: 200,
+  });
+}
+```
+
+This API route receives a token as a query parameter and checks if it matches the token we have set in our environment variables. If the token matches, we trigger a rebuild of the API route we want to rebuild. In our case, we want to rebuild the `/isr` route. We also want to revalidate the fetch cache of every request that uses the `isr` tag. This way, we can ensure that the data is always up-to-date.
+
+Now we have to call this API route whenever the data has changed. We can do this by adding a webhook to our spreadsheet.
+
+### Spreadsheet webhook
+
+To add a webhook to our spreadsheet, we need to open the script editor. We can do this by clicking on **Tools**, and then selecting **Script Editor**. This action will open a new tab with the script editor. Now, we can add the following code to the script editor:
+
+```js
+var url = "https://url-to-our-application/on-update?token=tokenthatmatchesourtoken";
+
+function onEdit() {
+  var response = UrlFetchApp.fetch(url, {
+    method: "POST",
+  });
+  Logger.log(response.getContentText());
+}
+```
+
+Than we have to create a trigger for the `onEdit` function. We can do this by clicking on **Triggers** and then **Add trigger**. We have to set the function to `onEdit`, the event source to `From spreadsheet` and the event type to `On edit`. We can leave the rest as it is and click on **Save**.
+
+Now, whenever we edit the spreadsheet, the `onEdit` function will be called, which will trigger our `on-update` API route.
+
+Now we can measure the performance of the new approach. After some testing, we see that the function is now really fast. Most of the time, we can measure a response time of under **50ms**! This is a huge improvement over the previous approaches. However, whenever the data has changed, the next request will again take a couple of seconds. This is because the revalidate does not regenerate the page; it only invalidates the cache. This means that the page will be regenerated on the first request after the revalidate. This can be a problem if the data changes frequently. Every time the data changes, the first request will be slow. But luckily, there is an easy solution for this problem. After we have invalidated the cache, we can call the page again. This will trigger a rebuild of the page, so the next request will be fast again. We can do this by adding the following code to our `onEdit` function:
+
+```js
+var url = "https://url-to-our-application/on-update?token=tokenthatmatchesourtoken";
+
+function onEdit() {
+  var response = UrlFetchApp.fetch(url, {
+    method: "POST",
+  });
+  Logger.log(response.getContentText());
+
+  response = UrlFetchApp.fetch("https://url-to-our-application/isr");
+  Logger.log(response.getContentText());
+}
+```
+
+Now, every request will be fast, even after the data has changed.

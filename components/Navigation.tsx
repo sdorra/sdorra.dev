@@ -6,6 +6,9 @@ const Navigation = () => (
       <li>
         <NavigationLink href="/">Home</NavigationLink>
       </li>
+      <li>
+        <NavigationLink href="/posts/pages/1" activePath="/posts">Posts</NavigationLink>
+      </li>
     </ul>
   </nav>
 );

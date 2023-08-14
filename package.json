@@ -19,6 +19,7 @@
     "date-fns": "^2.30.0",
     "fathom-client": "^3.5.0",
     "lucide-react": "^0.263.0",
+    "minisearch": "^6.1.0",
     "next": "13.4.13",
     "next-contentlayer": "^0.3.4",
     "react": "18.2.0",

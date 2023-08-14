@@ -36,6 +36,6 @@ yarn-error.log*
 next-env.d.ts
 .contentlayer
 .vscode
-.scripts
+.generated
 
 public/posts

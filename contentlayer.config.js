@@ -2,15 +2,16 @@ import { defineDocumentType, makeSource } from "contentlayer/source-files";
 
 import { remarkCodeHike } from "@code-hike/mdx";
 import { exec as syncExec } from "child_process";
-import { mkdir, writeFile } from "fs/promises";
-import path, { join } from "path";
+import path from "path";
 import readingTime from "reading-time";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import { promisify } from "util";
 import resolveImageBlurDataURL from "./lib/imageBlurDataURL";
 import mdxEmbedder from "./lib/mdxEmbedder";
+import searchIndex from "./lib/searchIndex";
 import staticImages, { staticCoverImage } from "./lib/static-images";
+import withoutBody from "./lib/withoutBody";
 
 const exec = promisify(syncExec);
 
@@ -100,14 +101,6 @@ export default makeSource({
   },
   onSuccess: async (importData) => {
     const { allDocuments } = await importData();
-    const postsWithoutContent = allDocuments.map((doc) => {
-      const { body, ...postWithoutContent } = doc;
-      return postWithoutContent;
-    });
-    const directory = join(".scripts", "Post");
-    await mkdir(directory, { recursive: true });
-    await writeFile(join(directory, "withoutbody.json"), JSON.stringify(postsWithoutContent, null, 2), {
-      encoding: "utf-8",
-    });
+    await Promise.all([withoutBody(allDocuments, ".generated"), searchIndex(allDocuments, ".generated")]);
   },
 });

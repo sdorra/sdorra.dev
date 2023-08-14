@@ -1,17 +1,17 @@
 import clsx from "clsx";
-import { Post } from "contentlayer/generated";
+import { PostOverview } from "lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import DateTime from "./DateTime";
 
 type Props = {
-  post: Post;
+  post: PostOverview;
 };
 
 const PostCard = ({ post }: Props) => (
   <article>
     <Link
-      href={`/posts/${post._raw.flattenedPath}`}
+      href={post.url}
       className={clsx(
         "group mt-10 grid gap-2 rounded-md hover:bg-base-100 dark:hover:bg-base-700 sm:grid-cols-[8.5rem,1fr]",
         "border-2 border-base-300 p-4 hover:border-primary-500 dark:border-base-700 dark:hover:border-primary-400"

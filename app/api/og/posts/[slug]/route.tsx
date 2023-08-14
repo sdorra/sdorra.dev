@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
-import allPosts from ".scripts/Post/withoutbody.json";
+import allPosts from ".generated/Post/withoutbody.json";
 import { ImageResponse } from "@vercel/og";
 import clsx from "clsx";
 import { createImageUrl } from "lib/images";

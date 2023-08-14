@@ -1,5 +1,5 @@
-import { allPosts } from "contentlayer/generated";
 import { baseUrl } from "lib/config";
+import { pages, postsOrderedByDate } from "lib/posts";
 
 type SitemapEntry = {
   loc: string;
@@ -16,7 +16,7 @@ const rootEntry: SitemapEntry = {
 };
 
 const createPostEntries = (): SitemapEntry[] =>
-  allPosts.map((p) => {
+  postsOrderedByDate.map((p) => {
     const url: SitemapEntry = {
       loc: createUrl(p.url),
     };
@@ -27,8 +27,15 @@ const createPostEntries = (): SitemapEntry[] =>
     return url;
   });
 
+const createPostPagesEntries = (): SitemapEntry[] =>
+  pages.map((_, i) => ({
+    loc: createUrl(`/posts/pages/${i + 1}`),
+    lastmod: new Date().toISOString(),
+    priority: "0.8",
+  }));
+
 const createEntries = () => {
-  return [rootEntry, ...createPostEntries()];
+  return [rootEntry, ...createPostPagesEntries(), ...createPostEntries()];
 };
 
 const createSitemap = async (entries: SitemapEntry[]) => {

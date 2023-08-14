@@ -7,18 +7,27 @@ import { FC, PropsWithChildren } from "react";
 
 type Props = PropsWithChildren & {
   href: string;
+  activePath?: string;
   className?: string;
 };
 
-const NavigationLink: FC<Props> = ({ href, className, children }) => {
+const isActive = (href: string, activePath: string | undefined, path: string) => {
+  if (activePath) {
+    return path.startsWith(activePath);
+  }
+  return path === href;
+}
+
+const NavigationLink: FC<Props> = ({ href, activePath, className, children }) => {
   const path = usePathname();
+  const active = isActive(href, activePath, path);
   return (
     <Link
       className={clsx(
         "underline decoration-2 hover:decoration-primary-500",
         {
-          "font-semibold": path === href,
-          "decoration-transparent": path !== href,
+          "font-semibold": active,
+          "decoration-transparent": !active,
         },
         className
       )}

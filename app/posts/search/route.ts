@@ -1,4 +1,4 @@
-import searchIndex from ".scripts/Post/search-index.json";
+import searchIndex from ".generated/Post/search-index.json";
 import searchOptions from "lib/search";
 import MiniSearch from "minisearch";
 import { NextResponse } from "next/server";
@@ -17,6 +17,11 @@ export async function GET(request: Request) {
     });
   }
 
-  const result = miniSearch.search(query);
+  const result = miniSearch.search(query, {
+    prefix: true,
+  });
+
+  result.splice(5);
+
   return NextResponse.json(result);
 }

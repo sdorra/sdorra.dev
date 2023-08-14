@@ -2,6 +2,7 @@ import "@code-hike/mdx/dist/index.css";
 import clsx from "clsx";
 import Analytics from "components/Analytics";
 import DarkModeToggle from "components/DarkModeToggle";
+import Search from "components/Search";
 import { FeedLink, GitHubLink, TwitterLink } from "components/ExternalLinks";
 import Navigation from "components/Navigation";
 import { baseUrl } from "lib/config";
@@ -46,6 +47,7 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => (
           <GitHubLink />
           <TwitterLink />
           <FeedLink />
+          <Search />
           <DarkModeToggle />
         </div>
       </header>

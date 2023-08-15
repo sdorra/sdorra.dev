@@ -1,0 +1,39 @@
+{
+  "__typename": "Tweet",
+  "lang": "en",
+  "favorite_count": 275,
+  "created_at": "2022-12-09T22:53:33.000Z",
+  "display_text_range": [
+    0,
+    258
+  ],
+  "entities": {
+    "hashtags": [],
+    "urls": [],
+    "user_mentions": [],
+    "symbols": []
+  },
+  "id_str": "1601349358255214592",
+  "text": "With the latest Next.js canary the `app` directory no longer adds additional `&lt;div&gt;`s\n\nThese were used to scroll layouts into view when navigating, this behavior is preserved without needing the extra element.\n\nAvailable through npm install next@canary",
+  "user": {
+    "id_str": "1189966273",
+    "name": "Tim",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/1590767370515222547/0IvrAKEJ_normal.jpg",
+    "screen_name": "timneutkens",
+    "verified": false,
+    "is_blue_verified": false,
+    "profile_image_shape": "Circle"
+  },
+  "edit_control": {
+    "edit_tweet_ids": [
+      "1601349358255214592"
+    ],
+    "editable_until_msecs": "1670628213000",
+    "is_edit_eligible": true,
+    "edits_remaining": "5"
+  },
+  "conversation_count": 5,
+  "news_action_type": "conversation",
+  "isEdited": false,
+  "isStaleEdit": false
+}

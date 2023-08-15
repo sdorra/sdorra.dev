@@ -71,6 +71,14 @@ export const metadata = {
       "application/rss+xml": "/rss.xml",
     },
   },
+  openGraph: {
+    locale: "en-US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: "@ssdorra",
+    creatorId: "777421783",
+  }
 };
 
 export default RootLayout;

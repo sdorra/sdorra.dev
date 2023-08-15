@@ -4,25 +4,21 @@ import allPosts from ".generated/Post/withoutbody.json";
 import { ImageResponse } from "@vercel/og";
 import clsx from "clsx";
 import { createImageUrl } from "lib/images";
-import { NextRequest } from "next/server";
+
+type Params = {
+  slug: string;
+};
+
+type Props = {
+  params: Params;
+};
 
 export const runtime = "edge";
 
-const ralewayBold = fetch(new URL("content/fonts/Raleway-Bold.ttf", import.meta.url)).then((res) => res.arrayBuffer());
+export const size = { width: 1200, height: 630 };
+export const contentType = "image/png";
 
-const cabinSemiBold = fetch(new URL("content/fonts/Cabin-SemiBold.ttf", import.meta.url)).then((res) =>
-  res.arrayBuffer()
-);
-
-const cabinMedium = fetch(new URL("content/fonts/Cabin-Medium.ttf", import.meta.url)).then((res) => res.arrayBuffer());
-
-type Context = {
-  params: {
-    slug: string;
-  };
-};
-
-export const GET = async (request: NextRequest, { params }: Context) => {
+export default async function Image({ params }: Props) {
   const slug = params.slug;
   const post = allPosts.find((p) => slug === p._raw.flattenedPath);
   if (!post) {
@@ -35,6 +31,18 @@ export const GET = async (request: NextRequest, { params }: Context) => {
       }
     );
   }
+
+  const ralewayBold = fetch(new URL("content/fonts/Raleway-Bold.ttf", import.meta.url)).then((res) =>
+    res.arrayBuffer()
+  );
+
+  const cabinSemiBold = fetch(new URL("content/fonts/Cabin-SemiBold.ttf", import.meta.url)).then((res) =>
+    res.arrayBuffer()
+  );
+
+  const cabinMedium = fetch(new URL("content/fonts/Cabin-Medium.ttf", import.meta.url)).then((res) =>
+    res.arrayBuffer()
+  );
 
   return new ImageResponse(
     (
@@ -101,8 +109,7 @@ export const GET = async (request: NextRequest, { params }: Context) => {
       </div>
     ),
     {
-      width: 1200,
-      height: 630,
+      ...size,
       debug: false,
       fonts: [
         {
@@ -126,4 +133,4 @@ export const GET = async (request: NextRequest, { params }: Context) => {
       ],
     }
   );
-};
+}

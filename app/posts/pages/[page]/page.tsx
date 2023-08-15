@@ -1,6 +1,5 @@
 import PostCard from "components/PostCard";
 import PostsPager from "components/PostsPager";
-import createMetadata from "lib/metadata";
 import { pages } from "lib/posts";
 import { notFound } from "next/navigation";
 
@@ -36,14 +35,10 @@ export const generateStaticParams = async () => {
   return pages.map((_, page) => ({ page: String(page + 1) }));
 };
 
-export const generateMetadata = ({ params }: Props) => {
-  return createMetadata({
-    title: `Posts - Page ${params.page}`,
-    description: `Posts - Page ${params.page} of ${pages.length}`,
-    image: `/api/og/home`,
-    url: `/posts/pages/${params.page}`,
-  });
-};
+export const generateMetadata = ({ params }: Props) => ({
+  title: `Posts - Page ${params.page}`,
+  description: `Posts - Page ${params.page} of ${pages.length}`,
+});
 
 export const dynamicParams = false;
 

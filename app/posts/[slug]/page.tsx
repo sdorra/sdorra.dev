@@ -1,6 +1,5 @@
 import Post from "components/Post";
 import { allPosts } from "contentlayer/generated";
-import createMetadata from "lib/metadata";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -30,13 +29,10 @@ export const generateMetadata = ({ params }: Props) => {
     return;
   }
 
-  return createMetadata({
+  return {
     title: post.title,
     description: post.summary,
-    url: post.url,
-    image: `/api/og/posts/${post._raw.flattenedPath}`,
-    type: "article",
-  });
+  }
 };
 
 export const dynamicParams = false;

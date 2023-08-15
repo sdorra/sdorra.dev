@@ -4,15 +4,19 @@ import { ImageResponse } from "@vercel/og";
 
 export const runtime = "edge";
 
-const ralewayBold = fetch(new URL("content/fonts/Raleway-Bold.ttf", import.meta.url)).then((res) => res.arrayBuffer());
+export const size = { width: 1200, height: 630 };
+export const contentType = "image/png";
 
-const cabinSemiBold = fetch(new URL("content/fonts/Cabin-SemiBold.ttf", import.meta.url)).then((res) =>
-  res.arrayBuffer()
-);
-
-const cabinMedium = fetch(new URL("content/fonts/Cabin-Medium.ttf", import.meta.url)).then((res) => res.arrayBuffer());
-
-export const GET = async () => {
+export default async function Image() {
+  const ralewayBold = fetch(new URL("content/fonts/Raleway-Bold.ttf", import.meta.url)).then((res) =>
+    res.arrayBuffer()
+  );
+  const cabinSemiBold = fetch(new URL("content/fonts/Cabin-SemiBold.ttf", import.meta.url)).then((res) =>
+    res.arrayBuffer()
+  );
+  const cabinMedium = fetch(new URL("content/fonts/Cabin-Medium.ttf", import.meta.url)).then((res) =>
+    res.arrayBuffer()
+  );
   return new ImageResponse(
     (
       <div
@@ -47,8 +51,7 @@ export const GET = async () => {
       </div>
     ),
     {
-      width: 1200,
-      height: 630,
+      ...size,
       debug: false,
       fonts: [
         {
@@ -72,4 +75,4 @@ export const GET = async () => {
       ],
     }
   );
-};
+}

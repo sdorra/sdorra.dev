@@ -23,6 +23,10 @@
   ::selection {
     @apply bg-cyan-500 text-base-50;
   }
+
+  *:focus-visible {
+    @apply rounded-md outline-none ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-base-800;
+  }
 }
 
 .ch-code-wrapper,

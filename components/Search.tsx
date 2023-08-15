@@ -41,7 +41,7 @@ const SearchModal = ({ isOpen, close }: SearchModalProps) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-base-700">
+              <Dialog.Panel className="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-base-800">
                 <Dialog.Title as="h3" className="text-xl font-bold text-base-900 dark:text-base-50">
                   Search Post
                 </Dialog.Title>
@@ -54,7 +54,7 @@ const SearchModal = ({ isOpen, close }: SearchModalProps) => {
                     value={query}
                     onChange={(e) => search(e.target.value)}
                   />
-                  <span className="pointer-events-none absolute -top-0.5 right-1.5 text-base-400">
+                  <span className="pointer-events-none absolute -top-0.5 right-3 text-base-400">
                     {isLoading ? <Loader2 className="animate-spin" /> : <SearchCode />}
                   </span>
                 </label>

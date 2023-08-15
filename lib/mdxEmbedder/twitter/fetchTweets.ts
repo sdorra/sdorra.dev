@@ -35,9 +35,11 @@ interface Edit_control {
   edits_remaining: string;
 }
 
+// https://github.com/vercel/react-tweet/pull/128/files
+const getToken = (id: string) => ((Number(id) / 1e15) * Math.PI).toString(6 ** 2).replace(/(0+|\.)/g, "");
 
 const fetchTweet = async (id: string) => {
-  const response = await fetch(`https://cdn.syndication.twimg.com/tweet-result?id=${id}`);
+  const response = await fetch(`https://cdn.syndication.twimg.com/tweet-result?id=${id}&token=${getToken(id)}`);
   if (!response.ok) {
     throw new Error("Twitter response is not ok");
   }

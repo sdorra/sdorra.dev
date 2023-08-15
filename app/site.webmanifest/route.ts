@@ -7,12 +7,12 @@ export const GET = async () => {
     short_name: "sdorra.dev",
     icons: [
       {
-        src: "/android-chrome-192x192.png",
+        src: "/icon2.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "/android-chrome-512x512.png",
+        src: "/icon3.png",
         sizes: "512x512",
         type: "image/png",
       },

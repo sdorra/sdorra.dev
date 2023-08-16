@@ -2,9 +2,9 @@ import "@code-hike/mdx/dist/index.css";
 import clsx from "clsx";
 import Analytics from "components/Analytics";
 import DarkModeToggle from "components/DarkModeToggle";
-import Search from "components/Search";
 import { FeedLink, GitHubLink, TwitterLink } from "components/ExternalLinks";
 import Navigation from "components/Navigation";
+import Search from "components/Search";
 import { baseUrl } from "lib/config";
 import { Cabin, Raleway } from "next/font/google";
 import { FC, PropsWithChildren } from "react";
@@ -78,7 +78,7 @@ export const metadata = {
     card: "summary_large_image",
     creator: "@ssdorra",
     creatorId: "777421783",
-  }
+  },
 };
 
 export default RootLayout;

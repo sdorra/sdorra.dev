@@ -43,8 +43,8 @@ dependencies:
     specifier: ^3.5.0
     version: 3.5.0
   lucide-react:
-    specifier: ^0.263.0
-    version: 0.263.0(react@18.2.0)
+    specifier: ^0.268.0
+    version: 0.268.0(react@18.2.0)
   minisearch:
     specifier: ^6.1.0
     version: 6.1.0
@@ -3992,8 +3992,8 @@ packages:
     dependencies:
       yallist: 4.0.0
 
-  /lucide-react@0.263.0(react@18.2.0):
-    resolution: {integrity: sha512-F+rHswbbI1xuDZ/OzofiJZJVlBPOIYVVST705cPdRLImJ5aOJNXYaFBPNo3qdUV0iEG/4nZeiUtLSHO2qU2ISw==}
+  /lucide-react@0.268.0(react@18.2.0):
+    resolution: {integrity: sha512-XP/xY3ASJAViqNqVnDRcEfdxfRB7uNST8sqTLwZhL983ikmHMQ7qQak7ZxrnXOVhB3QDBawdr3ANq0P+iWHP/g==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:

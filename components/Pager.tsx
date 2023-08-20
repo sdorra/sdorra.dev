@@ -16,11 +16,18 @@ const Item = ({ page, active, hrefFactory }: ItemProps) => {
   });
 
   if (active) {
-    return <span className={baseClass}>{page + 1}</span>;
+    return (
+      <span aria-current className={baseClass}>
+        {page + 1}
+      </span>
+    );
   }
 
   return (
-    <Link className={clsx(baseClass, "hover:border-primary-500 dark:hover:border-primary-500 hover:font-bold")} href={hrefFactory(page + 1)}>
+    <Link
+      className={clsx(baseClass, "hover:border-primary-500 hover:font-bold dark:hover:border-primary-500")}
+      href={hrefFactory(page + 1)}
+    >
       {page + 1}
     </Link>
   );

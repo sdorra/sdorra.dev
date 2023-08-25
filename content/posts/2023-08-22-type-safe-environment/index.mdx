@@ -1,0 +1,143 @@
+---
+title: Type-safe environment with TypeScript and Zod
+summary: Let's build a type-safe version of process.env with TypeScript and Zod
+date: 2023-08-22
+image: https://images.unsplash.com/photo-1582489853490-cd3a53eb4530
+tags:
+  - typescript
+  - zod
+  - environment
+---
+
+In Node.js applications, we often use environment variables for configuration. We can access them via `process.env`, but we have to be careful. We don't know if the variable we are looking for is actually there, and `process.env` always returns a string. Therefore, we often need to convert the value to the type we need.
+
+If something is wrong with the environment (e.g., a variable is missing or has the wrong type), we often don't notice it until we use the variable at runtime, and the error message is often not very helpful.
+
+In this post, we will try to solve this problem using [TypeScript](https://www.typescriptlang.org/) and [Zod](https://zod.dev/).
+
+## Sample application
+
+Let's say we have a simple application that loads its environment using the [dotenv](https://www.npmjs.com/package/dotenv) package. The application requires the following environment variables:
+
+| Variable | Type   | Default value |
+| -------- | ------ | ------------- |
+| HOST     | string | localhost     |
+| PORT     | number | 3000          |
+| EMAIL    | string | -             |
+| URL      | string | -             |
+| NODE_ENV | enum   | development   |
+
+To specify the environment variables, we create an `.env` file in the root directory of our project.
+
+```env .env
+PORT=5000
+EMAIL="info@sdorra.dev"
+URL="https://sdorra.dev"
+```
+
+Now, we can load the environment variables using dotenv.
+
+```ts app.ts
+import dotenv from "dotenv";
+
+dotenv.config();
+```
+
+After loading the environment variables, we can access them through `process.env`.
+
+```ts app.ts
+console.log(process.env.PORT);
+```
+
+But here, our problems begin. We are unsure if the variable exists, and we receive it as a string. Therefore, the following code will not successfully pass the [TypeScript](https://www.typescriptlang.org/) compiler.
+
+```ts app.ts
+const port: number = process.env.PORT;
+```
+
+<Notification type="error">Type 'string | undefined' is not assignable to type 'number'.</Notification>
+
+To fix this, we need to verify the existence of the variable and convert it into a number.
+
+```ts app.ts
+if (!process.env.PORT) {
+  throw new Error("❌ PORT environment variable is not defined.");
+}
+
+const port: number = parseInt(process.env.PORT);
+```
+
+We have to do this for every variable we need.
+This is not only annoying, but also error-prone.
+If we forget to check a variable, we will only notice it when we run the application.
+
+## Type-safe environment
+
+To solve this problem, we will create a type-safe version of `process.env`.
+
+First, we create a new file called `env.ts`, which loads, validates and converts our environment variables.
+
+```ts env.ts
+import dotenv from "dotenv";
+import { z } from "zod";
+
+dotenv.config();
+
+const schema = z.object({
+  // explained later
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error("❌ Invalid environment variables:", JSON.stringify(parsed.error.format(), null, 4));
+  process.exit(1);
+}
+
+export default parsed.data;
+```
+
+The code above loads the environment, as we have seen before. After that, it creates a schema with [Zod](https://zod.dev/). The schema defines the structure of our environment variables. We will look at the schema in a moment, but for now, we define it as an empty object. Once the schema is defined, we parse the environment variables using the schema. If the parsing fails, we log an error and exit the process. Finally, we export the parsed environment variables.
+
+The beauty of this approach is that we only have to do this once, and we can import it from wherever we want. The best part is that it is completely type-safe.
+
+We can access the environment variables as follows:
+
+```ts app.ts
+import env from "./env";
+
+const port: number = env.PORT;
+```
+
+We no longer need to check if the variable exists or convert it. [Zod](https://zod.dev/) handles it for us, and [TypeScript](https://www.typescriptlang.org/) no longer yells at us.
+
+If an environment variable is missing or has the wrong format, we will encounter an error upon application startup.
+Now let's take a look at the schema.
+
+<CH.Section>
+
+```ts env.ts
+const schema = z.object({
+  HOST: z.string().nonempty().default("localhost"),
+  PORT: z.coerce.number().int().positive().default(3000),
+  EMAIL: z.string().nonempty().email(),
+  URL: z.string().nonempty().url(),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+});
+```
+
+- **HOST:** The host is a [string](focus://2[10:18]) and [cannot be empty](focus://2[19:29]). [If the variable is missing, we use the default value `localhost`.](focus://2[30:50])
+- **PORT:** [The port must be converted to a number. We use the `coerce` method for this.](focus://3[9:25]) The port must be an [integer](focus://3[26:31]) and [positive](focus://3[32:42]). [If the variable is missing, we use the default value `3000`.](focus://3[43:56])
+- **EMAIL:** The email is a [string](focus://4[11:19]) and [cannot be empty](focus://4[20:30]). [It must be a valid email address](focus://4[31:38]).
+- **URL:** The URL is a [string](focus://5[9:17]) and [cannot be empty](focus://5[18:28]). [It must be a valid URL](focus://5[29:34]).
+- **NODE_ENV:** The node environment is an [enum](focus://6[14:19]) and must be one of the following values: [`development`](focus://6[21:33]), [`production`](focus://6[35:47]) or [`test`](focus://6[49:55]). [If the variable is missing, we use the default value `development`](focus://6[58:80]).
+
+</CH.Section>
+
+As we can see, [Zod](https://zod.dev/) makes it really simple to define a complex schema for our environment variables, and this is just the tip of the iceberg for what can be done with [Zod](https://zod.dev/). If you want to learn more about [Zod](https://zod.dev/), check out the [documentation](https://zod.dev/) or the wonderful course by [Matt Pocock](https://www.totaltypescript.com/tutorials/zod).
+
+## Conclusion
+
+In this post, we have seen how to create a type-safe version of `process.env` with [TypeScript](https://www.typescriptlang.org/) and [Zod](https://zod.dev/). This approach is not only type-safe but also makes working with environment variables easier.
+
+The approach we have used in this article works fine for most applications, but there are edge cases where it does not work as well, especially in frameworks where the environment is used on both the server and the client. In these cases, it is better to use a library designed specifically for this purpose, such as [T3 Env](https://env.t3.gg).

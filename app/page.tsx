@@ -1,3 +1,4 @@
+import { BlogSchema } from "components/jsonLd";
 import PostCard from "components/PostCard";
 import PostsPager from "components/PostsPager";
 import SiteHeading from "components/SiteHeading";
@@ -13,6 +14,7 @@ const Home = () => (
       ))}
     </section>
     <PostsPager page={0} />
+    <BlogSchema />
   </>
 );
 

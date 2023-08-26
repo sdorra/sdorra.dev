@@ -16,7 +16,7 @@ const createContent = (post: Post, url: string) => `
 const me = {
   name: "Sebastian Sdorra",
   email: "s.sdorra@gmail.com",
-  link: "https://sdorra.dev",
+  link: baseUrl,
 };
 
 const createFeed = () => {

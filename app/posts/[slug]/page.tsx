@@ -1,3 +1,4 @@
+import { BlogPostingSchema } from "components/jsonLd";
 import Post from "components/Post";
 import { allPosts } from "contentlayer/generated";
 import { notFound } from "next/navigation";
@@ -14,7 +15,12 @@ const PostPage = ({ params }: Props) => {
     notFound();
   }
 
-  return <Post post={post} />;
+  return (
+    <>
+      <Post post={post} />
+      <BlogPostingSchema post={post} />
+    </>
+  );
 };
 
 export const generateStaticParams = async () => {
@@ -32,7 +38,7 @@ export const generateMetadata = ({ params }: Props) => {
   return {
     title: post.title,
     description: post.summary,
-  }
+  };
 };
 
 export const dynamicParams = false;

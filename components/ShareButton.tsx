@@ -2,6 +2,7 @@
 
 import { Dialog, Transition } from "@headlessui/react";
 import clsx from "clsx";
+import { baseUrl } from "lib/config";
 import { Check, Copy, Facebook, Linkedin, Mail, Pocket, Share2, Twitter, XCircle } from "lucide-react";
 import { Fragment, ReactNode, useEffect, useState } from "react";
 import { IconButton, IconExternalLink } from "./icons";
@@ -32,8 +33,6 @@ const ShareIcon = ({ title, url, children }: ShareIconProps) => (
   </li>
 );
 
-const fqdn = process.env.NEXT_PUBLIC_FQDN ? process.env.NEXT_PUBLIC_FQDN : "sdorra.dev";
-
 const CopyButton = ({ url }: { url: string }) => {
   const [copied, setCopied] = useState(false);
 
@@ -61,7 +60,7 @@ const CopyButton = ({ url }: { url: string }) => {
 const ShareButton = ({ title, text, url, className }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const completeUrl = `https://${fqdn}${url}?utm_campaign=social-sharing&utm_source=btn&utm_medium=`;
+  const completeUrl = `${baseUrl}${url}?utm_campaign=social-sharing&utm_source=btn&utm_medium=`;
 
   const onClick = async () => {
     const data: ShareData = {

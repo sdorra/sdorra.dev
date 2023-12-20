@@ -33,7 +33,7 @@
     "schema-dts": "^1.1.2"
   },
   "devDependencies": {
-    "@ladle/react": "^2.16.1",
+    "@ladle/react": "^4.0.2",
     "@next/bundle-analyzer": "14.0.4",
     "@playwright/test": "^1.37.1",
     "@tailwindcss/forms": "^0.5.7",
@@ -54,7 +54,7 @@
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.9",
     "prop-types": "^15.8.1",
-    "sharp": "^0.32.4",
+    "sharp": "^0.33.1",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.3.0",
     "unified": "^10.1.2",
@@ -75,7 +75,8 @@
     },
     "peerDependencyRules": {
       "allowedVersions": {
-        "next": "14"
+        "next-contentlayer>next": "^14.0.4",
+        "msw>typescript": "^5.3.0"
       }
     }
   }

@@ -72,6 +72,11 @@
       "@opentelemetry/sdk-trace-base": "1.13.0",
       "@opentelemetry/sdk-trace-node": "1.13.0",
       "@opentelemetry/semantic-conventions": "1.13.0"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "next": "14"
+      }
     }
   }
 }

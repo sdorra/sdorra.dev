@@ -12,10 +12,16 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ["images.unsplash.com", "pbs.twimg.com", "avatars.githubusercontent.com"],
-  },
-  experimental: {
-    appDir: true,
+    remotePatterns: [{
+      protocol: "https",
+      hostname: "images.unsplash.com",
+    }, {
+      protocol: "https",
+      hostname: "pbs.twimg.com",
+    }, {
+      protocol: "https",
+      hostname: "avatars.githubusercontent.com",
+    }]
   },
 };
 

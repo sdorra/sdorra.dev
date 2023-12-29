@@ -16,7 +16,7 @@ const isActive = (href: string, activePath: string | undefined, path: string) =>
     return path.startsWith(activePath);
   }
   return path === href;
-}
+};
 
 const NavigationLink: FC<Props> = ({ href, activePath, className, children }) => {
   const path = usePathname();
@@ -24,12 +24,12 @@ const NavigationLink: FC<Props> = ({ href, activePath, className, children }) =>
   return (
     <Link
       className={clsx(
-        "underline decoration-2 hover:decoration-primary-500",
+        "underline decoration-2 underline-offset-2 hover:decoration-primary-500",
         {
           "font-semibold": active,
           "decoration-transparent": !active,
         },
-        className
+        className,
       )}
       href={href}
     >

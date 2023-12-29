@@ -1,0 +1,118 @@
+---
+title: Simple loading spinners with Tailwind
+summary: Creating nice loading spinner without using external libraries and even without JavaScript.
+date: 2023-12-29
+image: https://images.unsplash.com/photo-1571291341382-f5493569cf73
+tags:
+  - tailwind
+  - spinner
+  - loading
+---
+
+import { SimpleDivSpinner, SimpleSvgSpinner } from "@components/TailwindCircleSpinners";
+
+We can create nice loading spinners without using external libraries and even without JavaScript. Here are two simple examples of how to create loading spinners with Tailwind CSS.
+
+## Simple div spinner
+
+We can create a simple loading spinner with just a `<div>` and some Tailwind CSS classes.
+
+<SimpleDivSpinner />
+
+Looks pretty good, right? Let's take a look at the code.
+
+```html
+<div class="h-6 w-6 animate-spin rounded-full border-b-2 border-current" />
+```
+
+The classes explained:
+
+* `h-6` and `w-6` set the height and width of the div.
+* `border-b-2` creates a 2px border at the bottom of the div.
+* `border-current` sets the border color to the current text color.
+* `rounded-full` turns the bottom border into a half circle.
+* `animate-spin` animates the spinner.
+
+## Simple SVG spinner
+
+Now, let's create a more complex spinner with SVG.
+
+<SimpleSvgSpinner />
+
+We will start with the SVG element.
+
+```html
+<svg class="h-6 w-6 animate-spin" viewBox="0 0 100 100"></svg>
+```
+
+The SVG element has a viewBox of 100x100.
+This means that the SVG element will be 100x100 pixels.
+We will also use `h-6` and `w-6` classes to set the height and width of the SVG element, and the `animate-spin` class to animate the spinner.
+
+Now, we will add a circle to the SVG element.
+
+```html
+<circle
+  fill="none"
+  stroke-width="10"
+  class="stroke-current opacity-40"
+  cx="50"
+  cy="50"
+  r="40"
+/>
+```
+
+Let's take a closer look at the used attributes:
+
+* `fill="none"` removes the fill color of the circle.
+* `stroke-width="10"` sets the width of the circle's stroke to 10px.
+* `class="stroke-current opacity-40"` sets the stroke color to the current text color and the opacity to 40%.
+* `cx="50" cy="50" r="40"` sets the center of the circle to 50x50 and the radius to 40px.
+
+Now, we will add a second circle to the SVG element.
+
+```html
+<circle
+  fill="none"
+  stroke-width="10"
+  class="stroke-current"
+  stroke-dasharray="250"
+  stroke-dashoffset="210"
+  cx="50"
+  cy="50"
+  r="40"
+/>
+```
+
+The second circle is almost the same as the first one, but it has two additional attributes:
+
+* `stroke-dasharray="250"` sets the length of the stroke to 250px.
+* `stroke-dashoffset="210"` sets the offset of the stroke to 210px.
+
+This means that we will only see a part of the second circle.
+ If you want to know more about the `stroke-dasharray` and `stroke-dashoffset` attributes, have a look at [this article](https://css-tricks.com/svg-line-animation-works/).
+
+Here is the combined code:
+
+```html
+<svg class="h-6 w-6 animate-spin" viewBox="0 0 100 100">
+  <circle
+    fill="none"
+    stroke-width="10"
+    class="stroke-current opacity-40"
+    cx="50"
+    cy="50"
+    r="40"
+  />
+  <circle
+    fill="none"
+    stroke-width="10"
+    class="stroke-current"
+    stroke-dasharray="250"
+    stroke-dashoffset="210"
+    cx="50"
+    cy="50"
+    r="40"
+  />
+</svg>
+```

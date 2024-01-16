@@ -1,0 +1,293 @@
+---
+title: Content Collections
+summary: An alternative to contentlayer
+date: 2024-01-15
+image: https://github.com/sdorra/content-collections/blob/main/website/assets/logo.png?raw=true
+tags:
+  - contentlayer
+  - markdown
+  - mdx
+  - typescript
+---
+
+## Contentlayer
+
+I am a big fan of [Contentlayer](https://contentlayer.dev/).
+I have used it for numerous projects and I absolutely love it, especially the developer experience (DX).
+The ability to define a schema for content and obtain a typed API with a simple import is truly amazing.
+However, there are a few aspects of [Contentlayer](https://contentlayer.dev/) that I do not like as much.
+
+### The schema
+
+The schema definition lacks flexibility.
+I want the ability to replace a property, such as defining a URL within the frontmatter and having the build process fetch content from that URL to replace the property in the schema.
+Additionally, I would like to remove default properties (Please refer to [Contentlayer, MDX and the Vercel Edge Function Size Limit](/posts/2022-11-24-contentlayer-mdx-edge) for more information).
+There is also no option to transform the final schema.
+The schema validation is not as powerful as I would like it to be.
+I want to be able to define not only a string, but also an email or a URL.
+
+### The orientation of the project
+
+The project has started implementing sources for various external systems such as [Notion](https://notion.so), [Contentful](https://www.contentful.com/), or [Sanity](https://www.sanity.io/).
+However, I am only interested in local files and there is so much more we could do before we start to implement sources for external systems.
+
+### Current state of development
+
+As of writing this post, the last [release](https://github.com/contentlayerdev/contentlayer/releases/tag/v0.3.4) was made on 2023-06-29, and the last [commit](https://github.com/contentlayerdev/contentlayer/commit/2f491c540e1d3667577f57fa368b150bff427aaf) was made on 2023-09-23.
+The maintainer of the project, [schickling](https://github.com/schickling), was sponsored by [Stackbit](https://www.stackbit.com/) for his work on [Contentlayer](https://contentlayer.dev/).
+However, [Stackbit was recently acquired by Netlify](https://www.netlify.com/blog/netlify-acquires-stackbit-to-bring-no-code-creation-to-its-platform/), and it is unclear if [Netlify](https://www.netlify.com) will continue to sponsor [Contentlayer](https://contentlayer.dev/).
+
+For more information, please refer to the following issue:
+
+https://github.com/contentlayerdev/contentlayer/issues/429
+
+## Content Collections
+
+So with that in mind, I decided to start an alternative [Content Collections](https://content-collections.dev).
+The project is heavily inspired by [Contentlayer](https://contentlayer.dev/), but I've tried to address the issues I have with it.
+The project is still in an early stage of development, but I am quite happy with the things I have implemented so far.
+Lets have a look at the configuration.
+
+### Configuration
+
+[Content Collections](https://content-collections.dev) uses a TypeScript file for its configuration.
+The configuration is done in a file called `content-collections.ts`, which should be placed in the root of your project.
+
+```ts
+import { defineCollection, defineConfig } from "@content-collections/core";
+
+const posts = defineCollection({
+  name: "posts",
+  directory: "src/posts",
+  include: "**/*.md",
+  schema: (z) => ({
+    title: z.string(),
+    summary: z.string(),
+  }),
+});
+
+export default defineConfig({
+  collections: [posts],
+});
+```
+
+The configuration consists of two parts.
+The first part is the definition of collections, which can be done with the `defineCollection` function.
+The second part is the definition of the configuration itself, which can be done with the `defineConfig` function.
+
+Lets have a closer look at the collection definition.
+We have a name, a directory and a include pattern.
+I think those properties are self explanatory.
+At the moment, [Content Collections](https://content-collections.dev) only supports files with a frontmatter section and string content (such as markdown or mdx files),
+but I plan to add support for other formats in the future.
+
+More interesting is the schema definition.
+
+### Schema
+
+The schema definition is powered by [zod](https://zod.dev) and it can be used to do some pretty cool things.
+E.g.: we can do complex validations:
+
+```ts
+schema: (z) => ({
+  title: z.string().min(1).max(160),
+  author: z.object({
+    name: z.string().min(1),
+    mail: z.string().email().optional(),
+  }),
+  tags: z.array(z.string().min(1).max(20)),
+}),
+```
+
+And the really cool thing is that [Content Collections](https://content-collections.dev) will generate TypeScript types for the collection, which infers its shape from the schema definition.
+
+But I took it further with the `transform` function.
+
+### Transformation
+
+The `transform` function can be used not only to transform the final schema, but also to add data from other sources.
+Let's have a look at some examples.
+
+Let's say we want to generate a slug to our posts.
+
+```ts
+schema: (z) => ({
+  title: z.string().min(1).max(160),
+}),
+transform: (context, data) => {
+  const slug = data.title.toLowerCase().replace(/\s/g, "-");
+  return { ...data, slug };
+},
+```
+
+Or, we have a summarization API and we want to add a summary to our posts.
+
+```ts
+schema: (z) => ({
+  title: z.string().min(1).max(160),
+}),
+transform: async (context, data) => {
+  const { title, content } = data;
+  const summary = await fetch(
+    `https://api.summarization.com/summarize?title=${title}&content=${content}`
+  ).then((res) => res.text());
+  return { ...data, summary };
+},
+```
+
+The last example is a bit more complex.
+Let's say we have a collection of authors and we want to add the authors to our posts.
+Each post has an `author` property which contains the name of the author.
+We can use the `transform` function to replace the name with the actual author object.
+
+```ts
+import { defineCollection, defineConfig } from "@content-collections/core";
+
+const authors = defineCollection({
+  name: "authors",
+  schema: (z) => ({
+    name: z.string(),
+    displayName: z.string(),
+    email: z.string().email(),
+  }),
+  directory: "authors",
+  include: "*.md",
+});
+
+const posts = defineCollection({
+  name: "posts",
+  typeName: "Post",
+  schema: (z) => ({
+    title: z.string().min(5),
+    author: z.string(),
+  }),
+  directory: "posts",
+  include: "**/*.md(x)?",
+  transform: async (context, post) => {
+    const author = context
+      .documents(authors)
+      .find((author) => author.name === post.author);
+
+    if (!author) {
+      throw new Error(`Author not found: ${post.author}`);
+    }
+
+    return {
+      ...post,
+      author
+    };
+  },
+});
+
+export default defineConfig({
+  collections: [authors, posts],
+});
+```
+
+Even for complex transformations, [Content Collections](https://content-collections.dev) will infer the correct type for the collection.
+
+
+### Content
+
+The main difference to [Contentlayer](https://contentlayer.dev/) is that [Content Collections](https://content-collections.dev) does not compile or parse the content.
+The content is just a string.
+It can be validated by adding a `content` property to the schema.
+But if we want to parse or compile it, we have to use the `transform` function.
+Here is an example with [MDX](https://mdxjs.com/):
+
+```ts
+import { defineCollection, defineConfig } from "@content-collections/core";
+import { compile } from "@mdx-js/mdx";
+
+const docs = defineCollection({
+  name: "docs",
+  directory: "docs",
+  include: "**/*.mdx",
+  schema: (z) => ({
+    title: z.string(),
+  }),
+  transform: async (context, { content, ...data }) => {
+    const body = String(
+      await compile(content, {
+        outputFormat: "function-body",
+      })
+    );
+    return {
+      ...data,
+      body,
+    };
+  },
+});
+
+export default defineConfig({
+  collections: [docs],
+});
+```
+
+Why does [Content Collections](https://content-collections.dev) not parse or compile the content?
+Because there are so many different formats and libraries out there and I don't want to limit the user to a specific format or library.
+
+### The CLI
+
+Add the moment, there is only a CLI to work with [Content Collections](https://content-collections.dev).
+In the future, I plan to add support for major frontend frameworks, such as [Next.js](https://nextjs.org/), [Remix](https://remix.run/), or [SvelteKit](https://kit.svelte.dev/).
+The CLI has only two commands, `build` and `watch`.
+I think they are pretty self-explanatory.
+
+```bash
+# build the collections
+content-collections build
+# watch files for changes
+content-collections watch
+```
+
+### Usage
+
+The usage of [Content Collections](https://content-collections.dev) is very similar to [Contentlayer](https://contentlayer.dev/).
+Just import the collection and use it.
+
+```tsx
+import { allPosts } from "content-collections";
+import Markdown from 'react-markdown'
+
+export function Posts() {
+  return (
+    <ul>
+      {allPosts.map((post) => (
+        <li key={post._meta.path}>
+          <a href={`/posts/${post._meta.path}`}>
+            <h3>{post.title}</h3>
+            <p>{post.summary}</p>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export function Post({slug}: {slug: string}) {
+  const post = allPosts.find((post) => post._meta.path === slug);
+  if (!post) {
+    return <div>Post not found</div>;
+  }
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <Markdown>{post.content}</Markdown>
+    </article>
+  );
+}
+```
+
+[Content Collections](https://content-collections.dev) will generate a `_meta` property for each document, which contains the path to the document and the collection it belongs to.
+
+With the `_meta` property, we can easily create links to the document and we can also use it to filter the documents.
+
+## Conclusion
+
+I am quite happy with the current state of [Content Collections](https://content-collections.dev).
+I think it is a good alternative to [Contentlayer](https://contentlayer.dev/).
+However, it is still in an early stage of development and there are still a lot of things to do.
+If you are interested in the project, please have a look at the [website](https://content-collections.dev) or the [GitHub repository](https://github.com/sdorra/content-collections) and let me know what you think.
+
+If you wan't try it out, please have a look at the [Getting Started](https://content-collections.dev/docs/guides/getting-started) section of the documentation.

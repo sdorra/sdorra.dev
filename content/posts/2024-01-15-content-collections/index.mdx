@@ -10,6 +10,12 @@ tags:
   - typescript
 ---
 
+<Notification type="info" title="tl;dr">
+  If you don't want to read the whole post and just want to try it out, please have a look at the{" "}
+  <a href="https://content-collections.dev/docs/guides/getting-started">Getting Started</a> section of the
+  documentation.
+</Notification>
+
 ## Contentlayer
 
 I am a big fan of [Contentlayer](https://contentlayer.dev/).
@@ -164,9 +170,7 @@ const posts = defineCollection({
   directory: "posts",
   include: "**/*.md(x)?",
   transform: async (context, post) => {
-    const author = context
-      .documents(authors)
-      .find((author) => author.name === post.author);
+    const author = context.documents(authors).find((author) => author.name === post.author);
 
     if (!author) {
       throw new Error(`Author not found: ${post.author}`);
@@ -174,7 +178,7 @@ const posts = defineCollection({
 
     return {
       ...post,
-      author
+      author,
     };
   },
 });
@@ -185,7 +189,6 @@ export default defineConfig({
 ```
 
 Even for complex transformations, [Content Collections](https://content-collections.dev) will infer the correct type for the collection.
-
 
 ### Content
 
@@ -210,7 +213,7 @@ const docs = defineCollection({
     const body = String(
       await compile(content, {
         outputFormat: "function-body",
-      })
+      }),
     );
     return {
       ...data,
@@ -248,7 +251,7 @@ Just import the collection and use it.
 
 ```tsx
 import { allPosts } from "content-collections";
-import Markdown from 'react-markdown'
+import Markdown from "react-markdown";
 
 export function Posts() {
   return (
@@ -265,7 +268,7 @@ export function Posts() {
   );
 }
 
-export function Post({slug}: {slug: string}) {
+export function Post({ slug }: { slug: string }) {
   const post = allPosts.find((post) => post._meta.path === slug);
   if (!post) {
     return <div>Post not found</div>;

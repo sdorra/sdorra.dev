@@ -1,0 +1,114 @@
+---
+title: Using temporary files with vitest
+summary: Extend the vitest context with a temporary directory
+date: 2024-02-12
+image: https://images.unsplash.com/photo-1532187863486-abf9dbad1b69
+tags:
+  - vitest
+  - fs
+  - temp
+  - typescript
+---
+
+Sometimes, we need to test code that interacts with the file system.
+To avoid conflicts between tests, we should use a temporary directory for each test.
+We can use the following function to create the temporary directory.
+
+<CH.Section>
+
+```typescript
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+
+async function createTempDir() {
+  const ostmpdir = os.tmpdir();
+  const tmpdir = path.join(ostmpdir, "unit-test-");
+  return await fs.mkdtemp(tmpdir);
+}
+```
+
+- [`os.tmpdir()`](focus://6) returns the system's temporary directory.
+- [`path.join()`](focus://7) joins the temporary directory with a prefix.
+- [`fs.mkdtemp()`](focus://8) adds a unique suffix to the path and creates the directory.
+
+</CH.Section>
+
+Now, we could use this function in our tests, for example, with the `beforeEach` hook.
+
+```typescript
+let tmpdir: string = "";
+
+beforeEach(async () => {
+  tmpdir = await createTempDir();
+});
+```
+
+But if we do not want to fill up the disk with temporary directories,
+we should remove the directory after the test.
+We can use the `afterEach` hook for this.
+
+```typescript
+afterEach(async () => {
+  await fs.rm(tmpdir, { recursive: true });
+});
+```
+
+Now, we can use the `tmpdir` in our tests to create files and directories.
+However, if we have many tests, we need to repeat the `beforeEach` and `afterEach` hooks in each test file.
+We can improve this by extending the test context with the temporary directory.
+
+## Vitest context
+
+We can extend the `vitest` context by passing an object to the `test.extend` function.
+The object contains a function for each property we want to add to the context.
+In our case, we want to add a `tmpdir` property to the context.
+The code looks like this:
+
+```typescript tmpdir.ts
+import { test } from "vitest";
+import os from "node:os";
+import fs from "node:fs/promises";
+import path from "node:path";
+
+interface TmpDirFixture {
+  tmpdir: string;
+}
+
+async function createTempDir() {
+  const ostmpdir = os.tmpdir();
+  const tmpdir = path.join(ostmpdir, "unit-test-");
+  return await fs.mkdtemp(tmpdir);
+}
+
+export const tmpdirTest = test.extend<TmpDirFixture>({
+  tmpdir: async ({}, use) => {
+    const directory = await createTempDir();
+
+    await use(directory);
+
+    await fs.rm(directory, { recursive: true });
+  },
+});
+```
+
+The `tmpdir` function receives the current context and a `use` function.
+The `use` function is utilized to provide the temporary directory to the test.
+The `tmpdir` function generates the temporary directory, passes it to the test, and deletes it after the test.
+
+Now we can employ the `tmpdir` in our tests as follows:
+
+```typescript
+import { tmpdirTest } from "./tmpdir";
+
+tmpdirTest("create file", async ({ tmpdir }) => {
+  const file = path.join(tmpdir, "file.txt");
+  await fs.writeFile(file, "Hello, World!");
+  const content = await fs.readFile(file, "utf-8");
+  expect(content).toBe("Hello, World!");
+});
+```
+
+That's it!
+Now we have a temporary directory for each test,
+and we do not have to repeat the `beforeEach` and `afterEach` hooks in each test file.

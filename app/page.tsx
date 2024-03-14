@@ -10,7 +10,7 @@ const Home = () => (
     <h2 className="mb-4 mt-10 text-4xl font-semibold">Latest Posts</h2>
     <section className="space-y-4">
       {pages[0].map((post) => (
-        <PostCard key={post._id} post={post} />
+        <PostCard key={post._meta.filePath} post={post} />
       ))}
     </section>
     <PostsPager page={0} />

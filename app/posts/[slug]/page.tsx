@@ -1,6 +1,6 @@
 import { BlogPostingSchema } from "components/jsonLd";
 import Post from "components/Post";
-import { allPosts } from "contentlayer/generated";
+import { allPosts } from "content-collections";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
 };
 
 const PostPage = ({ params }: Props) => {
-  const post = allPosts.find((p) => p._raw.flattenedPath === params.slug);
+  const post = allPosts.find((p) => p._meta.path === params.slug);
   if (!post) {
     notFound();
   }
@@ -25,12 +25,12 @@ const PostPage = ({ params }: Props) => {
 
 export const generateStaticParams = async () => {
   return allPosts.map((post) => ({
-    slug: post._raw.flattenedPath,
+    slug: post._meta.path
   }));
 };
 
 export const generateMetadata = ({ params }: Props) => {
-  const post = allPosts.find((p) => p._raw.flattenedPath === params.slug);
+  const post = allPosts.find((p) => p._meta.path === params.slug);
   if (!post) {
     return;
   }

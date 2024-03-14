@@ -4,6 +4,7 @@ import allPosts from ".generated/Post/withoutbody.json";
 import { ImageResponse } from "@vercel/og";
 import clsx from "clsx";
 import { createImageUrl } from "lib/images";
+import {type Post} from "content-collections";
 
 type Params = {
   slug: string;
@@ -20,7 +21,8 @@ export const contentType = "image/png";
 
 export default async function Image({ params }: Props) {
   const slug = params.slug;
-  const post = allPosts.find((p) => slug === p._raw.flattenedPath);
+  // @ts-ignore i don't know how to fix typing here
+  const post: Post = allPosts.find((p) => slug === p._meta.path);
   if (!post) {
     return new Response(
       JSON.stringify({
@@ -57,7 +59,7 @@ export default async function Image({ params }: Props) {
           <img
             width="375"
             height="562"
-            src={createImageUrl(post.imageURL, 375, 562)}
+            src={createImageUrl(post.image.url, 375, 562)}
             tw="rounded-xl border-2 border-stone-700"
             style={{ objectFit: "cover" }}
           />

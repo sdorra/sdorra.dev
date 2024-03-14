@@ -1,6 +1,6 @@
-import { type Post } from "contentlayer/generated";
+import { type Post } from "content-collections";
 
 export type PostOverview = Pick<
   Post,
-  "url" | "title" | "summary" | "date" | "readingTime" | "imageURL" | "imageBlurDataURL"
+  "url" | "title" | "summary" | "date" | "readingTime" | "image"
 >;

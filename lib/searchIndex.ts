@@ -1,24 +1,18 @@
-import { Document } from "contentlayer/core";
-import { Post } from "contentlayer/generated";
 import { mkdir, writeFile } from "fs/promises";
 import MiniSearch from "minisearch";
 import { join } from "path";
 import searchOptions from "./search";
+import { Post } from "content-collections";
 
-function isPost(doc: Document): doc is Post {
-  return doc.type === "Post";
-}
 
-export default async function searchIndex(documents: Document[], outputPath: string) {
-  const posts = documents.filter(isPost);
-
+export default async function searchIndex(posts: Post[], outputPath: string) {
   if (posts.length === 0) {
     return;
   }
 
   const miniSearch = new MiniSearch(searchOptions);
   // Index all documents
-  miniSearch.addAll(posts.map((post) => ({ ...post, id: post._id, body: post.body.raw })));
+  miniSearch.addAll(posts.map((post) => ({ ...post, content: post.content.raw })));
 
   const data = miniSearch.toJSON();
 

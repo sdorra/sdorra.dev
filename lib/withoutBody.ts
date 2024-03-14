@@ -1,11 +1,13 @@
-import { Document } from "contentlayer/core";
+import { Post } from "content-collections";
 import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 
-export default async function withoutBody(documents: Document[], outputPath: string) {
-  const postsWithoutContent = documents.map((doc) => {
-    const { body, ...postWithoutContent } = doc;
-    return postWithoutContent;
+export default async function withoutBody(posts: Post[], outputPath: string) {
+  const postsWithoutContent = posts.map((post) => {
+    return {
+      ...post,
+      content: undefined,
+    };
   });
   const directory = join(outputPath, "Post");
   await mkdir(directory, { recursive: true });

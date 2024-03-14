@@ -1,4 +1,4 @@
-import { allPosts } from "contentlayer/generated";
+import { allPosts } from "content-collections";
 import { compareDesc } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,14 +11,14 @@ const OgDebugPage = () => (
       {allPosts
         .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
         .map((post) => (
-          <li key={post._id}>
+          <li key={post.url}>
             <Link href={post.url} className="group">
               <Image
                 className="rounded-xl border-4 border-transparent group-hover:scale-105 transition-all group-hover:border-primary-400"
                 width={1200}
                 height={630}
                 alt={post.title}
-                src={`/api/og/posts/${post._raw.flattenedPath}`}
+                src={`/api/og/posts/${post._meta.path}`}
               />
             </Link>
           </li>

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { allPosts, Post, Post as PostType } from "contentlayer/generated";
+import { Post, allPosts } from "content-collections";
 import { compareDesc } from "date-fns";
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import ScrollToTop from "./ScrollToTop";
 import ShareButton from "./ShareButton";
 
 type Props = {
-  post: PostType;
+  post: Post;
 };
 
 const createPrevAndNext = (post: Post) => {
@@ -25,7 +25,7 @@ const createPrevAndNext = (post: Post) => {
 };
 
 type NavigationButtonProps = {
-  post: PostType | null;
+  post: Post | null;
   type: "prev" | "next";
 };
 
@@ -40,7 +40,7 @@ const NavigationButton = ({ post, type }: NavigationButtonProps) => {
         "text-left": type === "prev",
         "flex-row-reverse text-right": type === "next",
       })}
-      href={`/posts/${post._raw.flattenedPath}`}
+      href={post.url}
       title={`Navigate to post "${post.title}"`}
     >
       <Icon className="w-6 shrink-0 group-hover:stroke-[3]" />
@@ -57,9 +57,9 @@ const Post = ({ post }: Props) => {
     <>
       <figure className="relative flex items-center gap-4">
         <Image
-          src={post.imageURL}
-          blurDataURL={post.imageBlurDataURL}
-          placeholder={post.imageBlurDataURL ? "blur" : "empty"}
+          src={post.image.url}
+          blurDataURL={post.image.blurDataURL}
+          placeholder="blur"
           width={256}
           height={160}
           alt="Feature blog image"
@@ -73,7 +73,7 @@ const Post = ({ post }: Props) => {
         <p>{post.readingTime}</p>
         <DateTime title="Posted at" value={post.date} />
       </div>
-      <Markdown code={post.body.code} />
+      <Markdown code={post.content.mdx} />
       <div className="mt-4 flex justify-between text-sm text-base-500 dark:text-base-400">
         <p>Posted in: {post.tags.join(", ")}</p>
         <ShareButton title={post.title} text={post.summary} url={post.url} />

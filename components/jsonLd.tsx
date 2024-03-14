@@ -1,4 +1,4 @@
-import { Post } from "contentlayer/generated";
+import { Post } from "content-collections";
 import { baseUrl, createCompleteUrl } from "lib/config";
 import { Blog, BlogPosting, Person } from "schema-dts";
 

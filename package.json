@@ -17,22 +17,23 @@
     "@uidotdev/usehooks": "^2.4.1",
     "@vercel/og": "^0.5.20",
     "clsx": "^2.0.0",
-    "contentlayer": "^0.3.4",
     "date-fns": "^2.30.0",
-    "eslint-config-next": "^14.0.4",
+    "eslint-config-next": "14.1.0",
     "fathom-client": "^3.6.0",
     "lucide-react": "^0.268.0",
+    "mdx-bundler": "^10.0.1",
     "minisearch": "^6.3.0",
     "next": "14.1.0",
-    "next-contentlayer": "^0.3.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "reading-time": "^1.5.0",
-    "rehype-slug": "^5.1.0",
-    "remark-gfm": "^3.0.1",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.0",
     "schema-dts": "^1.1.2"
   },
   "devDependencies": {
+    "@content-collections/core": "^0.3.1",
+    "@content-collections/next": "^0.1.3",
     "@ladle/react": "^4.0.2",
     "@next/bundle-analyzer": "14.1.0",
     "@playwright/test": "^1.40.1",
@@ -57,27 +58,8 @@
     "sharp": "^0.33.1",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.3.3",
-    "unified": "^10.1.2",
+    "unified": "^11.0.4",
     "unist-util-visit": "4.1.1",
     "vite": "^4.5.1"
-  },
-  "pnpm": {
-    "//": "https://github.com/contentlayerdev/contentlayer/issues/506",
-    "overrides": {
-      "shiki": "^0.12.1",
-      "@opentelemetry/api": "1.4.1",
-      "@opentelemetry/core": "1.13.0",
-      "@opentelemetry/exporter-trace-otlp-grpc": "0.39.1",
-      "@opentelemetry/resources": "1.13.0",
-      "@opentelemetry/sdk-trace-base": "1.13.0",
-      "@opentelemetry/sdk-trace-node": "1.13.0",
-      "@opentelemetry/semantic-conventions": "1.13.0"
-    },
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "next-contentlayer>next": "^14.1.0",
-        "msw>typescript": "^5.3.0"
-      }
-    }
   }
 }

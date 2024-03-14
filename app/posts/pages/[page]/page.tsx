@@ -23,7 +23,7 @@ const PostsPage = ({ params }: Props) => {
       </p>
       <section className="space-y-4 pt-4">
         {page.map((post) => (
-          <PostCard key={post._id} post={post} />
+          <PostCard key={post.url} post={post} />
         ))}
       </section>
       <PostsPager page={pageNumber} />

@@ -1,4 +1,4 @@
-import { type Post } from "contentlayer/generated";
+import { type Post } from "content-collections";
 import { Options } from "minisearch";
 import { PostOverview } from "./types";
 
@@ -17,13 +17,13 @@ const createSearchOptions = <T extends Array<keyof Post>>(
 });
 
 const searchOptions = createSearchOptions(
-  "_id",
-  ["title", "summary", "body", "tags"],
-  ["url", "title", "summary", "date", "readingTime", "imageURL", "imageBlurDataURL"],
+  "url",
+  ["title", "summary", "content", "tags"],
+  ["url", "title", "summary", "date", "readingTime", "image"],
   {
     title: 1.6,
     summary: 1.2,
-    body: 1,
+    content: 1,
     tags: 1.8,
   }
 );

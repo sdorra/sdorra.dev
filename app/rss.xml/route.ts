@@ -1,4 +1,4 @@
-import { allPosts, Post } from "contentlayer/generated";
+import { allPosts, Post } from "content-collections";
 import { compareDesc, parseISO, setHours } from "date-fns";
 import { Feed } from "feed";
 import { baseUrl } from "lib/config";
@@ -9,7 +9,7 @@ const createPostUrl = (url: string) => {
 };
 
 const createContent = (post: Post, url: string) => `
-<img src="${createImageUrl(post.imageURL, 1000, 420)}" width="1000" height="420" vspace="3" hspace="8" align="center">
+<img src="${createImageUrl(post.image.url, 1000, 420)}" width="1000" height="420" vspace="3" hspace="8" align="center">
 <p>${post.summary}</p>
 <p>Read the full article on <a href="${url}">sdorra.dev</a></p>`;
 
@@ -45,7 +45,7 @@ const createFeed = () => {
         author: [me],
         date: setHours(parseISO(post.date), 13),
         category: post.tags.map((name) => ({ name })),
-        image: createImageUrl(post.imageURL, 256, 256, true),
+        image: createImageUrl(post.image.url, 256, 256, true),
       });
     });
 

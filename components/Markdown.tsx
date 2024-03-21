@@ -1,5 +1,6 @@
 "use client";
 
+import { MDXContent } from "@content-collections/mdx/react";
 import Notification from "components/Notification";
 import { Hash } from "lucide-react";
 import { ReactNode } from "react";
@@ -8,8 +9,6 @@ import FileTree from "./FileTree";
 import { GitHubIssue, GitHubPullRequest } from "./GitHub";
 import MarkdownImage from "./MarkdownImage";
 import StaticTweet from "./StaticTweet";
-import { useMDXComponent } from "../lib/useMDXComponent";
-
 
 type Props = {
   code: string;
@@ -40,28 +39,25 @@ const heading = (As: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => {
 };
 
 const Markdown = ({ code }: Props) => {
-  const Content = useMDXComponent(code);
-
   return (
     <ContentSection>
-      {Content ? (
-        <Content
-          components={{
-            Notification,
-            FileTree,
-            StaticTweet,
-            GitHubPullRequest,
-            GitHubIssue,
-            img: MarkdownImage,
-            h1: heading("h1"),
-            h2: heading("h2"),
-            h3: heading("h3"),
-            h4: heading("h4"),
-            h5: heading("h5"),
-            h6: heading("h6"),
-          }}
-        />
-      ) : null}
+      <MDXContent
+        code={code}
+        components={{
+          Notification,
+          FileTree,
+          StaticTweet,
+          GitHubPullRequest,
+          GitHubIssue,
+          img: MarkdownImage,
+          h1: heading("h1"),
+          h2: heading("h2"),
+          h3: heading("h3"),
+          h4: heading("h4"),
+          h5: heading("h5"),
+          h6: heading("h6"),
+        }}
+      />
     </ContentSection>
   );
 };

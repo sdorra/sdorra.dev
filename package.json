@@ -33,8 +33,8 @@
   },
   "devDependencies": {
     "@content-collections/core": "^0.3.1",
-    "@content-collections/next": "^0.1.3",
     "@content-collections/mdx": "^0.1.1",
+    "@content-collections/next": "^0.1.3",
     "@ladle/react": "^4.0.2",
     "@next/bundle-analyzer": "14.1.3",
     "@playwright/test": "^1.40.1",
@@ -61,6 +61,7 @@
     "typescript": "^5.3.3",
     "unified": "^11.0.4",
     "unist-util-visit": "4.1.1",
+    "vfile": "^6.0.1",
     "vite": "^4.5.1"
   },
   "pnpm": {

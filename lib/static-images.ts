@@ -5,8 +5,8 @@ import crypto from "node:crypto";
 import path from "node:path";
 import sharp from "sharp";
 import { Plugin } from "unified";
-import { VFileWithOutput } from "unified/lib";
 import { visit } from "unist-util-visit";
+import { VFile } from "vfile";
 import createPlaceholder from "./placeholder";
 
 type FileData = {
@@ -28,7 +28,7 @@ const checksum = (content: Buffer) => {
   return crypto.createHash("sha256").update(content).digest("hex");
 };
 
-const findPath = (file: VFileWithOutput<undefined>, image: Element) => {
+const findPath = (file: VFile, image: Element) => {
   const data = file.data as FileData;
 
   const directory = data._meta.directory;
@@ -74,7 +74,7 @@ const metadata = async (resourcePath: string, source: string, pathname: string) 
   };
 };
 
-const processImage = async (options: Options, file: VFileWithOutput<undefined>, node: Element): Promise<void> => {
+const processImage = async (options: Options, file: VFile, node: Element): Promise<void> => {
   const root = options.sourceRoot;
 
   const pathname = findPath(file, node);

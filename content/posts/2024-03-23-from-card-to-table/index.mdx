@@ -1,0 +1,184 @@
+---
+title: From card layout to table layout
+summary: From a mobile card layout to a table layout on larger devices
+date: 2024-03-23
+image: assets/cover.webp
+tags:
+  - css
+  - tailwind
+  - grid
+  - subgrid
+---
+
+Recently at work, a designer showed me a design for a new service we are building.
+The design consisted of a card layout on mobile devices and a table layout on larger devices.
+I immediately thought that the implementation would be tricky because the structures of both layouts are quite different.
+If they are too different, they can't be implemented within the same component, and we have to use two separate components.
+I dislike doing this because it often results in a poor user experience.
+If we ship two separate components, we have to hide one of them, and I see only two ways of doing this:
+
+1. We ship the code for both to the client and hide one of them with CSS.
+   The user should not see a layout shift, but we potentially ship a lot of unseen code to the client.
+2. We use JavaScript on the frontend to determine the screen size and render the correct layout.
+   However, this can result in a layout shift because the user sees the card layout first, and if the device is larger, the layout changes to the table layout.
+
+I wanted to avoid both of these solutions and thought about a way to implement both layouts within the same component.
+I came up with a solution that uses CSS Grid and CSS Subgrid.
+Let me show you how I did it.
+
+## The card layout
+
+We start with the card layout.
+I always like to start with the markup only.
+This way, I can focus on clean and semantic HTML.
+The card layout could be as follows:
+
+```html
+<div>
+
+  <article>
+    <h2>Type-safe environment with TypeScript and Zod</h2>
+    <div>Sebastian Sdorra</div>
+    <time>2023-08-22</time>
+  </article>
+
+  <article>
+    <h2>Speeding up a serverless function</h2>
+    <div>Sebastian Sdorra</div>
+    <time>2023-08-13</time>
+  </article>
+
+</div>
+```
+
+If we create a React component for this layout, it could look like this:
+
+```tsx
+function Post({ title, author, date }: Props) {
+  return (
+    <article>
+      <h2>{title}</h2>
+      <div>{author}</div>
+      <time>{date}</time>
+    </article>
+  );
+}
+
+function Posts({ posts }: Props) {
+  return (
+    <div>
+      {posts.map((post) => (
+        <Post key={post.id} {...post} />
+      ))}
+    </div>
+  );
+}
+```
+
+Now we can use Tailwind to apply some styles to the layout.
+
+```tsx
+function Post({ title, author, date }: Props) {
+  return (
+    <article className="border rounded-xl shadow-md p-4 max-w-lg">
+      <h2 className="text-xl font-semibold mb-2">{title}</h2>
+      <div>{author}</div>
+      <time>{date}</time>
+    </article>
+  );
+}
+
+function Posts({ posts }: Props) {
+  return (
+    <div className="space-y-4">
+      {posts.map((post) => (
+        <Post key={post.id} {...post} />
+      ))}
+    </div>
+  );
+}
+```
+
+You can imagine that this is a simplified version, and the real implementation is much more complex, but you get the idea.
+We used the mobile-first approach here and implemented the card layout for mobile devices.
+Now we want to implement the table layout for larger devices.
+
+## The table layout
+
+For the upgrade to the table, we use a technique called [Subgrid](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Subgrid).
+First, we make the parent element a grid container with three columns.
+
+```tsx
+function Posts({ posts }: Props) {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {posts.map((post) => (
+        <Post key={post.id} {...post} />
+      ))}
+    </div>
+  );
+}
+```
+
+Now we should see three cards in a row.
+But this is not what we want; we want a table layout.
+To achieve this, we have to span the `article` element over all three columns with `col-span-3`.
+Now we are back to the layout we had before, one card per row.
+But if we add `grid grid grid-cols-subgrid` to the article element, we can get an idea of how to implement the table layout.
+We had to prefix our classes for the table layout with `md:`, so that they only apply to larger devices.
+We also had to hide shadow and border for the card layout on the larger devices.
+
+```tsx
+function Post({ title, author, date }: Props) {
+  return (
+    <article className="col-span-3 max-w-lg rounded-xl border p-4 shadow-md md:grid md:grid-cols-subgrid md:rounded-none md:border-0 md:shadow-none">
+      <h2 className="text-xl font-semibold mb-2">{title}</h2>
+      <div>{author}</div>
+      <time>{date}</time>
+    </article>
+  );
+}
+
+function Posts({ posts }: Props) {
+  return (
+    <div className="grid grid-cols-3 gap-4 divide-y rounded-lg md:border md:shadow-md md:gap-y-0">
+      {posts.map((post) => (
+        <Post key={post.id} {...post} />
+      ))}
+    </div>
+  );
+}
+```
+
+That is looking good, but a table layout should have a header row.
+
+```tsx
+function Posts({ posts }: Props) {
+  return (
+    <div className="grid grid-cols-3 gap-4 divide-y rounded-lg md:border md:shadow-md md:gap-y-0">
+
+      <header className="hidden col-span-3 p-4 md:grid md:grid-cols-subgrid font-semibold text-gray-500">
+        <div>Title</div>
+        <div>Author</div>
+        <div>Date</div>
+      </header>
+
+      {posts.map((post) => (
+        <Post key={post.id} {...post} />
+      ))}
+    </div>
+  );
+}
+```
+
+The header row is hidden on mobile devices and only visible on larger devices.
+We also added some styles to the header row to make it look like a table header.
+
+A sample implementation (HTML + Tailwind only) can be found [here](https://play.tailwindcss.com/nK7kwSFOjO).
+
+## Conclusion
+
+We started with a card layout for mobile devices and upgraded it to a table layout for larger devices.
+We used CSS Grid and CSS Subgrid to implement both layouts within the same component.
+This way, we avoided shipping two separate components to the client and avoided layout shifts.
+I hope this technique helps you implement similar designs in the future.

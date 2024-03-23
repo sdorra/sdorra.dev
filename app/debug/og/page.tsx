@@ -18,7 +18,7 @@ const OgDebugPage = () => (
                 width={1200}
                 height={630}
                 alt={post.title}
-                src={`/api/og/posts/${post._meta.path}`}
+                src={`/posts/${post._meta.path}/opengraph-image`}
               />
             </Link>
           </li>

@@ -25,8 +25,10 @@ function calculateReadingTime(content: string) {
 
 async function lastModificationDate(filePath: string) {
   const { stdout } = await exec(`git log -1 --format=%ai -- ${path.join(postDirectory, filePath)}`);
-  const date = new Date(stdout.trim()).toISOString();
-  return date;
+  if (stdout) {
+    return new Date(stdout.trim()).toISOString();
+  }
+  return new Date().toISOString();
 }
 
 type ImageParams = { image: string; directory: string };

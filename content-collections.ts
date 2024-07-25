@@ -1,9 +1,9 @@
 import { remarkCodeHike } from "@code-hike/mdx";
 import { defineCollection, defineConfig } from "@content-collections/core";
 import { compileMDX } from "@content-collections/mdx";
-import resolveImageBlurDataURL from "lib/imageBlurDataURL";
-import searchIndex from "lib/searchIndex";
-import withoutBody from "lib/withoutBody";
+import resolveImageBlurDataURL from "./lib/imageBlurDataURL";
+import searchIndex from "./lib/searchIndex";
+import withoutBody from "./lib/withoutBody";
 import { exec as syncExec } from "node:child_process";
 import path from "node:path";
 import { promisify } from "node:util";

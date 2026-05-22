@@ -1,6 +1,5 @@
 import { Issue, PullRequest, Repository } from "lib/mdxEmbedder/github";
-import { Github } from "lucide-react";
-import Avatar from "./Avatar";
+import { GitHubIcon } from "./icons";
 import DateTime from "./DateTime";
 import EmbeddedCard from "./EmbeddedCard";
 
@@ -18,7 +17,7 @@ type Props =
 
 const EmbeddedEntity = ({ repository, entity, type }: Props) => (
   <EmbeddedCard href={entity.url}>
-    <EmbeddedCard.Title icon={Github}>
+    <EmbeddedCard.Title icon={GitHubIcon}>
       <p className="text-lg font-bold">
         <span className="text-base-500 dark:text-base-400">
           {repository.owner}/{repository.name}

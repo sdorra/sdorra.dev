@@ -1,9 +1,13 @@
 "use client";
 
-import { MDXContent } from "@content-collections/mdx/react";
+/* eslint-disable react-hooks/static-components */
+
+import { getMDXComponent } from "mdx-bundler/client";
 import Notification from "components/Notification";
 import { Hash } from "lucide-react";
-import { ReactNode } from "react";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { ReactNode, useMemo } from "react";
 import ContentSection from "./ContentSection";
 import FileTree from "./FileTree";
 import { GitHubIssue, GitHubPullRequest } from "./GitHub";
@@ -18,6 +22,13 @@ type HeadingProps = {
   id?: string;
   children?: ReactNode;
 };
+
+const mdxGlobals = {
+  React: { ...React, default: React },
+  ReactDOM: { ...ReactDOM, default: ReactDOM },
+};
+
+const createMDXComponent = (code: string) => getMDXComponent(code, mdxGlobals);
 
 const heading = (As: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => {
   const Heading = ({ id, children }: HeadingProps) => (
@@ -39,10 +50,11 @@ const heading = (As: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => {
 };
 
 const Markdown = ({ code }: Props) => {
+  const Component = useMemo(() => createMDXComponent(code), [code]);
+
   return (
     <ContentSection>
-      <MDXContent
-        code={code}
+      <Component
         components={{
           Notification,
           FileTree,

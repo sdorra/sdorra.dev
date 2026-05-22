@@ -4,13 +4,14 @@ import { allPosts } from "content-collections";
 import { notFound } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
-const PostPage = ({ params }: Props) => {
-  const post = allPosts.find((p) => p._meta.path === params.slug);
+const PostPage = async ({ params }: Props) => {
+  const { slug } = await params;
+  const post = allPosts.find((p) => p._meta.path === slug);
   if (!post) {
     notFound();
   }
@@ -29,8 +30,9 @@ export const generateStaticParams = async () => {
   }));
 };
 
-export const generateMetadata = ({ params }: Props) => {
-  const post = allPosts.find((p) => p._meta.path === params.slug);
+export const generateMetadata = async ({ params }: Props) => {
+  const { slug } = await params;
+  const post = allPosts.find((p) => p._meta.path === slug);
   if (!post) {
     return;
   }

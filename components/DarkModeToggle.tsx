@@ -2,24 +2,30 @@
 
 import clsx from "clsx";
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { IconButton } from "./icons";
 
+const subscribe = (onStoreChange: () => void) => {
+  const observer = new MutationObserver(() => onStoreChange());
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+
+  return () => {
+    observer.disconnect();
+  };
+};
+
+const getSnapshot = () => (document.documentElement.classList.contains("dark") ? "dark" : "light");
+
 const DarkModeToggle = () => {
-  const [mode, setMode] = useState("");
-  useEffect(() => {
-    if (document.documentElement.classList.contains("dark")) {
-      setMode("dark");
-    } else {
-      setMode("light");
-    }
-  }, []);
+  const mode = useSyncExternalStore(subscribe, getSnapshot, () => "");
 
   const onClick = () => {
     const toggle = document.documentElement.classList.toggle("dark");
     const theme = toggle ? "dark" : "light";
     window.localStorage.setItem("theme", theme);
-    setMode(theme);
   };
 
   return (

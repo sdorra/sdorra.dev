@@ -25,7 +25,7 @@ const fileChecksum = async (file: string) => {
 };
 
 const checksum = (content: Buffer) => {
-  return crypto.createHash("sha256").update(content).digest("hex");
+  return crypto.createHash("sha256").update(Uint8Array.from(content)).digest("hex");
 };
 
 const findPath = (file: VFile, image: Element) => {
@@ -103,7 +103,7 @@ type Options = {
   resourcePath: string;
 };
 
-const staticImages: Plugin<[Options], Root> = (options) => (tree, file, done) => {
+const staticImages: Plugin<[Options], Root, any> = (options) => (tree, file, done) => {
   const tasks: Promise<void>[] = [];
 
   visit(tree, "element", (node) => {

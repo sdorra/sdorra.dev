@@ -31,7 +31,7 @@ type Result = {
   data: {
     repository: {
       issue: Issue;
-    };
+    } | null;
   };
 };
 
@@ -42,12 +42,16 @@ const fetchIssue = async (owner: string, repo: string, id: string) => {
     id: Number(id),
   };
 
-  const result = await queryGitHub<Result>(query, variables)
-  return result.data.repository.issue;
+  const result = await queryGitHub<Result>(query, variables);
+  return result?.data.repository?.issue ?? null;
 };
 
 const fetchAndTransformIssue = async (node: Paragraph, owner: string, repo: string, id: string) => {
-  const pullRequest = await fetchIssue(owner, repo, id);
+  const issue = await fetchIssue(owner, repo, id);
+  if (!issue) {
+    return;
+  }
+
   const repository: Repository = {
     owner,
     name: repo,
@@ -63,7 +67,7 @@ const fetchAndTransformIssue = async (node: Paragraph, owner: string, repo: stri
         value: {
           type: "mdxJsxAttributeValueExpression",
           data: {
-            estree: createJSONParseAST(JSON.stringify(pullRequest)),
+            estree: createJSONParseAST(JSON.stringify(issue)),
           },
         },
       },

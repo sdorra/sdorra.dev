@@ -30,7 +30,7 @@ type Result = {
   data: {
     repository: {
       pullRequest: PullRequest;
-    };
+    } | null;
   };
 };
 
@@ -41,12 +41,16 @@ const fetchPullRequest = async (owner: string, repo: string, id: string) => {
     id: Number(id),
   };
 
-  const result = await queryGitHub<Result>(query, variables)
-  return result.data.repository.pullRequest;
+  const result = await queryGitHub<Result>(query, variables);
+  return result?.data.repository?.pullRequest ?? null;
 };
 
 const fetchAndTransformPullRequest = async (node: Paragraph, owner: string, repo: string, id: string) => {
   const pullRequest = await fetchPullRequest(owner, repo, id);
+  if (!pullRequest) {
+    return;
+  }
+
   const repository: Repository = {
     owner,
     name: repo,

@@ -20,7 +20,7 @@ const cabin = Cabin({
 });
 
 const RootLayout: FC<PropsWithChildren> = ({ children }) => (
-  <html lang="en" className="h-full" suppressHydrationWarning={true}>
+  <html lang="en" className="h-full" data-scroll-behavior="smooth" suppressHydrationWarning={true}>
     <head>
       <script
         dangerouslySetInnerHTML={{

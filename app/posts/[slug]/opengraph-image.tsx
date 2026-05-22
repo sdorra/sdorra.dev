@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/alt-text */
-/* eslint-disable @next/next/no-img-element */
 import allPosts from ".generated/Post/withoutbody.json";
 import { ImageResponse } from "@vercel/og";
 import clsx from "clsx";
@@ -11,7 +10,7 @@ type Params = {
 };
 
 type Props = {
-  params: Params;
+  params: Promise<Params>;
 };
 
 export const runtime = "edge";
@@ -20,7 +19,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function Image({ params }: Props) {
-  const slug = params.slug;
+  const { slug } = await params;
   // @ts-ignore i don't know how to fix typing here
   const post: Post = allPosts.find((p) => slug === p._meta.path);
   if (!post) {
@@ -57,8 +56,8 @@ export default async function Image({ params }: Props) {
       >
         <div tw="rounded-xl border-2 border-stone-700 w-full h-full p-4 flex bg-stone-800 shadow-lg">
           <img
-            width="375"
-            height="562"
+            width={375}
+            height={562}
             src={createImageUrl(post.image.url, 375, 562)}
             tw="rounded-xl border-2 border-stone-700"
             style={{ objectFit: "cover" }}
@@ -101,8 +100,8 @@ export default async function Image({ params }: Props) {
           <div tw="absolute left-[338px] bottom-[68px] flex items-center">
             <img
               tw="rounded-full border-2 border-stone-700"
-              width="110"
-              height="110"
+              width={110}
+              height={110}
               src="https://avatars.githubusercontent.com/u/493333"
             />
             <p tw="ml-6 text-4xl font-semibold text-stone-400">Sebastian Sdorra</p>

@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/alt-text */
-/* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "@vercel/og";
 
 export const runtime = "edge";
@@ -41,8 +40,8 @@ export default async function Image() {
           <div tw="flex items-center justify-center w-full">
             <img
               tw="rounded-full border-2 border-stone-700"
-              width="72"
-              height="72"
+              width={72}
+              height={72}
               src="https://avatars.githubusercontent.com/u/493333"
             />
             <p tw="ml-4 text-4xl font-semibold text-stone-200 text-center">Sebastian Sdorra</p>

@@ -3,9 +3,9 @@
 import { Dialog, Transition } from "@headlessui/react";
 import clsx from "clsx";
 import { baseUrl } from "lib/config";
-import { Check, Copy, Facebook, Linkedin, Mail, Pocket, Share2, Twitter, XCircle } from "lucide-react";
+import { Check, Copy, Mail, Share2, XCircle } from "lucide-react";
 import { Fragment, ReactNode, useEffect, useState } from "react";
-import { IconButton, IconExternalLink } from "./icons";
+import { FacebookIcon, IconButton, IconExternalLink, LinkedInIcon, PocketIcon, TwitterIcon } from "./icons";
 
 type Props = {
   title: string;
@@ -118,7 +118,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                       title="Add to Pocket"
                       url={`https://getpocket.com/save?url=${encodeURIComponent(completeUrl + "pocket")}`}
                     >
-                      <Pocket />
+                      <PocketIcon />
                     </ShareIcon>
                     <ShareIcon
                       title="Share on Twitter"
@@ -126,7 +126,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                         completeUrl + "twitter"
                       )}&text=${encodeURIComponent(title)}`}
                     >
-                      <Twitter />
+                      <TwitterIcon />
                     </ShareIcon>
                     <ShareIcon
                       title="Share on Facebook"
@@ -134,7 +134,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                         completeUrl + "facebook"
                       )}`}
                     >
-                      <Facebook />
+                      <FacebookIcon />
                     </ShareIcon>
                     <ShareIcon
                       title="Share on LinkedIn"
@@ -142,7 +142,7 @@ const ShareButton = ({ title, text, url, className }: Props) => {
                         completeUrl + "linkedin"
                       )}`}
                     >
-                      <Linkedin />
+                      <LinkedInIcon />
                     </ShareIcon>
                     <ShareIcon
                       title="Send by e-mail"

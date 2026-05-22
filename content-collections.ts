@@ -10,9 +10,10 @@ import { promisify } from "node:util";
 import readingTime from "reading-time";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
-import theme from "./lib/ch-theme.json" assert { type: "json" };
+import theme from "./lib/ch-theme.json" with { type: "json" };
 import mdxEmbedder from "./lib/mdxEmbedder";
 import staticImages, { staticCoverImage } from "./lib/static-images";
+import { z } from "zod";
 
 const exec = promisify(syncExec);
 
@@ -43,9 +44,10 @@ const posts = defineCollection({
   name: "posts",
   directory: postDirectory,
   include: "*/index.mdx",
-  schema: (z) => ({
+  schema: z.object({
     title: z.string(),
     summary: z.string(),
+    content: z.string(),
     date: z.string(),
     image: z.string(),
     tags: z.array(z.string()),
@@ -67,7 +69,11 @@ const posts = defineCollection({
           },
         ],
       ],
-      remarkPlugins: [remarkGfm, mdxEmbedder, [remarkCodeHike, { theme, showCopyButton: true, autoImport: true }]],
+      remarkPlugins: [
+        remarkGfm,
+        mdxEmbedder,
+        [remarkCodeHike, { theme, showCopyButton: true, autoImport: true }],
+      ],
     });
 
     const lastModification = await ctx.cache(post._meta.filePath, lastModificationDate);
@@ -91,5 +97,5 @@ const posts = defineCollection({
 });
 
 export default defineConfig({
-  collections: [posts],
+  content: [posts],
 });
